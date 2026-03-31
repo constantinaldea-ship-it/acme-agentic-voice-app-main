@@ -21,6 +21,8 @@ class DemoAccountApplicationIntegrationTest {
 
     private static final int WIREMOCK_PORT = 8089;
     private static final String BASE_URL = "http://localhost:" + WIREMOCK_PORT;
+    private static final String TOKEN_ENDPOINT = "/oauth/token";
+    private static final String AUTHZ_ENDPOINT = "/authz/authorize";
     private static final String PERSONAL_DATA_ENDPOINT = "/customers/{partnerId}/personal-data";
     private static final String PARTNER_ID = "1234567890";
     private static final String HEADER_DEUBA_CLIENT_ID = "deuba-client-id";
@@ -70,6 +72,57 @@ class DemoAccountApplicationIntegrationTest {
                 .body("_debug.captured_headers.x_agent_id", equalTo("customer_details_agent"))
                 .body("_debug.captured_headers.x_tool_id", equalTo("get_customer_details"))
                 .body("_debug.captured_headers.x_debug_echo_headers", equalTo("true"));
+    }
+
+    @Test
+    @DisplayName("Should complete the EIDP to AuthZ to personal-data flow used by CES")
+    void shouldCompleteCustomerDetailsTokenFlow() {
+        String accessToken = given()
+                .contentType("application/x-www-form-urlencoded")
+                .formParam("grant_type", "client_credentials")
+                .formParam("client_id", "ces-agent-service")
+                .formParam("client_secret", "mock-secret")
+        .when()
+                .post(TOKEN_ENDPOINT)
+        .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(blankOrNullString()))
+                .body("token_type", equalTo("Bearer"))
+                .extract()
+                .path("access_token");
+
+        String authorizationToken = given()
+                .contentType(ContentType.JSON)
+                .header(HEADER_AUTHORIZATION, "Bearer " + accessToken)
+                .body("""
+                        {
+                          "resource": "customers:personal-data",
+                          "action": "read"
+                        }
+                        """)
+        .when()
+                .post(AUTHZ_ENDPOINT)
+        .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("authorized", equalTo(true))
+                .body("authorization_token", not(blankOrNullString()))
+                .extract()
+                .path("authorization_token");
+
+        given()
+                .header(HEADER_DEUBA_CLIENT_ID, "pb-banking")
+                .header(HEADER_DB_ID, "acme-banking-db-01")
+                .header(HEADER_AUTHORIZATION, "Bearer " + authorizationToken)
+                .accept(ContentType.JSON)
+        .when()
+                .get(PERSONAL_DATA_ENDPOINT, PARTNER_ID)
+        .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("firstname", equalTo("Maria"))
+                .body("lastname", equalTo("Musterfrau"));
     }
 
     @Test

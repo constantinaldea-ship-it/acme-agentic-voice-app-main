@@ -19,7 +19,7 @@
     },
     "customer_details_openapi": {
       "openApiToolset": {
-        "url": "https://mock-server-6gxbppksrq-uc.a.run.app",
+        "url": "https://mock-server-athrdxthxq-ey.a.run.app",
         "requestContextHeaders": {
           "agentIdHeader": "X-Agent-Id",
           "toolIdHeader": "X-Tool-Id",
