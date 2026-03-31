@@ -40,7 +40,14 @@ for key, value in LOADED.items():
         continue
     globals()[key] = value
 
+# Extract SmokeError if available for clean reporting
+SmokeError = LOADED.get("SmokeError", type("SmokeError", (RuntimeError,), {}))
+
 
 if __name__ == "__main__":
     sys.argv = _rewrite_cli_args(sys.argv)
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except SmokeError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        sys.exit(1)

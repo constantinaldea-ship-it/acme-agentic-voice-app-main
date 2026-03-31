@@ -1,6 +1,6 @@
 # Deployment Integration Test Results
 
-**Service URL:** https://bfa-service-resource-6gxbppksrq-uc.a.run.app  
+**Service URL:** https://bfa-service-resource-504803821129.europe-west3.run.app  
 **Test Date:** 2026-02-07  
 **Environment:** Google Cloud Run (Production)
 

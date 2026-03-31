@@ -79,7 +79,7 @@ resolve_region() {
 }
 
 require_cloud_run_env() {
-  require_gcp_run_env || fail "Missing required GCP settings. Define GCP_PROJECT_ID and GCP_REGION in ${ROOT_ENV_FILE} or export them before running this script."
+  require_gcp_run_env || exit 1
 }
 
 append_env_var() {

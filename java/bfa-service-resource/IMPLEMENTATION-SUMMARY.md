@@ -39,7 +39,7 @@
 
 ### BFA Service
 
-**Current URL:** https://bfa-service-resource-1041912723804.us-central1.run.app
+**Current URL:** https://bfa-service-resource-504803821129.europe-west3.run.app
 
 **Status:** ⏳ **Ready to Deploy** (built but not deployed due to Cloud Build permissions)
 
@@ -90,7 +90,7 @@
 
 ```bash
 cd java/bfa-service-resource
-./test-agent-headers.sh https://bfa-service-resource-1041912723804.us-central1.run.app test
+./test-agent-headers.sh https://bfa-service-resource-504803821129.europe-west3.run.app test
 ```
 
 **Expected:** Both searches return results with matching correlation IDs in response metadata.

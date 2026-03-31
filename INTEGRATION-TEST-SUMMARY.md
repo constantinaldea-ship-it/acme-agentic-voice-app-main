@@ -1,7 +1,7 @@
 # BFA Service Integration Test Summary
 
 ## 🎯 Deployment URL
-**https://bfa-service-resource-6gxbppksrq-uc.a.run.app**
+**https://bfa-service-resource-504803821129.europe-west3.run.app**
 
 ## 📊 Test Results
 
@@ -90,20 +90,14 @@ All returning 500 Internal Server Error:
 - VIEW_PARTNER_OFFERS, VIEW_SERVICE_CONTACTS
 ```
 
-## 📝 Test Scripts Created
+## 📝 Test Script
 
-### 1. `test-deployed-service.sh`
-Basic integration test using hardcoded IDs.
-- **Result:** 11/32 tests passed
-- **Issue:** Wrong ID format (ACC001 vs ACC-001)
-
-### 2. `test-deployed-service-enhanced.sh`
-Improved version with dynamic ID extraction and full consents.
-- **Result:** 16/31 tests passed
-- **Features:**
-  - Dynamically extracts account/card IDs from list responses
-  - Includes all consent scopes in test token
-  - Better error reporting
+### `java/test-deployed-service.sh`
+Canonical deployed-service smoke test for `bfa-service-resource`.
+- Resolves the live Cloud Run URL dynamically
+- Supports private Cloud Run access via `X-Serverless-Authorization`
+- Validates the currently implemented location and advisory-appointment endpoints
+- Replaces the legacy duplicate `java/test-deployed-service-enhanced.sh`
 
 ## 🚀 Production Readiness Assessment
 
@@ -127,10 +121,9 @@ Improved version with dynamic ID extraction and full consents.
 
 ## 📂 Test Artifacts
 
-All test artifacts are in `/java/bfa-service-resource/`:
-- `test-deployed-service.sh` - Basic test script
-- `test-deployed-service-enhanced.sh` - Enhanced test script with dynamic IDs
-- `DEPLOYMENT-TEST-RESULTS.md` - Detailed test analysis
+Relevant test artifacts:
+- `java/test-deployed-service.sh` - Canonical deployed smoke test
+- `java/bfa-service-resource/DEPLOYMENT-TEST-RESULTS.md` - Historical detailed test analysis
 
 ## 🔄 Next Steps
 
@@ -141,7 +134,7 @@ All test artifacts are in `/java/bfa-service-resource/`:
 2. **Short-term**
    - Fix personal finance service initialization
    - Fix non-banking services initialization
-   - Re-run enhanced test script
+   - Re-run `java/test-deployed-service.sh`
    - Target: 100% test pass rate
 
 3. **Integration**
@@ -156,14 +149,14 @@ All test artifacts are in `/java/bfa-service-resource/`:
 gcloud run logs read bfa-service-resource --limit=100
 
 # Re-run tests
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/java/bfa-service-resource
-./test-deployed-service-enhanced.sh
+cd /Users/constantinaldea/IdeaProjects/ai-account-balance
+bash java/test-deployed-service.sh
 
 # Check service health
-curl https://bfa-service-resource-6gxbppksrq-uc.a.run.app/api/v1/health
+curl https://bfa-service-resource-504803821129.europe-west3.run.app/api/v1/health
 
 # View OpenAPI spec
-curl https://bfa-service-resource-6gxbppksrq-uc.a.run.app/api-docs/location-services
+curl https://bfa-service-resource-504803821129.europe-west3.run.app/api-docs/location-services
 ```
 
 ---

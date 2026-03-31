@@ -2,7 +2,7 @@
 
 # Integration Test Script for POC Event Store
 # Tests the H2-backed event persistence endpoints
-# Reuses patterns from java/test-deployed-service-enhanced.sh
+# Reuses patterns from java/test-deployed-service.sh
 # Created: 2026-03-10
 
 set -e
@@ -22,7 +22,7 @@ TESTS_PASSED=0
 TESTS_FAILED=0
 
 # --------------------------------------------------------
-# Helper functions (adapted from test-deployed-service-enhanced.sh)
+# Helper functions (adapted from test-deployed-service.sh)
 # --------------------------------------------------------
 
 print_section() {
