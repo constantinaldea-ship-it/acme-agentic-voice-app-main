@@ -1,0 +1,54 @@
+# Default ignored files
+/shelf/
+.idea/*
+# Ignored default folder with query files
+/queries/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# OS
+.DS_Store
+
+# Credentials and secrets
+credentials.json
+.env
+.env.local
+*.key
+*.pem
+
+# Node / package managers
+node_modules/
+.pnpm-store/
+
+# Build & test outputs
+dist/
+coverage/
+*.tsbuildinfo
+
+# Frontend tooling caches
+.parcel-cache/
+.vite/
+
+# Local scratch
+.tmp/
+**/target/
+# Documentation at repository root — served locally via Docsify, no longer tracked in git
+/docs/
+# Binary documents (may contain confidential content)
+*.pdf
+*.pptx
+*.docx
+*.xlsx
+
+# Archived TypeScript MVP docs (historical, may contain stale sensitive info)
+ai-account-balance-ts/docs/
+
+# Beads database (local state, may contain sensitive task info)
+.beads/
+
+# Data folder (contains branch harvest scripts and datasets)
+
+.vscode

@@ -1,0 +1,3 @@
+[submodule "ces-plugin"]
+	path = ces-plugin
+	url = git@github.com:rbrn/cx-agent-studio-vscode-plugin.git
