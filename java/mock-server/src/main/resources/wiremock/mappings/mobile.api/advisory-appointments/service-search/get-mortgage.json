@@ -1,0 +1,27 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/advisory-appointments/service-search",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      }
+    },
+    "queryParameters": {
+      "query": {
+        "contains": "mortgage"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/service-search/mortgage.json"
+  }
+}

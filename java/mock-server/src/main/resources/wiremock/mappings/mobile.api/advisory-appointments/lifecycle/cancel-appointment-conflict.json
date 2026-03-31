@@ -1,0 +1,24 @@
+{
+  "priority": 6,
+  "scenarioName": "branch-lifecycle",
+  "requiredScenarioState": "CANCELLED",
+  "request": {
+    "method": "POST",
+    "urlPath": "/advisory-appointments/lifecycle/APT-BRANCH-0001/cancel",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      }
+    }
+  },
+  "response": {
+    "status": 409,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/errors/cancel-window-closed.json"
+  }
+}

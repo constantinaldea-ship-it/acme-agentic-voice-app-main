@@ -1,0 +1,28 @@
+{
+  "priority": 6,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/customers/.+/personal-data",
+    "headers": {
+      "deuba-client-id": {
+        "matches": ".*-banking.*"
+      },
+      "DB-ID": {
+        "absent": true
+      },
+      "Authorization": {
+        "matches": "Bearer .+"
+      }
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "forbidden",
+      "error_description": "Missing DB-ID header. A non-empty DB-ID is required."
+    }
+  }
+}

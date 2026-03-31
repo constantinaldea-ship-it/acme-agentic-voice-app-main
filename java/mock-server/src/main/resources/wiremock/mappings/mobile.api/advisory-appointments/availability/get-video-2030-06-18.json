@@ -1,0 +1,33 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/advisory-appointments/availability",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      }
+    },
+    "queryParameters": {
+      "consultationChannel": {
+        "equalTo": "VIDEO"
+      },
+      "locationId": {
+        "equalTo": "REMOTE-VIDEO-DE"
+      },
+      "selectedDay": {
+        "equalTo": "2030-06-18"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/availability/video-2030-06-18.json"
+  }
+}

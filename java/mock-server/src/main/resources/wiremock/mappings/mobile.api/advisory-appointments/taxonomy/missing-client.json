@@ -1,0 +1,22 @@
+{
+  "priority": 2,
+  "request": {
+    "method": "GET",
+    "urlPath": "/advisory-appointments/taxonomy",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/errors/taxonomy-missing-client.json"
+  }
+}

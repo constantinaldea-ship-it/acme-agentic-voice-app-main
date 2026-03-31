@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "locationId": "REMOTE-PHONE-DE",
+    "timezone": "Europe/Berlin",
+    "availableDays": [
+      {
+        "date": "2030-06-18",
+        "label": "MONDAY, 2030-06-18",
+        "availableSlotCount": 1,
+        "earliestTime": "10:00"
+      }
+    ],
+    "slots": [
+      {
+        "slotId": "SLOT-PHONE-REMOTE-PHONE-DE-20300618-1000",
+        "startTime": "2030-06-18T10:00:00",
+        "endTime": "2030-06-18T10:30:00",
+        "advisorId": "ADV-PH-001",
+        "advisorName": "Remote Service Team",
+        "advisorMode": "INTERNAL"
+      }
+    ],
+    "fallbackSuggestions": []
+  }
+}

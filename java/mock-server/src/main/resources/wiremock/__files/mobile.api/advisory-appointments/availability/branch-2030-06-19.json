@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "locationId": "20286143",
+    "timezone": "Europe/Berlin",
+    "availableDays": [
+      {
+        "date": "2030-06-19",
+        "label": "TUESDAY, 2030-06-19",
+        "availableSlotCount": 1,
+        "earliestTime": "11:00"
+      }
+    ],
+    "slots": [
+      {
+        "slotId": "SLOT-BRANCH-20286143-20300619-1100",
+        "startTime": "2030-06-19T11:00:00",
+        "endTime": "2030-06-19T11:45:00",
+        "advisorId": "ADV-BR-003",
+        "advisorName": "Maria Becker",
+        "advisorMode": "INTERNAL"
+      }
+    ],
+    "fallbackSuggestions": []
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/advisory-appointments/eligibility",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      }
+    },
+    "queryParameters": {
+      "consultationChannel": {
+        "equalTo": "BRANCH"
+      },
+      "city": {
+        "contains": "berlin"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/eligibility/branch-berlin.json"
+  }
+}

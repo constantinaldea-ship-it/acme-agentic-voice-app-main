@@ -1,0 +1,76 @@
+{
+  "success": true,
+  "data": {
+    "entryPaths": [
+      {
+        "code": "SERVICE_REQUEST",
+        "label": "Service request",
+        "description": "Resolve an existing banking-service issue with a specialist."
+      },
+      {
+        "code": "PRODUCT_CONSULTATION",
+        "label": "Product consultation",
+        "description": "Discuss investments, financing, and advisory topics."
+      }
+    ],
+    "topics": [
+      {
+        "code": "IN",
+        "label": "Investments",
+        "entryPath": "PRODUCT_CONSULTATION",
+        "requiresComment": false
+      },
+      {
+        "code": "FIN",
+        "label": "Financing",
+        "entryPath": "PRODUCT_CONSULTATION",
+        "requiresComment": false
+      },
+      {
+        "code": "standing-order",
+        "label": "Standing order support",
+        "entryPath": "SERVICE_REQUEST",
+        "requiresComment": false
+      }
+    ],
+    "consultationChannels": [
+      {
+        "code": "BRANCH",
+        "label": "Branch",
+        "description": "Meet in a branch with an advisor."
+      },
+      {
+        "code": "PHONE",
+        "label": "Phone",
+        "description": "Talk to a specialist by phone."
+      },
+      {
+        "code": "VIDEO",
+        "label": "Video",
+        "description": "Join a secure video consultation."
+      }
+    ],
+    "advisorModes": [
+      {
+        "code": "INTERNAL",
+        "label": "Internal advisor",
+        "allowedChannels": ["BRANCH", "PHONE", "VIDEO"]
+      },
+      {
+        "code": "PRIVATE_BANKING",
+        "label": "Premium Banking",
+        "allowedChannels": ["BRANCH", "PHONE"]
+      }
+    ],
+    "validationRules": [
+      {
+        "field": "selectedTimeSlotId",
+        "required": true,
+        "message": "A slot must be selected before booking.",
+        "appliesWhen": {
+          "entryPath": "SERVICE_REQUEST"
+        }
+      }
+    ]
+  }
+}

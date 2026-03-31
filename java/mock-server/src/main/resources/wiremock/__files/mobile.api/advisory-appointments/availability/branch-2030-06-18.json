@@ -1,0 +1,34 @@
+{
+  "success": true,
+  "data": {
+    "locationId": "20286143",
+    "timezone": "Europe/Berlin",
+    "availableDays": [
+      {
+        "date": "2030-06-18",
+        "label": "MONDAY, 2030-06-18",
+        "availableSlotCount": 2,
+        "earliestTime": "09:30"
+      }
+    ],
+    "slots": [
+      {
+        "slotId": "SLOT-BRANCH-20286143-20300618-0930",
+        "startTime": "2030-06-18T09:30:00",
+        "endTime": "2030-06-18T10:15:00",
+        "advisorId": "ADV-BR-001",
+        "advisorName": "Maria Becker",
+        "advisorMode": "INTERNAL"
+      },
+      {
+        "slotId": "SLOT-BRANCH-20286143-20300618-1430",
+        "startTime": "2030-06-18T14:30:00",
+        "endTime": "2030-06-18T15:15:00",
+        "advisorId": "ADV-BR-002",
+        "advisorName": "Daniel Weber",
+        "advisorMode": "INTERNAL"
+      }
+    ],
+    "fallbackSuggestions": []
+  }
+}

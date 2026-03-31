@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "locations": [
+      {
+        "locationId": "20286143",
+        "locationType": "BRANCH",
+        "branchId": "20286143",
+        "name": "Berlin Friedrichstraße Advisory Center",
+        "address": "Friedrichstraße 45",
+        "city": "Berlin",
+        "postalCode": "10117",
+        "phone": "+49 30 1234-5678",
+        "wheelchairAccessible": true,
+        "distanceKm": 1.2,
+        "supportedChannels": ["BRANCH"],
+        "supportedAdvisorModes": ["INTERNAL", "PRIVATE_BANKING"],
+        "nextAvailableDay": "2030-06-18",
+        "eligibilityReason": "Standing-order specialists are available at this branch."
+      }
+    ],
+    "count": 1,
+    "totalMatches": 1,
+    "fallbackSuggestions": []
+  }
+}

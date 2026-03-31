@@ -1,0 +1,29 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "POST",
+    "urlPath": "/oauth/token",
+    "headers": {
+      "Content-Type": {
+        "contains": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      { "matchesJsonPath": "$[?(@.grant_type == 'client_credentials')]" },
+      { "matchesJsonPath": "$[?(@.client_id == 'ces-agent-service')]" },
+      { "matchesJsonPath": "$[?(@.client_secret == 'mock-secret')]" }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "access_token": "mock-eidp-access-token",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "read:customers read:accounts"
+    }
+  }
+}

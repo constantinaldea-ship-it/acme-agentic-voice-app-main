@@ -1,0 +1,29 @@
+{
+  "priority": 5,
+  "scenarioName": "branch-lifecycle",
+  "requiredScenarioState": "BOOKED",
+  "request": {
+    "method": "GET",
+    "urlPath": "/advisory-appointments/lifecycle/APT-BRANCH-0001",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      }
+    },
+    "queryParameters": {
+      "appointmentAccessToken": {
+        "equalTo": "aat-branch-0001"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/lifecycle/get-appointment-booked.json"
+  }
+}

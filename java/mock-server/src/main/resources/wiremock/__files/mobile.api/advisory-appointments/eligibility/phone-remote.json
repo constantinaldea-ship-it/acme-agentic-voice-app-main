@@ -1,0 +1,25 @@
+{
+  "success": true,
+  "data": {
+    "locations": [
+      {
+        "locationId": "REMOTE-PHONE-DE",
+        "locationType": "REMOTE_CENTER",
+        "branchId": "REMOTE-PHONE-DE",
+        "name": "Acme Bank Phone Advisory Hub",
+        "address": "Remote",
+        "city": "Berlin",
+        "postalCode": "10117",
+        "phone": "+49 800 111-2233",
+        "wheelchairAccessible": true,
+        "supportedChannels": ["PHONE"],
+        "supportedAdvisorModes": ["INTERNAL"],
+        "nextAvailableDay": "2030-06-18",
+        "eligibilityReason": "Phone consultations are available nationwide."
+      }
+    ],
+    "count": 1,
+    "totalMatches": 1,
+    "fallbackSuggestions": []
+  }
+}

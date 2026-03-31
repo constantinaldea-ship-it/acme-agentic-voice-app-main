@@ -1,0 +1,28 @@
+{
+  "priority": 5,
+  "scenarioName": "branch-lifecycle",
+  "requiredScenarioState": "BOOKED",
+  "newScenarioState": "RESCHEDULED",
+  "request": {
+    "method": "POST",
+    "urlPath": "/advisory-appointments/lifecycle/APT-BRANCH-0001/reschedule",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      },
+      "Content-Type": {
+        "contains": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/lifecycle/reschedule-appointment.json"
+  }
+}

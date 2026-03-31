@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "matches": [
+      {
+        "serviceCode": "mortgage-consultation",
+        "label": "Mortgage and financing consultation",
+        "topicCode": "FIN",
+        "confidence": 0.94,
+        "requiresComment": false
+      }
+    ],
+    "fallbackGuidance": []
+  }
+}

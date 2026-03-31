@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "locationId": "20286143",
+    "timezone": "Europe/Berlin",
+    "availableDays": [
+      {
+        "date": "2030-06-20",
+        "label": "WEDNESDAY, 2030-06-20",
+        "availableSlotCount": 0,
+        "earliestTime": null
+      }
+    ],
+    "slots": [],
+    "fallbackSuggestions": [
+      {
+        "type": "TRY_ANOTHER_DAY",
+        "label": "Try another day"
+      },
+      {
+        "type": "TRY_ANOTHER_LOCATION",
+        "label": "Try another branch"
+      }
+    ]
+  }
+}

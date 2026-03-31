@@ -1,0 +1,61 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "GET",
+    "urlPath": "/customers/1234567890/personal-data",
+    "headers": {
+      "deuba-client-id": {
+        "matches": ".*-banking.*"
+      },
+      "DB-ID": {
+        "matches": ".+"
+      },
+      "Authorization": {
+        "matches": "Bearer .+"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "firstname": "Maria",
+      "lastname": "Musterfrau",
+      "academicTitle": "Dr.",
+      "fullName": "Dr. Maria Musterfrau",
+      "id": 1234567890,
+      "gender": "FEMALE",
+      "nationality": "DEU",
+      "dateOfBirth": "1988-05-15",
+      "maritalStatus": "single",
+      "registrationAddress": {
+        "street": "Friedrichstraße",
+        "streetNumber": "45",
+        "postalCode": "10117",
+        "city": "Berlin"
+      },
+      "postalAddress": {
+        "street": "Friedrichstraße",
+        "streetNumber": "45",
+        "postalCode": "10117",
+        "city": "Berlin"
+      },
+      "emailAddress": {
+        "address": "maria.musterfrau@mail.com",
+        "type": "PRIVATE"
+      },
+      "phoneNumbers": {
+        "private": {
+          "countryCode": "+49",
+          "number": "987654321"
+        },
+        "mobile": {
+          "countryCode": "+49",
+          "number": "800000600"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "priority": 3,
+  "request": {
+    "method": "GET",
+    "urlPath": "/advisory-appointments/availability",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "X-BFA-Client": {
+        "matches": ".+"
+      },
+      "X-Mock-Scenario": {
+        "equalTo": "no-availability"
+      }
+    },
+    "queryParameters": {
+      "consultationChannel": {
+        "equalTo": "BRANCH"
+      },
+      "locationId": {
+        "equalTo": "20286143"
+      },
+      "selectedDay": {
+        "equalTo": "2030-06-20"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "mobile.api/advisory-appointments/availability/no-availability.json"
+  }
+}

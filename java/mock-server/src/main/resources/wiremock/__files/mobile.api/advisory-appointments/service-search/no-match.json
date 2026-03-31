@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "data": {
+    "matches": [],
+    "fallbackGuidance": [
+      "Try describing the request in a few more words.",
+      "If you prefer, I can help you find a branch or phone consultation instead."
+    ]
+  }
+}

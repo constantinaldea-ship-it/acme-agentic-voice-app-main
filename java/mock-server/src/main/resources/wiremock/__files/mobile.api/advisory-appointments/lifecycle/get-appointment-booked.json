@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "data": {
+    "appointmentId": "APT-BRANCH-0001",
+    "status": "CONFIRMED",
+    "confirmationCode": "CONF-BRANCH-0001",
+    "consultationChannel": "BRANCH",
+    "topicCode": "IN",
+    "locationId": "20286143",
+    "locationName": "Berlin Friedrichstraße Advisory Center",
+    "scheduledStart": "2030-06-18T09:30:00",
+    "scheduledEnd": "2030-06-18T10:15:00",
+    "advisorName": "Maria Becker",
+    "summaryText": "Investment consultation in Berlin branch.",
+    "canCancelUntil": "2030-06-17T18:00:00",
+    "canRescheduleUntil": "2030-06-17T18:00:00",
+    "timeline": [
+      "Appointment created",
+      "Confirmation sent by email"
+    ],
+    "delivery": {
+      "channel": "EMAIL",
+      "destinationMasked": "m***@example.com",
+      "followUpText": "We sent the appointment details to your email."
+    }
+  }
+}

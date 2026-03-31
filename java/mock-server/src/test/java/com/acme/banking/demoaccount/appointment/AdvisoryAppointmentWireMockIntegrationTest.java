@@ -92,6 +92,67 @@ class AdvisoryAppointmentWireMockIntegrationTest {
     }
 
     @Test
+    @DisplayName("Should return deterministic service-search matches for standing orders")
+    void shouldReturnServiceSearchMatches() {
+        // Modified by Augment Agent on 2026-03-31: extend WireMock coverage to service-search fixtures.
+        given()
+                .header(AUTHORIZATION, "Bearer test-service-token")
+                .header(CLIENT_HEADER, "advisory-appointment-bff")
+                .header(CORRELATION_HEADER, "corr-service-search")
+                .queryParam("query", "standing order")
+                .accept(ContentType.JSON)
+        .when()
+                .get("/advisory-appointments/service-search")
+        .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("success", equalTo(true))
+                .body("data.matches", hasSize(1))
+                .body("data.matches[0].serviceCode", equalTo("standing-order"));
+    }
+
+    @Test
+    @DisplayName("Should return booking-eligible branch locations for Berlin")
+    void shouldReturnEligibilityForBerlinBranch() {
+        given()
+                .header(AUTHORIZATION, "Bearer test-service-token")
+                .header(CLIENT_HEADER, "advisory-appointment-bff")
+                .header(CORRELATION_HEADER, "corr-eligibility-branch")
+                .queryParam("consultationChannel", "BRANCH")
+                .queryParam("city", "berlin")
+                .accept(ContentType.JSON)
+        .when()
+                .get("/advisory-appointments/eligibility")
+        .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("success", equalTo(true))
+                .body("data.count", equalTo(1))
+                .body("data.locations[0].locationId", equalTo("20286143"));
+    }
+
+    @Test
+    @DisplayName("Should return deterministic branch slot availability for the selected day")
+    void shouldReturnBranchAvailabilityForSelectedDay() {
+        given()
+                .header(AUTHORIZATION, "Bearer test-service-token")
+                .header(CLIENT_HEADER, "advisory-appointment-bff")
+                .header(CORRELATION_HEADER, "corr-slots-branch-day")
+                .queryParam("consultationChannel", "BRANCH")
+                .queryParam("locationId", "20286143")
+                .queryParam("selectedDay", "2030-06-18")
+                .accept(ContentType.JSON)
+        .when()
+                .get("/advisory-appointments/availability")
+        .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("success", equalTo(true))
+                .body("data.slots", hasSize(2))
+                .body("data.slots[0].slotId", equalTo("SLOT-BRANCH-20286143-20300618-0930"));
+    }
+
+    @Test
     @DisplayName("Should return a deterministic no-availability response when forced by scenario header")
     void shouldReturnNoAvailabilityScenario() {
         given()

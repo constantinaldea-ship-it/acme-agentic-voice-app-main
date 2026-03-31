@@ -47,6 +47,7 @@ spring-boot-devtools.properties
 !package.json
 !tsconfig.json
 !**/openapi-specs/*.json
+!mock-server/src/main/resources/wiremock/**/*.json
 !bfa-mcp-spike/src/main/resources/data/**
 !bfa-service-resource/src/main/resources/data/**
 credentials/

@@ -1,0 +1,25 @@
+{
+  "success": true,
+  "data": {
+    "locations": [
+      {
+        "locationId": "REMOTE-VIDEO-DE",
+        "locationType": "REMOTE_CENTER",
+        "branchId": "REMOTE-VIDEO-DE",
+        "name": "Acme Bank Video Advisory Hub",
+        "address": "Remote",
+        "city": "Berlin",
+        "postalCode": "10117",
+        "phone": "+49 800 222-3344",
+        "wheelchairAccessible": true,
+        "supportedChannels": ["VIDEO"],
+        "supportedAdvisorModes": ["INTERNAL"],
+        "nextAvailableDay": "2030-06-18",
+        "eligibilityReason": "Video consultations are available nationwide."
+      }
+    ],
+    "count": 1,
+    "totalMatches": 1,
+    "fallbackSuggestions": []
+  }
+}

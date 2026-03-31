@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "data": {
+    "locationId": "20286143",
+    "timezone": "Europe/Berlin",
+    "availableDays": [
+      {
+        "date": "2030-06-18",
+        "label": "MONDAY, 2030-06-18",
+        "availableSlotCount": 2,
+        "earliestTime": "09:30"
+      },
+      {
+        "date": "2030-06-19",
+        "label": "TUESDAY, 2030-06-19",
+        "availableSlotCount": 1,
+        "earliestTime": "11:00"
+      }
+    ],
+    "slots": [],
+    "fallbackSuggestions": []
+  }
+}

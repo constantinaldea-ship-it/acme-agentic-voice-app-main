@@ -1,0 +1,30 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "POST",
+    "urlPath": "/authz/authorize",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "Content-Type": {
+        "contains": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      { "matchesJsonPath": "$[?(@.resource == 'customers:personal-data')]" }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "authorized": true,
+      "authorization_token": "mock-authz-token",
+      "permissions": ["read:customers", "read:personal-data"],
+      "expires_in": 1800
+    }
+  }
+}

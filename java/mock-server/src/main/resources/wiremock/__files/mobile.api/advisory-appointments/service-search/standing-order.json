@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "matches": [
+      {
+        "serviceCode": "standing-order",
+        "label": "Standing order support",
+        "topicCode": "DAILY_BANKING",
+        "confidence": 0.97,
+        "requiresComment": false
+      }
+    ],
+    "fallbackGuidance": []
+  }
+}

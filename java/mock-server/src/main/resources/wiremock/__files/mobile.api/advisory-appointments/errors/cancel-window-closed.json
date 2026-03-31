@@ -1,0 +1,7 @@
+{
+  "success": false,
+  "error": {
+    "code": "CANCEL_WINDOW_CLOSED",
+    "message": "The appointment is already cancelled and cannot be cancelled again."
+  }
+}

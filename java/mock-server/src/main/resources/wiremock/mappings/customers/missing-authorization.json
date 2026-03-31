@@ -1,0 +1,28 @@
+{
+  "priority": 6,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/customers/.+/personal-data",
+    "headers": {
+      "deuba-client-id": {
+        "matches": ".*-banking.*"
+      },
+      "DB-ID": {
+        "matches": ".+"
+      },
+      "Authorization": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "unauthorized",
+      "error_description": "Missing or invalid Authorization header. A valid AuthZ Bearer token is required."
+    }
+  }
+}

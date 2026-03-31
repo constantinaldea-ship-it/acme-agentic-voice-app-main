@@ -1,0 +1,22 @@
+{
+  "priority": 8,
+  "request": {
+    "method": "POST",
+    "urlPath": "/authz/authorize",
+    "headers": {
+      "Authorization": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "unauthorized",
+      "error_description": "Missing or invalid Authorization header. A valid EIDP Bearer token is required."
+    }
+  }
+}

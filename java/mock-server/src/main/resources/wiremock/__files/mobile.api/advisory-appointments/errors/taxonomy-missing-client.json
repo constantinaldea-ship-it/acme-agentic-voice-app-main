@@ -1,0 +1,7 @@
+{
+  "success": false,
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "X-BFA-Client header is required for advisory appointment requests."
+  }
+}
