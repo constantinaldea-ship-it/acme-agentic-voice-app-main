@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -167,6 +168,71 @@ class DeployResourceLibTests(unittest.TestCase):
             request.update_mask,
             "displayName,executionType,pythonFunction",
         )
+
+    def test_build_request_for_toolset_resolves_env_var_schema_url(self) -> None:
+        app_root = Path(tempfile.mkdtemp(prefix="deploy-resource-lib-toolset-"))
+        (app_root / "app.json").write_text("{}\n", encoding="utf-8")
+        (app_root / "environment.json").write_text(
+            json.dumps(
+                {
+                    "toolsets": {
+                        "customer_details_openapi": {
+                            "openApiToolset": {"url": "https://mock-server.example"}
+                        }
+                    }
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        toolset_dir = app_root / "toolsets" / "customer_details_openapi"
+        (toolset_dir / "open_api_toolset").mkdir(parents=True, exist_ok=True)
+        (toolset_dir / "customer_details_openapi.json").write_text(
+            '{"displayName":"customer_details_openapi","openApiToolset":{"openApiSchema":"toolsets/customer_details_openapi/open_api_toolset/open_api_schema.yaml"}}\n',
+            encoding="utf-8",
+        )
+        (toolset_dir / "open_api_toolset" / "open_api_schema.yaml").write_text(
+            'openapi: "3.0.1"\nservers:\n  - url: "$env_var"\npaths: {}\n',
+            encoding="utf-8",
+        )
+
+        request = MODULE.build_request(
+            kind="toolset",
+            source_path=toolset_dir / "customer_details_openapi.json",
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+        )
+
+        schema = request.payload["openApiToolset"]["openApiSchema"]
+        self.assertIn('url: "https://mock-server.example"', schema)
+        self.assertNotIn("$env_var", schema)
+
+    def test_build_request_for_toolset_requires_environment_value_for_env_var(self) -> None:
+        app_root = Path(tempfile.mkdtemp(prefix="deploy-resource-lib-toolset-missing-env-"))
+        (app_root / "app.json").write_text("{}\n", encoding="utf-8")
+        (app_root / "environment.json").write_text('{"toolsets":{}}\n', encoding="utf-8")
+        toolset_dir = app_root / "toolsets" / "customer_details_openapi"
+        (toolset_dir / "open_api_toolset").mkdir(parents=True, exist_ok=True)
+        (toolset_dir / "customer_details_openapi.json").write_text(
+            '{"displayName":"customer_details_openapi","openApiToolset":{"openApiSchema":"toolsets/customer_details_openapi/open_api_toolset/open_api_schema.yaml"}}\n',
+            encoding="utf-8",
+        )
+        (toolset_dir / "open_api_toolset" / "open_api_schema.yaml").write_text(
+            'openapi: "3.0.1"\nservers:\n  - url: "$env_var"\npaths: {}\n',
+            encoding="utf-8",
+        )
+
+        with self.assertRaises(MODULE.DeployResourceError) as ctx:
+            MODULE.build_request(
+                kind="toolset",
+                source_path=toolset_dir / "customer_details_openapi.json",
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+            )
+
+        self.assertIn("toolsets.customer_details_openapi.openApiToolset.url", str(ctx.exception))
 
     def test_http_request_wraps_transport_failures(self) -> None:
         with patch.object(

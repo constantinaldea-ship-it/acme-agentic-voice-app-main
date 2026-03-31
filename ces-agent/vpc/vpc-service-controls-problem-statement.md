@@ -145,7 +145,7 @@ These local files define the current topology:
 These local suites already give us a reproducible baseline:
 
 - `test-harness/smoke/suites/ces/customer-details-smoke-suite.json`
-- `test-harness/smoke/suites/ces/customer-details-header-capture-smoke-suite.json`
+- `test-harness/smoke/suites/ces/customer-details-header-capture-contract-suite.json`
 
 Today, outside a perimeter, both CES tool variants are healthy:
 
@@ -198,7 +198,7 @@ python3 ces-runtime-smoke.py run-suite \
   --suite /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/test-harness/smoke/suites/ces/customer-details-smoke-suite.json
 
 python3 ces-runtime-smoke.py run-suite \
-  --suite /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/test-harness/smoke/suites/ces/customer-details-header-capture-smoke-suite.json
+  --suite /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/test-harness/smoke/suites/ces/customer-details-header-capture-contract-suite.json
 ```
 
 Expected baseline:
@@ -408,4 +408,4 @@ Local repository references:
 - `acme_voice_agent/tools/get_customer_details/python_function/python_code.py`
 - `acme_voice_agent/toolsets/customer_details/open_api_toolset/open_api_schema.yaml`
 - `smoke-tests/suites/ces/customer-details-smoke-suite.json`
-- `smoke-tests/suites/ces/customer-details-header-capture-smoke-suite.json`
+- `smoke-tests/suites/ces/customer-details-header-capture-contract-suite.json`

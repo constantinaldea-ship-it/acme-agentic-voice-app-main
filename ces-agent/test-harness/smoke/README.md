@@ -207,6 +207,7 @@ The wrapper now auto-discovers suites by folder and filename pattern.
 - Put CES runtime suites in `suites/ces/`
 - Put e2e-remote/OpenAPI suites in `suites/e2e-remote/`
 - Name runnable suite files with the suffix `-smoke-suite.json`
+- Use `-contract-suite.json` or `-regression-suite.json` for targeted proof/diagnostic suites that should be executed explicitly rather than through the wrapper's default auto-discovery
 
 Examples:
 
@@ -224,6 +225,8 @@ the wrapper executes every matching suite in the appropriate folder automaticall
 ### CES suite authoring
 
 Use `suites/ces/customer-details-smoke-suite.json` as the reference shape.
+
+For targeted proof/diagnostic runs that should stay opt-in, invoke the suite directly with `python3 ces-runtime-smoke.py run-suite --suite <path>` and keep a non-`-smoke-suite.json` suffix.
 
 For the customer-details comparison flow, the CES inventory should now expose:
 

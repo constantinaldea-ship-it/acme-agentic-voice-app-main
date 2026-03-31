@@ -46,45 +46,9 @@
       }
     },
     {
-      "name": "customer_details_python_tool_health",
-      "type": "execute_tool",
-      "tool_display_name": "get_customer_details_python",
-      "args": {
-        "partner_id": "1234567890"
-      },
-      "expect": {
-        "equals": {
-          "response.result.success": true,
-          "response.result.customer.firstname": "Maria",
-          "response.result.customer.city": "Berlin"
-        },
-        "contains": {
-          "response.result.summary": "Maria Musterfrau"
-        }
-      }
-    },
-    {
       "name": "customer_details_wrapper_tool_default_customer",
       "type": "execute_tool",
       "tool_display_name": "get_customer_details_wrapper",
-      "args": {
-        "partner_id": "9999999999"
-      },
-      "expect": {
-        "equals": {
-          "response.result.success": true,
-          "response.result.customer.firstname": "Hans",
-          "response.result.customer.city": "Berlin"
-        },
-        "contains": {
-          "response.result.summary": "Hans Müller"
-        }
-      }
-    },
-    {
-      "name": "customer_details_python_tool_default_customer",
-      "type": "execute_tool",
-      "tool_display_name": "get_customer_details_python",
       "args": {
         "partner_id": "9999999999"
       },

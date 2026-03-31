@@ -293,6 +293,7 @@ def discover_tools(app_root: Path) -> list[LocalComponent]:
 def discover_toolsets(app_root: Path) -> list[LocalComponent]:
     components: list[LocalComponent] = []
     toolsets_root = app_root / "toolsets"
+    environment_path = (app_root / "environment.json").resolve()
     for toolset_dir in sorted(toolsets_root.iterdir()):
         if not toolset_dir.is_dir():
             continue
@@ -305,7 +306,10 @@ def discover_toolsets(app_root: Path) -> list[LocalComponent]:
         if isinstance(openapi_toolset, dict):
             schema_path = openapi_toolset.get("openApiSchema")
             if isinstance(schema_path, str) and schema_path.strip():
-                tracked.append((app_root / schema_path).resolve())
+                resolved_schema_path = (app_root / schema_path).resolve()
+                tracked.append(resolved_schema_path)
+                if environment_path.is_file() and "$env_var" in resolved_schema_path.read_text(encoding="utf-8"):
+                    tracked.append(environment_path)
         combined_hash, file_hashes = combined_sha256(app_root, tracked)
         components.append(
             LocalComponent(

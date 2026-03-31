@@ -99,6 +99,18 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_environment_json(app_root: Path) -> dict[str, Any]:
+    environment_path = app_root / "environment.json"
+    if not environment_path.is_file():
+        raise DeployResourceError(
+            f"OpenAPI schema uses '$env_var' but environment.json is missing under {app_root}."
+        )
+    data = load_json(environment_path)
+    if not isinstance(data, dict):
+        raise DeployResourceError("environment.json must contain a JSON object.")
+    return data
+
+
 def read_text(app_root: Path, relative_path: str) -> str:
     target = (app_root / relative_path).resolve()
     if not target.exists():
@@ -272,6 +284,8 @@ def convert_tool_manifest(
 def convert_toolset_manifest(
     manifest: dict[str, Any],
     app_root: Path,
+    *,
+    toolset_id: str,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {}
 
@@ -285,7 +299,18 @@ def convert_toolset_manifest(
         converted_openapi = dict(openapi_toolset)
         schema_path = converted_openapi.get("openApiSchema")
         if isinstance(schema_path, str) and schema_path.strip():
-            converted_openapi["openApiSchema"] = read_text(app_root, schema_path)
+            schema_text = read_text(app_root, schema_path)
+            if "$env_var" in schema_text:
+                environment = load_environment_json(app_root)
+                toolset_env = environment.get("toolsets", {}).get(toolset_id, {})
+                resolved_url = toolset_env.get("openApiToolset", {}).get("url")
+                if not isinstance(resolved_url, str) or not resolved_url.strip():
+                    raise DeployResourceError(
+                        "OpenAPI schema uses '$env_var' but "
+                        f"environment.json does not define toolsets.{toolset_id}.openApiToolset.url"
+                    )
+                schema_text = schema_text.replace("$env_var", resolved_url)
+            converted_openapi["openApiSchema"] = schema_text
         payload["openApiToolset"] = converted_openapi
 
     return payload
@@ -336,7 +361,7 @@ def build_request(
         resolved_update_mask = update_mask or build_update_mask(payload, TOOL_ALLOWED_UPDATE_FIELDS)
     elif kind == "toolset":
         resource_name = full_toolset_name(project, location, app_id, resolved_resource_id)
-        payload = convert_toolset_manifest(manifest, app_root)
+        payload = convert_toolset_manifest(manifest, app_root, toolset_id=resolved_resource_id)
         collection_url = f"{resolved_endpoint}/v1/{app_name}/toolsets"
         resource_url = f"{resolved_endpoint}/v1/{resource_name}"
         create_query = f"toolsetId={urllib.parse.quote(resolved_resource_id)}"

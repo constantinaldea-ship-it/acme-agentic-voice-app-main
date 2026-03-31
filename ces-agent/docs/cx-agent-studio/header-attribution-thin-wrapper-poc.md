@@ -140,7 +140,7 @@ sequenceDiagram
 | OpenAPI header contract | `acme_voice_agent/toolsets/customer_details/open_api_toolset/open_api_schema.yaml` |
 | Repo-level environment contract | `acme_voice_agent/environment.json` |
 | Backend header echo for proof | `java/mock-server/src/main/java/com/acme/banking/demoaccount/HeaderCaptureResponseTransformer.java` |
-| Remote proof suite | `test-harness/smoke/suites/ces/customer-details-header-capture-smoke-suite.json` |
+| Remote proof suite | `test-harness/smoke/suites/ces/customer-details-header-capture-contract-suite.json` |
 
 ### Python wrapper path
 
@@ -211,7 +211,7 @@ Run the CES smoke suite:
 ```bash
 cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/test-harness/smoke
 python3 ces-runtime-smoke.py run-suite \
-  --suite /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/test-harness/smoke/suites/ces/customer-details-header-capture-smoke-suite.json
+  --suite /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/test-harness/smoke/suites/ces/customer-details-header-capture-contract-suite.json
 ```
 
 This validates:
@@ -307,7 +307,7 @@ For production banking flows that require deterministic backend attribution:
 - `acme_voice_agent/toolsets/customer_details/open_api_toolset/open_api_schema.yaml`
 - `acme_voice_agent/environment.json`
 - `java/mock-server/src/main/java/com/acme/banking/demoaccount/HeaderCaptureResponseTransformer.java`
-- `test-harness/smoke/suites/ces/customer-details-header-capture-smoke-suite.json`
+- `test-harness/smoke/suites/ces/customer-details-header-capture-contract-suite.json`
 - `test-harness/smoke/ces-runtime-smoke.py`
 
 ## External References

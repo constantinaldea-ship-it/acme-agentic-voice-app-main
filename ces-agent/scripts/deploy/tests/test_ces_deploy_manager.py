@@ -140,6 +140,39 @@ class CesDeployManagerTests(unittest.TestCase):
         plan = MODULE.classify_components(changed_components, state["components"])
         self.assertEqual([component.key for component in plan["modified"]], ["agent:customer_details_agent"])
 
+    def test_environment_json_change_marks_env_backed_toolset_modified(self) -> None:
+        app_root = self.create_app()
+        write_text(
+            app_root / "environment.json",
+            '{"toolsets":{"customer_details":{"openApiToolset":{"url":"https://mock-one.example"}}}}\n',
+        )
+        schema_path = app_root / "toolsets/customer_details/open_api_toolset/open_api_schema.yaml"
+        write_text(
+            schema_path,
+            'openapi: "3.0.1"\nservers:\n  - url: "$env_var"\npaths: {}\n',
+        )
+
+        components = MODULE.discover_components(app_root)
+        toolset_component = next(component for component in components if component.kind == "toolset")
+        tracked_relative = {
+            path.resolve().relative_to(app_root.resolve()).as_posix()
+            for path in toolset_component.tracked_files
+        }
+        self.assertIn("environment.json", tracked_relative)
+
+        state_components = {
+            component.key: {"combined_sha256": component.combined_hash}
+            for component in components
+        }
+        write_text(
+            app_root / "environment.json",
+            '{"toolsets":{"customer_details":{"openApiToolset":{"url":"https://mock-two.example"}}}}\n',
+        )
+
+        changed_components = MODULE.discover_components(app_root)
+        plan = MODULE.classify_components(changed_components, state_components)
+        self.assertEqual([component.key for component in plan["modified"]], ["toolset:customer_details"])
+
     def test_find_removed_components_returns_state_only_keys(self) -> None:
         app_root = self.create_app()
         components = MODULE.discover_components(app_root)
