@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent.parent
 VALIDATOR = SCRIPT_DIR / "deploy" / "validate-package.py"
 
 
@@ -182,6 +183,18 @@ class ValidatePackageScriptTests(unittest.TestCase):
         result = self.run_validator(None)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("global_instruction.txt: PASS", result.stdout)
+
+    def test_accepts_default_repo_package_without_cli_argument(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(VALIDATOR)],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("=== CX Agent Studio Package Validation ===", result.stdout)
 
 
 if __name__ == "__main__":

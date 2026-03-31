@@ -428,6 +428,8 @@ class CesDeployManagerTests(unittest.TestCase):
         ), mock.patch.object(MODULE, "run_validator"), mock.patch.object(
             MODULE, "get_access_token", return_value="token"
         ), mock.patch.object(
+            MODULE, "print_execution_target"
+        ), mock.patch.object(
             MODULE,
             "reconcile_noop_components_with_remote",
             return_value=(
@@ -473,6 +475,8 @@ class CesDeployManagerTests(unittest.TestCase):
             MODULE, "parse_args", return_value=args
         ), mock.patch.object(MODULE, "run_validator"), mock.patch.object(
             MODULE, "confirm_plan", side_effect=AssertionError("should not prompt")
+        ), mock.patch.object(
+            MODULE, "print_execution_target", side_effect=AssertionError("should not inspect remote CES deployments")
         ), mock.patch.object(
             MODULE, "require_value", side_effect=AssertionError("should not require CES target")
         ):
@@ -578,6 +582,35 @@ class CesDeployManagerTests(unittest.TestCase):
         self.assertIn("Latest git SHA: abc123", rendered)
         self.assertIn("toolset customer_details", rendered)
         self.assertIn("agent   customer_details_agent", rendered)
+
+    def test_print_execution_target_shows_discovered_deployment_id_and_export_hint(self) -> None:
+        stdout = io.StringIO()
+        with mock.patch.object(
+            MODULE,
+            "list_api_access_deployments",
+            return_value=[
+                {
+                    "name": (
+                        "projects/voice-banking-poc/locations/eu/apps/acme-voice-eu/"
+                        "deployments/api-access-1"
+                    ),
+                    "displayName": "Primary API Access",
+                }
+            ],
+        ), mock.patch.dict("os.environ", {}, clear=True), redirect_stdout(stdout):
+            MODULE.print_execution_target(
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+                endpoint=None,
+                token="token",
+            )
+
+        rendered = stdout.getvalue()
+        self.assertIn("CES Execution Target", rendered)
+        self.assertIn("CES_APP_ID         : acme-voice-eu", rendered)
+        self.assertIn("api-access-1", rendered)
+        self.assertIn("Suggested export    : CES_DEPLOYMENT_ID=api-access-1", rendered)
 
 
 if __name__ == "__main__":

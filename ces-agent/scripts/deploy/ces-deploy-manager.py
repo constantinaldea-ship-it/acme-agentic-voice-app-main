@@ -23,8 +23,10 @@ from lib.deploy_resource_lib import (
     DeployResourceError,
     apply_request,
     build_request,
+    detect_endpoint,
     find_existing_resource_name,
     get_access_token,
+    http_request,
     load_json,
     parse_json_body,
 )
@@ -471,6 +473,142 @@ def print_plan(plan: dict[str, list[LocalComponent]], removed: list[str]) -> Non
     else:
         for key in removed:
             print(f"  - {key} (state only, no remote delete)")
+    print("")
+
+
+def app_parent(project: str, location: str, app_id: str) -> str:
+    return f"projects/{project}/locations/{location}/apps/{app_id}"
+
+
+def resource_id_from_name(resource_name: str) -> str:
+    return resource_name.rsplit("/", 1)[-1] if resource_name else ""
+
+
+def format_named_resources(resources: list[dict[str, Any]]) -> str:
+    formatted: list[str] = []
+    for resource in resources:
+        name = resource.get("name")
+        if not isinstance(name, str) or not name:
+            continue
+        identifier = resource_id_from_name(name)
+        display_name = resource.get("displayName")
+        if isinstance(display_name, str) and display_name.strip():
+            formatted.append(f"{identifier} (displayName={display_name.strip()})")
+        else:
+            formatted.append(identifier)
+    if not formatted:
+        return "none"
+    if len(formatted) <= 5:
+        return ", ".join(formatted)
+    return ", ".join(formatted[:5]) + f", +{len(formatted) - 5} more"
+
+
+def list_api_access_deployments(
+    *,
+    project: str,
+    location: str,
+    app_id: str,
+    endpoint: str | None,
+    token: str,
+) -> list[dict[str, Any]]:
+    resolved_endpoint = detect_endpoint(location, endpoint)
+    url = f"{resolved_endpoint}/v1beta/{app_parent(project, location, app_id)}/deployments"
+    status, body = http_request("GET", url, token)
+    if status == 404:
+        raise DeploymentManagerError(
+            f"Configured CES app '{app_id}' was not found while listing API access deployments."
+        )
+    if not 200 <= status < 300:
+        detail = body.strip() or "no response body"
+        raise DeploymentManagerError(
+            f"Unable to list CES API access deployments for app '{app_id}' (HTTP {status}): {detail}"
+        )
+    payload = parse_json_body(body)
+    deployments = payload.get("deployments", [])
+    if not isinstance(deployments, list):
+        raise DeploymentManagerError(
+            f"Expected 'deployments' list in CES response for app '{app_id}', got {type(deployments).__name__}."
+        )
+    return [item for item in deployments if isinstance(item, dict)]
+
+
+def print_execution_target(
+    *,
+    project: str,
+    location: str,
+    app_id: str,
+    endpoint: str | None,
+    token: str,
+) -> None:
+    resolved_endpoint = detect_endpoint(location, endpoint)
+    console_url = f"https://ces.cloud.google.com/projects/{project}/locations/{location}/apps/{app_id}"
+    configured_deployment_id = os.environ.get("CES_DEPLOYMENT_ID", "").strip()
+
+    print("")
+    print("CES Execution Target")
+    print("====================")
+    print(f"Project            : {project}")
+    print(f"Location           : {location}")
+    print(f"CES_APP_ID         : {app_id}")
+    print(f"CES endpoint       : {resolved_endpoint}")
+    print(f"Console URL        : {console_url}")
+    if configured_deployment_id:
+        print(f"Configured CES_DEPLOYMENT_ID: {configured_deployment_id}")
+
+    try:
+        deployments = list_api_access_deployments(
+            project=project,
+            location=location,
+            app_id=app_id,
+            endpoint=endpoint,
+            token=token,
+        )
+    except (DeploymentManagerError, DeployResourceError) as exc:
+        print(f"Discovered deployment IDs: unavailable ({exc})")
+        print("")
+        return
+
+    if not deployments:
+        print("Discovered deployment IDs: none")
+        print("Suggested export    : create an API access deployment in CES and set CES_DEPLOYMENT_ID to that id")
+        print("")
+        return
+
+    print("Discovered deployment IDs:")
+    discovered_ids: list[str] = []
+    configured_match = False
+    normalized_configured_id = resource_id_from_name(configured_deployment_id)
+    for deployment in deployments:
+        name = deployment.get("name")
+        if not isinstance(name, str) or not name:
+            continue
+        deployment_id = resource_id_from_name(name)
+        if not deployment_id:
+            continue
+        discovered_ids.append(deployment_id)
+        display_name = deployment.get("displayName")
+        suffix = f" (displayName={display_name})" if isinstance(display_name, str) and display_name.strip() else ""
+        print(f"  - {deployment_id}{suffix}")
+        if configured_deployment_id and (
+            configured_deployment_id == name
+            or configured_deployment_id == deployment_id
+            or normalized_configured_id == deployment_id
+            or configured_deployment_id == display_name
+        ):
+            configured_match = True
+
+    if configured_deployment_id:
+        if configured_match:
+            print("Configured CES_DEPLOYMENT_ID is present in the live app.")
+        else:
+            print(
+                "Configured CES_DEPLOYMENT_ID was not found in the live app deployments. "
+                f"Available deployments: {format_named_resources(deployments)}"
+            )
+    elif len(discovered_ids) == 1:
+        print(f"Suggested export    : CES_DEPLOYMENT_ID={discovered_ids[0]}")
+    else:
+        print("Suggested export    : set CES_DEPLOYMENT_ID to one of the deployment ids above")
     print("")
 
 
@@ -1268,6 +1406,13 @@ def main() -> int:
             location = require_value("location", location)
             app_id = require_value("app-id", app_id)
             token = get_access_token()
+            print_execution_target(
+                project=project,
+                location=location,
+                app_id=app_id,
+                endpoint=args.endpoint,
+                token=token,
+            )
             plan, stale_components = reconcile_noop_components_with_remote(
                 plan,
                 state_components,

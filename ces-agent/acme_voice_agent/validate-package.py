@@ -27,7 +27,8 @@ if len(sys.argv) > 1 and sys.argv[1] in {"-h", "--help"}:
     raise SystemExit(0)
 
 # Allow overriding the package directory via CLI argument
-ces_agent_dir = PARENT_SCRIPTS_DIR.parent
+# Modified by Augment Agent on 2026-03-31: keep the default package rooted under ces-agent/.
+ces_agent_dir = PARENT_SCRIPTS_DIR
 default_dir = str(ces_agent_dir / "acme_voice_agent")
 package_dir = sys.argv[1] if len(sys.argv) > 1 else default_dir
 os.chdir(package_dir)
