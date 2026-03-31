@@ -1,0 +1,77 @@
+# Voice Banking Assistant Configuration
+# Common settings for all profiles
+
+spring:
+  application:
+    name: voice-banking-assistant
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ============================================
+# BFA (Backend-for-Agents) Configuration
+# ============================================
+bfa:
+  resource:
+    # Use resource-oriented REST client (true) or legacy AgentRegistry (false)
+    enabled: true
+    # BFA Resource Service base URL
+    base-url: http://localhost:8082
+    # Connection timeout in milliseconds
+    connect-timeout: 5000
+    # Read timeout in milliseconds
+    read-timeout: 30000
+
+# Voice Banking specific configuration
+voice-banking:
+  # ADK Integration (enabled by default in cloud profile)
+  adk:
+    enabled: false  # Default off for local profile
+  
+  # Default session settings
+  session:
+    max-history-turns: 10
+    timeout-minutes: 30
+  
+  # Policy gate settings
+  policy:
+    read-only-mode: true
+    max-response-length: 200
+    allowed-tools:
+      - getBalance
+      - listAccounts
+      - queryTransactions
+      - summarizeTransactions
+    blocked-intents:
+      - transfer
+      - payment
+      - send_money
+      - delete_account
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    com.voicebanking: DEBUG
+    com.voicebanking.integration.bfa: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

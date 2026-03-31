@@ -1,0 +1,28 @@
+{
+  "displayName": "session_end_live_agent",
+  "golden": {
+    "turns": [{
+      "steps": [{
+        "userInput": {
+          "text": "I want to speak to a real person"
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "voice_banking_agent",
+            "chunks": [{
+              "text": "I'll connect you with a live agent right away."
+            }]
+          }
+        }
+      }, {
+        "expectation": {
+          "toolCall": {
+            "tool": "end_session",
+            "params": {}
+          }
+        }
+      }]
+    }]
+  }
+}

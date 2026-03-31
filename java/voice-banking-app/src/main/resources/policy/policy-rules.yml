@@ -1,0 +1,53 @@
+policy:
+  guardrails:
+    enabled: true
+    mode: ENFORCE
+    
+  categories:
+    allowed:
+      - balance_inquiry
+      - get_balance
+      - check_balance
+      - list_accounts
+      - transaction_history
+      - account_statement
+      - product_info
+      - find_branch
+      - help
+    
+    money_movement:
+      - transfer_funds
+      - send_money
+      - pay_bill
+      - make_payment
+    
+    advisory:
+      - investment_advice
+      - recommend_product
+      - financial_planning
+    
+    trading:
+      - buy_stock
+      - sell_stock
+      - portfolio_value
+    
+    account_changes:
+      - change_address
+      - change_email
+      - change_phone
+    
+    disputes:
+      - dispute_charge
+      - file_complaint
+    
+    non_banking:
+      - weather
+      - joke
+      - sports
+    
+    security_keywords:
+      - my pin
+      - my password
+      - my credentials
+      - tell me pin
+      - reveal password

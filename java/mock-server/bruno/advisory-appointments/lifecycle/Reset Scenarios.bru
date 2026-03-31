@@ -1,0 +1,31 @@
+meta {
+  name: Reset Scenarios
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/__admin/scenarios/reset
+  body: none
+  auth: none
+}
+
+docs {
+  # Reset WireMock Scenarios
+
+  Resets ALL WireMock scenarios back to their initial "Started" state.
+  Run this BEFORE the lifecycle flow to get a clean state machine.
+
+  ## Expected Response
+  - HTTP 200
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should reset scenarios successfully", function() {
+    expect(res.status).to.equal(200);
+  });
+}

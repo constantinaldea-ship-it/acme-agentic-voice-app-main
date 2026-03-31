@@ -1,0 +1,56 @@
+flowchart LR
+  subgraph User[End User]
+    U((Voice Caller))
+  end
+
+  subgraph GoogleManaged[Google-managed: CX Agent Studio]
+    CES[CX Agent Studio\nRoot + Subagents]
+  end
+
+  subgraph Perimeter[VPC-SC Service Perimeter: acme-landingzone]
+    subgraph NetProj[Net Project / Shared VPC]
+      SD[Service Directory\nPrivate Network Access]
+      ILB[Internal HTTP(S) LB]
+      DNS[Cloud DNS Private Zones]
+      IC[Cloud Interconnect\n(HA VLAN attachments)]
+    end
+
+    subgraph AppProj[App Project]
+      BFA[BFA Gateway\nCloud Run (internal)]
+      AUTHZ[AuthZ PDP Service\n(Cloud Run or GKE)]
+      OBS[Logs/Traces/Audit Sinks]
+      KB[Knowledge Index]
+      FEES[Fees Read Model]
+    end
+
+    subgraph ApigeeProj[Apigee Project]
+      AP[Apigee Internal\n(GCP-based)]
+    end
+  end
+
+  subgraph CIAMLandingZone[GCP Landing Zone: CIAM]
+    CIAM[ForgeRock CIAM]
+  end
+
+  subgraph OnPrem[On-Prem DC]
+    GLUE[Glue (WSO2 API Manager)]
+    CORE[Core Systems of Record]
+  end
+
+  U --> CES
+  CES -->|Tool call via SD PNA| SD
+  SD --> ILB --> BFA
+
+  BFA --> AUTHZ
+  BFA -->|Token exchange / introspection| CIAM
+  BFA -->|Regulated/productized APIs| AP
+  BFA -->|Legacy/internal APIs| GLUE
+
+  AP -->|via Interconnect| IC --> CORE
+  GLUE -->|via Interconnect| IC --> CORE
+  %% NOTE: CIAM is GCP cloud-hosted — no Interconnect dependency
+
+  BFA --> OBS
+  BFA --> KB
+  BFA --> FEES
+  DNS --- SD

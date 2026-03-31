@@ -1,0 +1,139 @@
+{
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "tests": [
+    {
+      "name": "customer_details_wrapper_tool_exists",
+      "type": "resource_exists",
+      "kind": "tools",
+      "display_name": "get_customer_details_wrapper"
+    },
+    {
+      "name": "customer_details_python_tool_exists",
+      "type": "resource_exists",
+      "kind": "tools",
+      "display_name": "get_customer_details_python"
+    },
+    {
+      "name": "customer_details_toolset_exists",
+      "type": "resource_exists",
+      "kind": "toolsets",
+      "display_name": "customer_details_openapi"
+    },
+    {
+      "name": "customer_details_agent_exists",
+      "type": "resource_exists",
+      "kind": "agents",
+      "display_name": "customer_details_agent"
+    },
+    {
+      "name": "customer_details_wrapper_tool_health",
+      "type": "execute_tool",
+      "tool_display_name": "get_customer_details_wrapper",
+      "args": {
+        "partner_id": "1234567890"
+      },
+      "expect": {
+        "equals": {
+          "response.result.success": true,
+          "response.result.customer.firstname": "Maria",
+          "response.result.customer.city": "Berlin"
+        },
+        "contains": {
+          "response.result.summary": "Maria Musterfrau"
+        }
+      }
+    },
+    {
+      "name": "customer_details_python_tool_health",
+      "type": "execute_tool",
+      "tool_display_name": "get_customer_details_python",
+      "args": {
+        "partner_id": "1234567890"
+      },
+      "expect": {
+        "equals": {
+          "response.result.success": true,
+          "response.result.customer.firstname": "Maria",
+          "response.result.customer.city": "Berlin"
+        },
+        "contains": {
+          "response.result.summary": "Maria Musterfrau"
+        }
+      }
+    },
+    {
+      "name": "customer_details_wrapper_tool_default_customer",
+      "type": "execute_tool",
+      "tool_display_name": "get_customer_details_wrapper",
+      "args": {
+        "partner_id": "9999999999"
+      },
+      "expect": {
+        "equals": {
+          "response.result.success": true,
+          "response.result.customer.firstname": "Hans",
+          "response.result.customer.city": "Berlin"
+        },
+        "contains": {
+          "response.result.summary": "Hans Müller"
+        }
+      }
+    },
+    {
+      "name": "customer_details_python_tool_default_customer",
+      "type": "execute_tool",
+      "tool_display_name": "get_customer_details_python",
+      "args": {
+        "partner_id": "9999999999"
+      },
+      "expect": {
+        "equals": {
+          "response.result.success": true,
+          "response.result.customer.firstname": "Hans",
+          "response.result.customer.city": "Berlin"
+        },
+        "contains": {
+          "response.result.summary": "Hans Müller"
+        }
+      }
+    },
+    {
+      "name": "customer_details_toolset_contract",
+      "type": "toolset_schema",
+      "toolset_display_name": "customer_details_openapi",
+      "expect_operation_ids": [
+        "getEidpToken",
+        "getAuthzToken",
+        "getCustomerPersonalData"
+      ],
+      "expect_schema_contains": [
+        "X-API-Key",
+        "/oauth/token",
+        "/authz/authorize",
+        "/customers/{partnerId}/personal-data"
+      ]
+    },
+    {
+      "name": "customer_details_openapi_token_flow_step_1",
+      "type": "execute_toolset_tool",
+      "toolset_display_name": "customer_details_openapi",
+      "tool_id": "getEidpToken",
+      "args": {
+        "X-API-Key": "${CUSTOMER_DETAILS_API_KEY}",
+        "grant_type": "client_credentials",
+        "client_id": "ces-agent-service",
+        "client_secret": "mock-secret"
+      },
+      "expect": {
+        "exists": [
+          "response.access_token"
+        ],
+        "equals": {
+          "response.token_type": "Bearer"
+        }
+      }
+    }
+  ]
+}

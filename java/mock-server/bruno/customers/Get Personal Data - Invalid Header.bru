@@ -1,0 +1,36 @@
+meta {
+  name: Get Personal Data - Invalid Header
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/customers/6585363429/personal-data
+  body: none
+  auth: none
+}
+
+headers {
+  deuba-client-id: invalid-header
+  Accept: application/json
+}
+
+docs {
+  # Get Personal Data - Invalid Header (Negative Test)
+  
+  Tests that the endpoint returns 404 when the `deuba-client-id` header 
+  does not contain `-banking`.
+  
+  ## Expected Response
+  - HTTP 404 (Not Found)
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("should return status 404 when header value is invalid", function() {
+    expect(res.status).to.equal(404);
+  });
+}

@@ -1,0 +1,64 @@
+---
+title: BFA Advisory Appointment Flow - Diagram Set Overview
+---
+%%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#4285f4', 'actorTextColor': '#ffffff', 'actorBorder': '#1a56db', 'activationBkg': '#c9daf8', 'activationBorder': '#1a73e8', 'noteBkg': '#fff9c4', 'noteBorderColor': '#f4b400', 'noteTextColor': '#37474f', 'signalColor': '#1a73e8', 'signalTextColor': '#174ea6', 'labelBoxBkgColor': '#e8f0fe', 'labelBoxBorderColor': '#4285f4', 'labelTextColor': '#174ea6', 'loopTextColor': '#174ea6', 'sequenceNumberColor': '#ffffff'}}}%%
+%% Modified by Codex on 2026-03-16.
+%% This overview replaces the monolithic appointment diagram with a diagram set
+%% aligned to the approved preparation topology:
+%% voice_banking_agent -> advisory_appointment_agent -> bfa-service-resource -> mock-server
+%% Detailed diagrams:
+%% 1. bfa-appointments-flow-01-routing-and-intake.mmd
+%% 2. bfa-appointments-flow-02-location-and-slots.mmd
+%% 3. bfa-appointments-flow-03-booking-confirmation.mmd
+%% 4. bfa-appointments-flow-04-lifecycle-management.mmd
+
+sequenceDiagram
+  autonumber
+
+  participant User as User
+  participant RootAgent as voice_banking_agent
+  participant AppointmentAgent as advisory_appointment_agent
+  participant Controller as AppointmentController
+  participant Service as AppointmentService
+  participant Upstream as AppointmentMockServerClient
+  participant MockServer as mock-server
+
+  Note over User,AppointmentAgent: Flow 01 - Routing and intake<br/>See bfa-appointments-flow-01-routing-and-intake.mmd
+  User->>RootAgent: "Book, reschedule, or cancel an advisory appointment"
+  RootAgent->>RootAgent: Detect appointment intent or lifecycle language
+  RootAgent->>AppointmentAgent: Route appointment journey
+  AppointmentAgent->>AppointmentAgent: Capture journey type,<br/>entryPath, topic or service,<br/>and consultation channel
+
+  Note over AppointmentAgent,MockServer: Flow 02 - Location and slot search<br/>See bfa-appointments-flow-02-location-and-slots.mmd
+  AppointmentAgent->>Controller: findBranches / getAvailableSlots
+  Controller->>Service: Validate request and orchestrate search
+  Service->>Upstream: Read eligibility and slot templates
+  Upstream->>MockServer: GET /advisory-appointments/*
+  MockServer-->>Upstream: Deterministic search payload
+  Upstream-->>Service: Typed upstream response
+  Service-->>Controller: Branches or slots
+  Controller-->>AppointmentAgent: ApiResponse payload
+
+  Note over User,MockServer: Flow 03 - Booking confirmation<br/>See bfa-appointments-flow-03-booking-confirmation.mmd
+  AppointmentAgent->>AppointmentAgent: Capture contact data and confirm summary
+  AppointmentAgent->>Controller: createAppointment
+  Controller->>Service: Validate request and reserve slot
+  Service->>Upstream: Read booking metadata
+  Upstream->>MockServer: GET or POST /advisory-appointments/*
+  MockServer-->>Upstream: Deterministic booking context
+  Upstream-->>Service: Typed booking response hints
+  Service-->>Controller: Appointment view and access token
+  Controller-->>AppointmentAgent: Structured booking result
+  AppointmentAgent-->>User: Confirmation, repair prompt, or fallback
+
+  Note over User,MockServer: Flow 04 - Lifecycle management<br/>See bfa-appointments-flow-04-lifecycle-management.mmd
+  User->>RootAgent: "Show, reschedule, or cancel my appointment"
+  RootAgent->>AppointmentAgent: Route lifecycle journey
+  AppointmentAgent->>Controller: getAppointment / rescheduleAppointment / cancelAppointment
+  Controller->>Service: Enforce access token and lifecycle rules
+  Service->>Upstream: Read supporting slot or state templates as needed
+  Upstream->>MockServer: GET /advisory-appointments/*
+  MockServer-->>Upstream: Lifecycle template or slot payload
+  Service-->>Controller: Current or updated appointment view
+  Controller-->>AppointmentAgent: Lifecycle response
+  AppointmentAgent-->>User: Appointment details or confirmation

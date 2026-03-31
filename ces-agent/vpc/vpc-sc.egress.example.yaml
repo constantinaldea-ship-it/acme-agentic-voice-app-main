@@ -1,0 +1,9 @@
+- egressFrom:
+    identities:
+      - serviceAccount:your-client-sa@your-project.iam.gserviceaccount.com
+  egressTo:
+    resources:
+      - projects/1041912723804
+    operations:
+      - serviceName: storage.googleapis.com
+      - serviceName: bigquery.googleapis.com

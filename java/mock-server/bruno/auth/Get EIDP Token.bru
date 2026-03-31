@@ -1,0 +1,63 @@
+meta {
+  name: Get EIDP Token
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/oauth/token
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+  client_id: ces-agent-service
+  client_secret: mock-secret
+}
+
+docs {
+  # Get EIDP Token
+  
+  Retrieves an access token from the Enterprise Identity Provider (EIDP).
+  Uses OAuth2 client credentials grant type.
+  
+  ## Request
+  - POST /oauth/token
+  - Content-Type: application/x-www-form-urlencoded
+  - Body: grant_type=client_credentials&client_id=...&client_secret=...
+  
+  ## Expected Response
+  - HTTP 200
+  - Returns JWT access_token, token_type, expires_in, scope
+}
+
+assert {
+  res.status: eq 200
+  res.body.access_token: isString
+  res.body.token_type: eq Bearer
+  res.body.expires_in: eq 3600
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return an access token", function() {
+    expect(res.body.access_token).to.be.a("string");
+    expect(res.body.access_token.length).to.be.greaterThan(0);
+  });
+  
+  test("should return Bearer token type", function() {
+    expect(res.body.token_type).to.equal("Bearer");
+  });
+  
+  test("should have 1 hour expiry", function() {
+    expect(res.body.expires_in).to.equal(3600);
+  });
+}

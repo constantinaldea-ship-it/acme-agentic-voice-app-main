@@ -1,0 +1,28 @@
+# Local Profile Configuration
+# Uses stub adapters for STT and LLM (no cloud credentials required)
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+# Adapter selection
+voice-banking:
+  adapters:
+    stt-provider: stub
+    llm-provider: stub
+  
+  # Stub adapter settings
+  stub:
+    # Simulated latency in milliseconds
+    stt-latency-ms: 50
+    llm-latency-ms: 100
+    
+    # Default confidence scores
+    stt-confidence: 0.95
+    llm-confidence: 0.90
+
+logging:
+  level:
+    com.voicebanking: DEBUG
+    com.voicebanking.adapter: TRACE

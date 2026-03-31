@@ -1,0 +1,16 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "display_name": "simple-voice-routing",
+  "scenarios": [
+    {
+      "name": "appointment_routing_english_voice",
+      "audio_path": "../fixtures/appointment-routing-english/utterance.aiff",
+      "transcriber": {
+        "kind": "sidecar",
+        "transcript_path": "../fixtures/appointment-routing-english/utterance.transcript.txt"
+      },
+      "expected_transcript": "I'd like to book an advisory appointment",
+      "linked_evaluation": "appointment_routing_english"
+    }
+  ]
+}

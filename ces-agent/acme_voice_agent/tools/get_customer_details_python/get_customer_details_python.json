@@ -1,0 +1,9 @@
+{
+  "pythonFunction": {
+    "name": "get_customer_details_python",
+    "pythonCode": "tools/get_customer_details_python/python_function/python_code.py",
+    "description": "Look up a customer's personal details by partner ID using a pure direct Python implementation. This tool performs the EIDP token, AuthZ token, and customer lookup HTTP calls itself through ces_requests without invoking the customer_details_openapi toolset.\n\nArgs:\n    partner_id: Customer partner ID.\n    debug_capture: Optional debug flag. When true, the tool returns the captured backend request headers for proof and troubleshooting.\n\nReturns:\n    Dict with 'success', 'summary', and 'customer' fields. When debug_capture is true, the payload also includes 'debug_capture'."
+  },
+  "executionType": "SYNCHRONOUS",
+  "displayName": "get_customer_details_python"
+}

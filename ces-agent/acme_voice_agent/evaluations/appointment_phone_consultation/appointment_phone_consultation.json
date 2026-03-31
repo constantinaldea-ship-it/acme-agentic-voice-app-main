@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_phone_consultation",
+  "scenario": {
+    "task": "Test a phone consultation appointment booking. Start with 'I'd like to schedule a phone consultation about a standing order'. The agent should: (1) transfer to advisory_appointment_agent, (2) search services for 'standing order', (3) check eligibility for PHONE channel, (4) get available phone slots, (5) present options and ask for confirmation. Verify the agent correctly handles the PHONE channel without requiring a city, uses the remote phone location ID, and maintains a natural conversational flow.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent routes to advisory_appointment_agent and uses the PHONE consultation channel."
+      },
+      {
+        "expectedResult": "The agent searches for services matching 'standing order' and presents results."
+      },
+      {
+        "expectedResult": "The agent presents available phone slots and asks for time preference."
+      }
+    ],
+    "maxTurns": 8
+  }
+}

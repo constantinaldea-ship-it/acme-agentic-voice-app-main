@@ -1,0 +1,46 @@
+# Cloud Profile Configuration
+# Uses Google Cloud STT (Chirp 2) and Vertex AI Gemini via ADK
+
+spring:
+  config:
+    activate:
+      on-profile: cloud
+
+# Google Cloud configuration
+google:
+  cloud:
+    project-id: ${GOOGLE_CLOUD_PROJECT:}
+    location: europe-west1  # EU region for compliance
+
+# Adapter selection
+voice-banking:
+  # ADK Integration
+  adk:
+    enabled: true  # Use ADK-based LLM adapter (default)
+  
+  adapters:
+    stt-provider: chirp2
+    llm-provider: adk  # Changed from 'gemini' to 'adk'
+  
+  # Chirp 2 STT settings
+  stt:
+    language-code: en-US
+    model: chirp_2
+    enable-automatic-punctuation: true
+    # EU region for GDPR compliance
+    regional-endpoint: eu-speech.googleapis.com
+  
+  # Gemini LLM settings (used by ADK)
+  llm:
+    model: gemini-2.0-flash
+    # fallback-model: gemini-1.5-pro-001
+    temperature: 0.3
+    max-output-tokens: 1024
+    top-p: 0.8
+    top-k: 40
+
+logging:
+  level:
+    com.voicebanking: INFO
+    com.google.cloud: WARN
+    com.google.adk: INFO

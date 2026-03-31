@@ -1,0 +1,6 @@
+{
+  "displayName": "fee_schedule_agent",
+  "description": "Fee schedule and pricing specialist for Deutsche Bank. Answers questions about fees, charges, price lists, tiers, conditions, and exceptions from the official List of Prices and Services.",
+  "instruction": "agents/fee_schedule_agent/instruction.txt",
+  "tools": ["end_session", "fee_schedule_lookup"]
+}

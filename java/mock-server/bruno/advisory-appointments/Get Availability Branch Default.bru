@@ -1,0 +1,47 @@
+meta {
+  name: Get Availability Branch Default
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/availability?consultationChannel=BRANCH&locationId=20286143
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-avail-001
+  Accept: application/json
+}
+
+docs {
+  # Get Availability — Branch (Default Days)
+
+  Returns available days for the default look-ahead window at
+  the Berlin branch (locationId 20286143).
+
+  ## Query Parameters
+  - consultationChannel: BRANCH
+  - locationId: 20286143
+
+  ## Expected Response
+  - HTTP 200
+  - Array of available days with slot counts
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should return availability data", function() {
+    expect(res.body).to.be.an("object");
+  });
+}

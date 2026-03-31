@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_booking_branch_flow",
+  "scenario": {
+    "task": "Test a full branch appointment booking conversation. Start with 'I want to book an advisory appointment at a branch in Berlin'. The agent should: (1) transfer to advisory_appointment_agent, (2) call the taxonomy or service-search tool to identify consultation topics, (3) call the eligibility tool with consultationChannel=BRANCH and city=berlin, (4) present available branches, (5) call the availability tool for the selected branch, (6) present available time slots, (7) request confirmation before booking, (8) call the create appointment tool. Verify that the agent always asks for confirmation before creating the appointment and responds in English throughout.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent routes to advisory_appointment_agent when the user requests an appointment."
+      },
+      {
+        "expectedResult": "The agent calls appropriate appointment tools (eligibility, availability, or lifecycle) during the booking flow."
+      },
+      {
+        "expectedResult": "The agent asks for explicit confirmation before creating the appointment."
+      }
+    ],
+    "maxTurns": 10
+  }
+}

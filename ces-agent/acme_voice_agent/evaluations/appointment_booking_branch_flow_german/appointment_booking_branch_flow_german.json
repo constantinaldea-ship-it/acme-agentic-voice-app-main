@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_booking_branch_flow_german",
+  "scenario": {
+    "task": "Teste eine vollständige deutschsprachige Beratungstermin-Buchung in einer Filiale. Beginne mit 'Ich möchte einen Beratungstermin in einer Filiale in Berlin buchen'. Die Agentin oder der Agent soll: (1) an advisory_appointment_agent übergeben, (2) das Taxonomie- oder Service-Suchwerkzeug nutzen, um Beratungsthemen zu identifizieren, (3) das Eligibility-Werkzeug mit consultationChannel=BRANCH und city=berlin aufrufen, (4) verfügbare Filialen vorstellen, (5) das Availability-Werkzeug für die ausgewählte Filiale aufrufen, (6) verfügbare Zeitfenster vorstellen, (7) vor der Buchung ausdrücklich um Bestätigung bitten und (8) anschließend das Create-Appointment-Werkzeug aufrufen. Verifiziere, dass die Antwort während des gesamten Gesprächs auf Deutsch bleibt und dass vor dem Erstellen des Termins immer eine explizite Bestätigung eingeholt wird.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "Der Agent leitet bei einer Terminbuchungsanfrage an advisory_appointment_agent weiter."
+      },
+      {
+        "expectedResult": "Der Agent ruft während des Buchungsablaufs passende Terminwerkzeuge wie Eligibility, Availability oder Lifecycle auf."
+      },
+      {
+        "expectedResult": "Der Agent fordert vor der eigentlichen Buchung eine ausdrückliche Bestätigung an und antwortet konsequent auf Deutsch."
+      }
+    ],
+    "maxTurns": 10
+  }
+}

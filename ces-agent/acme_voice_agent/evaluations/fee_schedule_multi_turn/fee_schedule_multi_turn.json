@@ -1,0 +1,8 @@
+{
+  "displayName": "fee_schedule_multi_turn",
+  "scenario": {
+    "task": "You are a customer testing Acme Bank's voice banking assistant fee lookup capability. Perform the following steps:\n\n1. Greet the assistant and ask: 'What are the fees for a current account?'\n2. Verify the agent transfers to a fee specialist and provides fee information\n3. Follow up with: 'Are there any conditions or waivers for that fee?'\n4. Verify the agent provides information about waiver conditions or exceptions\n5. Then ask: 'How do the different account tiers compare in terms of fees?'\n6. Verify the agent provides a comparison of fee tiers or asks a clarifying question\n\nPass criteria:\n- The root agent routes the fee question to a fee specialist agent (not handling it directly)\n- The fee agent cites 'List of Prices and Services' or 'Preis- und Leistungsverzeichnis'\n- The fee agent NEVER fabricates specific fee amounts without citing tool results\n- The fee agent mentions conditions or footnotes when providing fee information\n- The fee agent responds in English throughout (user is speaking English)\n- Responses are concise and appropriate for voice interaction (2-3 sentences per turn)",
+    "scenarioExpectations": [],
+    "maxTurns": 6
+  }
+}

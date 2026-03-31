@@ -1,0 +1,232 @@
+openapi: "3.0.1"
+info:
+  title: Acme Bank Location Services API
+  description: >-
+    Branch and ATM location search service for the Voice Banking Assistant.
+    238 branches (Deutsche Bank + Postbank) across 50 German cities.
+    Canonical source: `java/bfa-service-resource/openapi-specs/location-services.json`.
+  version: "1.0.0"
+servers:
+  - url: "$env_var"                    # Injected from environment.json
+    description: "BFA Service (environment-injected)"
+
+# NOTE: security section REMOVED — auth handled by toolset serviceAgentIdTokenAuthConfig
+
+tags:
+  - name: Location Services
+    description: Branch and ATM location search
+
+paths:
+  /api/v1/branches:
+    get:
+      tags: [Location Services]
+      summary: Search branches
+      description: >-
+        Search for bank branches by city, address, postal code, GPS coordinates,
+        or brand. Results are distance-sorted from a reference point.
+      operationId: searchBranches
+      parameters:
+        # --- Query Parameters ---
+        - name: city
+          in: query
+          required: false
+          schema: { type: string }
+          description: "City name (case-insensitive, partial match)"
+          example: "Köln"
+        - name: address
+          in: query
+          required: false
+          schema: { type: string }
+          description: "Street name or landmark (partial match)"
+          example: "Hauptstraße"
+        - name: postalCode
+          in: query
+          required: false
+          schema: { type: string }
+          description: "Postal code prefix (matches start of PLZ)"
+          example: "50667"
+        - name: latitude
+          in: query
+          required: false
+          schema: { type: number, format: double }
+          description: "Caller latitude for distance sorting"
+        - name: longitude
+          in: query
+          required: false
+          schema: { type: number, format: double }
+          description: "Caller longitude for distance sorting"
+        - name: radiusKm
+          in: query
+          required: false
+          schema: { type: number, format: double, default: 50.0 }
+          description: "Search radius in km (requires lat/lon)"
+        - name: brand
+          in: query
+          required: false
+          schema: { type: string }
+          description: "Filter by bank brand: 'Deutsche Bank' or 'Postbank'"
+        - name: accessible
+          in: query
+          required: false
+          schema: { type: boolean }
+          description: "If true, only wheelchair-accessible branches"
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, format: int32, default: 10 }
+          description: "Max results (max 50)"
+      responses:
+        "200":
+          description: Search results (may be empty)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchSearchResponse"
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchSearchResponse"
+        "404":
+          description: No branches found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchSearchResponse"
+        "401":
+          description: Authentication required (bypassed in Phase 1 via backend feature flag)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchSearchResponse"
+        "403":
+          description: Missing AI_INTERACTION consent (bypassed in Phase 1 via backend feature flag)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchSearchResponse"
+
+  /api/v1/branches/{branchId}:
+    get:
+      tags: [Location Services]
+      summary: Get branch details
+      description: >-
+        Returns full details for a specific branch including address,
+        opening hours, phone, services, advisory availability,
+        and accessibility information.
+      operationId: getBranch
+      parameters:
+        - name: branchId
+          in: path
+          required: true
+          schema: { type: string }
+          description: "Unique branch identifier"
+          example: "DB-DE-00003"
+      responses:
+        "200":
+          description: Branch details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchDto"
+        "404":
+          description: Branch not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchDto"
+        "401":
+          description: Authentication required (bypassed in Phase 1 via backend feature flag)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseBranchDto"
+
+components:
+  schemas:
+    ApiResponseBranchSearchResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/BranchSearchResponse"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    BranchSearchResponse:
+      type: object
+      properties:
+        branches:
+          type: array
+          items:
+            $ref: "#/components/schemas/BranchDto"
+        count: { type: integer, format: int32 }
+        totalMatches: { type: integer, format: int32 }
+        referencePoint:
+          $ref: "#/components/schemas/ReferencePoint"
+
+    BranchDto:
+      type: object
+      properties:
+        branchId: { type: string, example: "DB-DE-00003" }
+        name: { type: string, example: "Deutsche Bank Marienplatz" }
+        brand: { type: string, enum: ["Deutsche Bank", "Postbank"] }
+        address: { type: string, example: "Marienplatz 22" }
+        city: { type: string, example: "München" }
+        postalCode: { type: string, example: "80331" }
+        latitude: { type: number, format: double }
+        longitude: { type: number, format: double }
+        phone: { type: string, example: "+49 89 2180-0" }
+        openingHours: { type: string, example: "Mo 10:00-18:00; Di 10:00-18:00" }
+        wheelchairAccessible: { type: boolean }
+        selfServices:
+          type: array
+          items: { type: string }
+        branchServices:
+          type: array
+          items: { type: string }
+        advisoryAvailable:
+          type: boolean
+          description: "Whether the branch offers advisory or consultation services"
+        transitInfo: { type: string }
+        parkingInfo: { type: string }
+        distanceKm: { type: number, format: double }
+
+    ReferencePoint:
+      type: object
+      properties:
+        latitude: { type: number, format: double }
+        longitude: { type: number, format: double }
+        source:
+          type: string
+          enum: [PROVIDED_COORDINATES, CITY_CENTROID, POSTAL_CODE_CENTROID, DATA_CENTROID]
+
+    ErrorInfo:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details:
+          type: object
+          additionalProperties: { type: object }
+
+    ResponseMeta:
+      type: object
+      properties:
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+        apiVersion: { type: string }
+
+    ApiResponseBranchDto:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/BranchDto"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"

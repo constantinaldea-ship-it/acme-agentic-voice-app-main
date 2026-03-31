@@ -1,0 +1,10 @@
+{
+  "displayName": "customer_details_agent",
+  "description": "Customer data specialist for Acme Bank. Retrieves customer personal details through a single wrapper tool that internally executes the EIDP token → AuthZ token → Customer API flow.",
+  "instruction": "agents/customer_details_agent/instruction.txt",
+  "tools": ["get_customer_details_wrapper", "end_session"],
+  "toolsets": [{
+    "toolset": "customer_details_openapi",
+    "toolIds": ["getEidpToken", "getAuthzToken", "getCustomerPersonalData"]
+  }]
+}

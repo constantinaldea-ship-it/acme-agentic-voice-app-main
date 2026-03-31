@@ -1,0 +1,46 @@
+meta {
+  name: Search Standing Order
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/service-search?query=standing+order
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-search-001
+  Accept: application/json
+}
+
+docs {
+  # Service Search — Standing Order
+
+  Searches advisory services by keyword. This request searches for "standing order"
+  which matches the German keyword pattern (standing|dauer).
+
+  ## Query Parameters
+  - query: standing order
+
+  ## Expected Response
+  - HTTP 200
+  - Array of matching services
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should return matching services", function() {
+    expect(res.body).to.be.an("array");
+  });
+}

@@ -1,0 +1,10 @@
+{
+  "displayName": "creditcards_agent",
+  "description": "Credit cards specialist for card-related guidance, benefit explanations, and safe next-step support when no live card tools are configured.",
+  "instruction": "agents/creditcards_agent/instruction.txt",
+  "beforeModelCallbacks": [
+    {
+      "pythonCode": "agents/creditcards_agent/before_model_callbacks/urgent_card_safety/python_code.py"
+    }
+  ]
+}

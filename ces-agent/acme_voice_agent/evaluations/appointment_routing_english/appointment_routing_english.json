@@ -1,0 +1,19 @@
+{
+  "displayName": "appointment_routing_english",
+  "golden": {
+    "turns": [{
+      "steps": [{
+        "userInput": {
+          "text": "I'd like to book an advisory appointment"
+        }
+      }, {
+        "expectation": {
+          "agentTransfer": {
+            "targetAgent": "advisory_appointment_agent",
+            "displayName": "advisory_appointment_agent"
+          }
+        }
+      }]
+    }]
+  }
+}

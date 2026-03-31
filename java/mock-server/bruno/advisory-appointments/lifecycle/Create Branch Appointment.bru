@@ -1,0 +1,59 @@
+meta {
+  name: Create Branch Appointment
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/advisory-appointments/lifecycle
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-lifecycle-001
+  Content-Type: application/json
+  X-Mock-Scenario: branch-lifecycle
+}
+
+body:json {
+  {
+    "consultationChannel": "BRANCH",
+    "locationId": "20286143",
+    "serviceId": "SVC-001",
+    "slotId": "SLOT-2030-06-18-0900"
+  }
+}
+
+docs {
+  # Create Branch Appointment
+
+  Creates a new appointment at a branch. This transitions the WireMock
+  lifecycle scenario from "Started" → "BOOKED".
+
+  ## Prerequisites
+  - Run "Reset Scenarios" first to ensure clean state
+
+  ## Headers
+  - X-Mock-Scenario: branch-lifecycle (selects the branch booking flow)
+
+  ## Expected Response
+  - HTTP 200
+  - Appointment with status BOOKED, appointmentId APT-BRANCH-0001
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should return a booked appointment", function() {
+    expect(res.body.appointmentId).to.equal("APT-BRANCH-0001");
+  });
+}

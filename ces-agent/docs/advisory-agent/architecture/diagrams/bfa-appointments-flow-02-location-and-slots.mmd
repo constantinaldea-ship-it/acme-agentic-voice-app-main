@@ -1,0 +1,61 @@
+---
+title: BFA Advisory Appointment Flow 02 - Location and Slot Search
+---
+%%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#4285f4', 'actorTextColor': '#ffffff', 'actorBorder': '#1a56db', 'activationBkg': '#c9daf8', 'activationBorder': '#1a73e8', 'noteBkg': '#fff9c4', 'noteBorderColor': '#f4b400', 'noteTextColor': '#37474f', 'signalColor': '#1a73e8', 'signalTextColor': '#174ea6', 'labelBoxBkgColor': '#e8f0fe', 'labelBoxBorderColor': '#4285f4', 'labelTextColor': '#174ea6', 'loopTextColor': '#174ea6', 'sequenceNumberColor': '#ffffff'}}}%%
+%% Modified by Codex on 2026-03-16.
+%% Scope: Booking-eligible location resolution plus date and slot search.
+
+sequenceDiagram
+  autonumber
+
+  participant User as User
+  participant AppointmentAgent as advisory_appointment_agent
+  participant Controller as AppointmentController
+  participant Service as AppointmentService
+  participant BranchResolver as AppointmentBranchResolver
+  participant SlotService as AppointmentSlotService
+  participant Upstream as AppointmentMockServerClient
+  participant MockServer as mock-server
+
+  alt consultationChannel == BRANCH
+    AppointmentAgent-->>User: Ask for postal code or city
+    User->>AppointmentAgent: Location hint
+    AppointmentAgent->>Controller: GET /api/v1/appointment-branches
+    Controller->>Service: findBranches(...)
+    Service->>BranchResolver: Resolve booking-eligible branch options
+    BranchResolver->>Upstream: Fetch branch eligibility candidates
+    Upstream->>MockServer: GET /advisory-appointments/branches?postalCode=...&entryPath=...&channel=BRANCH
+    MockServer-->>Upstream: Deterministic branch list or no-match scenario
+    Upstream-->>BranchResolver: Typed branch payload
+    BranchResolver-->>Service: Eligible branches
+    Service-->>Controller: AppointmentBranchSearchResponse
+    Controller-->>AppointmentAgent: ApiResponse with branch options
+    AppointmentAgent-->>User: Present branch choices
+    User->>AppointmentAgent: Select branch
+  else consultationChannel == VIDEO or PHONE
+    AppointmentAgent->>Controller: GET /api/v1/appointment-branches
+    Controller->>Service: findBranches(...)
+    Service->>BranchResolver: Resolve remote advisory location
+    BranchResolver->>BranchResolver: Map to REMOTE-VIDEO-DE or REMOTE-PHONE-DE
+    BranchResolver-->>Service: Virtual location
+    Service-->>Controller: AppointmentBranchSearchResponse
+    Controller-->>AppointmentAgent: ApiResponse with remote location
+  end
+
+  AppointmentAgent->>Controller: GET /api/v1/appointment-slots
+  Controller->>Service: getAvailableSlots(...)
+  Service->>SlotService: Resolve matching slots
+  SlotService->>Upstream: Fetch slot templates for location and topic
+  Upstream->>MockServer: GET /advisory-appointments/slots?locationId=...&entryPath=...&channel=...
+  MockServer-->>Upstream: Deterministic slot list or no-slots scenario
+  Upstream-->>SlotService: Typed slot payload
+  SlotService-->>Service: Candidate slots or empty result
+  Service-->>Controller: AppointmentSlotSearchResponse
+  Controller-->>AppointmentAgent: ApiResponse with slot options
+
+  alt slots available
+    AppointmentAgent-->>User: Present date and time options
+    User->>AppointmentAgent: Select slot and selectedDay
+  else no slots available
+    AppointmentAgent-->>User: Offer branch retry, channel switch, or human handoff
+  end

@@ -1,0 +1,65 @@
+{
+  "displayName": "agent_handover_roundtrip",
+  "golden": {
+    "turns": [{
+      "steps": [{
+        "userInput": {
+          "text": "Hi, I need help finding a branch"
+        }
+      }, {
+        "expectation": {
+          "agentTransfer": {
+            "targetAgent": "location_services_agent",
+            "displayName": "location_services_agent"
+          }
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "location_services_agent",
+            "chunks": [{
+              "text": "I can help you find a branch. Which city are you looking for?"
+            }]
+          }
+        }
+      }]
+    }, {
+      "steps": [{
+        "userInput": {
+          "text": "Frankfurt"
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "location_services_agent",
+            "chunks": [{
+              "text": "I found 11 branches in Frankfurt. Here are the nearest three: 1. Postbank Rohmerplatz 33-37 (0.29 km) 2. Deutsche Bank Theodor-Heuss-Allee 72 (0.51 km) 3. Deutsche Bank Taunusanlage 12 (1.83 km). Would you like to see more or get details on any of these?"
+            }]
+          }
+        }
+      }]
+    }, {
+      "steps": [{
+        "userInput": {
+          "text": "Actually, can I speak to someone about my account?"
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "voice_banking_agent",
+            "chunks": [{
+              "text": "I'll connect you with a live agent who can help with your account."
+            }]
+          }
+        }
+      }, {
+        "expectation": {
+          "toolCall": {
+            "tool": "end_session",
+            "params": {}
+          }
+        }
+      }]
+    }]
+  }
+}

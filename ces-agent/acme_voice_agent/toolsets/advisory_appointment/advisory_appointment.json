@@ -1,0 +1,9 @@
+{
+  "displayName": "advisory_appointment",
+  "openApiToolset": {
+    "openApiSchema": "toolsets/advisory_appointment/open_api_toolset/open_api_schema.yaml",
+    "apiAuthentication": {
+      "serviceAgentIdTokenAuthConfig": {}
+    }
+  }
+}

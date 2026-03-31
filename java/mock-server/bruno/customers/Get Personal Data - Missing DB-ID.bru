@@ -1,0 +1,45 @@
+meta {
+  name: Get Personal Data - Missing DB-ID
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/customers/1234567890/personal-data
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authzToken}}
+}
+
+headers {
+  deuba-client-id: {{clientId}}
+  Accept: application/json
+}
+
+docs {
+  # Get Personal Data - Missing DB-ID (Negative Test)
+  
+  Tests that the endpoint returns 403 when the DB-ID header is missing.
+  Authorization and deuba-client-id headers are present.
+  
+  ## Expected Response
+  - HTTP 403 (Forbidden)
+}
+
+assert {
+  res.status: eq 403
+  res.body.error: eq forbidden
+}
+
+tests {
+  test("should return status 403 when DB-ID is missing", function() {
+    expect(res.status).to.equal(403);
+  });
+  
+  test("should return forbidden error", function() {
+    expect(res.body.error).to.equal("forbidden");
+  });
+}

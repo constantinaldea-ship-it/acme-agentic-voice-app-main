@@ -1,0 +1,47 @@
+meta {
+  name: Get AuthZ Token - Missing Bearer Token
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/authz/authorize
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "resource": "customers:personal-data",
+    "action": "read"
+  }
+}
+
+docs {
+  # Get AuthZ Token - Missing Bearer Token (Negative Test)
+  
+  Tests that the AuthZ endpoint returns 401 when the Authorization header is missing.
+  
+  ## Expected Response
+  - HTTP 401 (Unauthorized)
+}
+
+assert {
+  res.status: eq 401
+  res.body.error: eq unauthorized
+}
+
+tests {
+  test("should return status 401 when Authorization header is missing", function() {
+    expect(res.status).to.equal(401);
+  });
+  
+  test("should return unauthorized error", function() {
+    expect(res.body.error).to.equal("unauthorized");
+  });
+}

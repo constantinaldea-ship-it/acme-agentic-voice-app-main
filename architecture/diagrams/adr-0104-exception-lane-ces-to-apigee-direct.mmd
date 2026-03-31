@@ -1,0 +1,113 @@
+%% ADR-0104 Round 2 Review: Exception Lane — CES → Apigee Direct (Resolved Token Model)
+%% Created by GitHub Copilot on 2026-03-01
+%% RESOLVES the "unsolved token" problem (previously in adr-0104-r2-option-c-exception-lane-unsolved-token.mmd, now deleted)
+%% Shows Tier 1 (API key) and Tier 2 (Token Broker) exception paths alongside BFA default path
+
+flowchart LR
+  subgraph CESPlatform["CX Agent Studio (Google-managed)"]
+    CES["CES Agents + Tools"]
+  end
+
+  subgraph VPCSCPerimeter["VPC-SC Perimeter: acme-landingzone"]
+    subgraph NetLayer["Network Layer"]
+      SD["Service Directory PNA"]
+      ILB["Internal HTTP/S LB"]
+    end
+
+    subgraph BFADefault["BFA (DEFAULT PATH)"]
+      BFA["BFA Gateway + Edge PEP"]
+      PDP["AuthZ PDP"]
+      ADAPTERS["Domain Adapters"]
+    end
+
+    subgraph IdentityServices["Identity Services"]
+      TOKEN_SVC["Token Broker:\nCIAM + CIDP + EIDP"]
+      CIDP["CIDP\n(Cloud Identity Provider)"]
+    end
+
+    subgraph ApigeeProj["Apigee (DEFAULT + EXCEPTION TARGET)"]
+      AP["Apigee Internal"]
+      AP_GW["Apigee Gateway Controls:\n· Rate limiting\n· Threat protection\n· Claim validation\n· Audit logging"]
+    end
+
+    subgraph SecretMgr["Secret Manager"]
+      APIKEY["API Key\n(BYOK)"]
+    end
+  end
+
+  subgraph CIAMLandingZone["GCP Landing Zone: CIAM"]
+    CIAM["ForgeRock CIAM"]
+  end
+
+  subgraph OnPrem["On-Prem Data Center"]
+    EIDP["EIDP\n(Enterprise Identity Provider)"]
+    GLUE["Glue (WSO2)"]
+    CORE["Core Banking SoR"]
+  end
+
+  subgraph ExceptionGov["Exception Governance"]
+    GOV["Exception Registry:\n· Security sign-off required\n· Max 90-day approval window\n· ≤ 3 active exceptions\n· Non-sensitive / low-PII only\n· Documented escalation path"]
+  end
+
+  %% ============================================================
+  %% DEFAULT PATH (BFA) — solid arrows
+  %% ============================================================
+  CES -->|"DEFAULT:\nIAM ID token"| SD --> ILB --> BFA
+  BFA --> PDP
+  BFA --> TOKEN_SVC
+  TOKEN_SVC --> CIAM
+  TOKEN_SVC --> CIDP
+  TOKEN_SVC -.->|"via Interconnect"| EIDP
+  BFA --> ADAPTERS
+  ADAPTERS -->|"Service tokens\n(mTLS)"| AP
+  ADAPTERS -.->|"EIDP token\n(mTLS via Interconnect)"| GLUE
+  AP --> AP_GW --> CORE
+
+  %% ============================================================
+  %% TIER 1 EXCEPTION PATH — API Key (dashed, amber)
+  %% ============================================================
+  CES -.->|"TIER 1 EXCEPTION:\nAPI key from\nSecret Manager\n(zero-PII reads only)"| AP
+  CES -.-> APIKEY
+  APIKEY -.->|"API key\ninjected into\ntool config"| CES
+
+  %% ============================================================
+  %% TIER 2 EXCEPTION PATH — Token Broker pre-mint (dashed, amber)
+  %% ============================================================
+  CES -.->|"TIER 2 EXCEPTION:\n① Pre-call for\nservice token"| TOKEN_SVC
+  TOKEN_SVC -.->|"② Short-lived\nCIDP/EIDP token"| CES
+  CES -.->|"③ Direct call\nwith service token\n(low-PII reads only)"| AP
+
+  %% ============================================================
+  %% GOVERNANCE LINKS
+  %% ============================================================
+  GOV -.-|"Approves\nexceptions"| CES
+
+  %% ============================================================
+  %% WARNING ANNOTATIONS
+  %% ============================================================
+  WARNING["⚠ Exception Lane Constraints:\n· Response PEP BYPASSED — no redaction\n· PII in Apigee response enters CES logs\n· Glue-backed APIs: ALWAYS use BFA\n· Customer-context auth: ALWAYS use BFA"]
+  WARNING -.- AP
+
+  %% ============================================================
+  %% STYLING — consistent with existing Option C diagram
+  %% ============================================================
+  classDef ces fill:#e8daef,stroke:#7d3c98,stroke-width:2px,color:#4a235a;
+  classDef bfa fill:#d4edda,stroke:#1f7a1f,stroke-width:2px,color:#114411;
+  classDef exception fill:#fff3cd,stroke:#b8860b,stroke-width:3px,color:#5f4500;
+  classDef danger fill:#f5b7b1,stroke:#cb4335,stroke-width:2px,color:#641e16;
+  classDef cloudIdp fill:#d5f5e3,stroke:#1e8449,stroke-width:2px,color:#145a32;
+  classDef onpremIdp fill:#fff3cd,stroke:#b8860b,stroke-width:2px,color:#5f4500;
+  classDef upstream fill:#f8d7da,stroke:#8b2f39,stroke-width:1.5px,color:#5a1c23;
+  classDef gov fill:#fadbd8,stroke:#e74c3c,stroke-width:2px,color:#78281f;
+  classDef secret fill:#dce6f1,stroke:#2c5282,stroke-width:2px,color:#1a365d;
+
+  class CES ces;
+  class BFA,PDP,ADAPTERS,SD,ILB bfa;
+  class TOKEN_SVC,CIDP cloudIdp;
+  class AP,AP_GW exception;
+  class WARNING danger;
+  class GOV gov;
+  class CIAM cloudIdp;
+  class EIDP onpremIdp;
+  class GLUE,CORE upstream;
+  class APIKEY secret;

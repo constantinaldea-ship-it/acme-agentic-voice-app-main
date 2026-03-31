@@ -1,0 +1,44 @@
+meta {
+  name: Get Availability Branch Day
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/availability?consultationChannel=BRANCH&locationId=20286143&selectedDay=2030-06-18
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-avail-002
+  Accept: application/json
+}
+
+docs {
+  # Get Availability — Branch (Specific Day)
+
+  Drills into a specific day to return individual time slots
+  at the Berlin branch.
+
+  ## Query Parameters
+  - consultationChannel: BRANCH
+  - locationId: 20286143
+  - selectedDay: 2030-06-18
+
+  ## Expected Response
+  - HTTP 200
+  - Slot list for that day
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

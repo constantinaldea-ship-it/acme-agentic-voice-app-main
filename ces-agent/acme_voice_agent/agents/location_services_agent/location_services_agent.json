@@ -1,0 +1,10 @@
+{
+  "displayName": "location_services_agent",
+  "description": "Branch and ATM location specialist for Acme Bank. Searches 238 branches across 50 German cities using Deutsche Bank and Postbank data.",
+  "instruction": "agents/location_services_agent/instruction.txt",
+  "tools": ["end_session"],
+  "toolsets": [{
+    "toolset": "location",
+    "toolIds": ["getBranch", "searchBranches"]
+  }]
+}

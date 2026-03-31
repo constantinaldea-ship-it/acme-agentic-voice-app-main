@@ -1,0 +1,17 @@
+%% Created by Codex on 2026-02-28 for ADR-0104 Option A.
+flowchart LR
+  CES[CES Tools] -->|Single ingress| BFA[BFA Gateway]
+  BFA -->|Policy + token exchange + PDP| PEP[Security Enforcement Layer]
+  PEP --> ADP1[Banking Adapter]
+  PEP --> ADP2[Fees Adapter]
+  PEP --> ADP3[Location Adapter]
+  ADP1 --> AP[Apigee Internal]
+  ADP2 --> GLUE[Glue]
+  ADP3 --> RM[Curated Read Models]
+
+  classDef edge fill:#d4edda,stroke:#1f7a1f,stroke-width:2px,color:#114411;
+  classDef internal fill:#e6f2ff,stroke:#1f4b99,stroke-width:1.5px,color:#0f2d5c;
+  classDef upstream fill:#f8d7da,stroke:#8b2f39,stroke-width:1.5px,color:#5a1c23;
+  class CES,BFA,PEP edge;
+  class ADP1,ADP2,ADP3,RM internal;
+  class AP,GLUE upstream;

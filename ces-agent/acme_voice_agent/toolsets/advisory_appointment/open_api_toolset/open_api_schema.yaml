@@ -1,0 +1,803 @@
+openapi: "3.0.1"
+info:
+  title: Acme Bank Advisory Appointment API
+  description: >-
+    Contract-first advisory appointment API for the Voice Banking Assistant.
+    CES-tuned schema aligned with the generated BFA OpenAPI export
+    (openapi-specs/advisory-appointment.json) from bfa-service-resource.
+  version: "1.0.0"
+servers:
+  - url: "$env_var"
+    description: "BFA Service (environment-injected)"
+
+# NOTE: security section REMOVED — auth handled by toolset serviceAgentIdTokenAuthConfig
+
+tags:
+  - name: Advisory Appointment
+    description: Advisory appointment booking and lifecycle
+
+paths:
+  /api/v1/appointment-taxonomy:
+    get:
+      tags: [Advisory Appointment]
+      summary: Get appointment taxonomy
+      description: >-
+        Returns entry paths, topics, channels, advisor modes, and validation
+        hints required to start a booking flow.
+      operationId: getAppointmentTaxonomy
+      responses:
+        "200":
+          description: Taxonomy returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentTaxonomyResponse"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentTaxonomyResponse"
+        "503":
+          description: Upstream unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentTaxonomyResponse"
+
+  /api/v1/appointment-service-search:
+    get:
+      tags: [Advisory Appointment]
+      summary: Search service-request categories
+      description: >-
+        Maps a free-text service request to one or more appointment service
+        categories and returns fallback guidance when no good match exists.
+      operationId: searchAppointmentServices
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema: { type: string }
+          description: "Free-text service request from the caller"
+          example: "standing order problem"
+        - name: entryPath
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/EntryPath"
+      responses:
+        "200":
+          description: Matches returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentServiceSearchResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentServiceSearchResponse"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentServiceSearchResponse"
+
+  /api/v1/appointment-branches:
+    get:
+      tags: [Advisory Appointment]
+      summary: Search booking-eligible locations
+      description: >-
+        Returns booking-eligible physical branches or remote advisory centers
+        for a topic, service, and consultation channel.
+      operationId: searchAppointmentBranches
+      parameters:
+        - name: entryPath
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/EntryPath"
+        - name: consultationChannel
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ConsultationChannel"
+        - name: topicCode
+          in: query
+          required: false
+          schema: { type: string }
+          description: "Required for product consultation flows"
+          example: "IN"
+        - name: serviceCode
+          in: query
+          required: false
+          schema: { type: string }
+          description: "Required for service-request flows"
+          example: "STANDING_ORDER_SUPPORT"
+        - name: city
+          in: query
+          required: false
+          schema: { type: string }
+          example: "München"
+        - name: postalCode
+          in: query
+          required: false
+          schema: { type: string }
+          example: "80331"
+        - name: address
+          in: query
+          required: false
+          schema: { type: string }
+          example: "Marienplatz"
+        - name: accessible
+          in: query
+          required: false
+          schema: { type: boolean }
+          description: "Only locations that support wheelchair access"
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, format: int32, default: 5 }
+          description: "Maximum number of options"
+      responses:
+        "200":
+          description: Eligible locations returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentBranchSearchResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentBranchSearchResponse"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentBranchSearchResponse"
+        "404":
+          description: No eligible locations found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentBranchSearchResponse"
+
+  /api/v1/appointment-slots:
+    get:
+      tags: [Advisory Appointment]
+      summary: Get available days and slots
+      description: >-
+        Returns available days for a location. If selectedDay is provided, the
+        response also returns concrete time-slot options for that day.
+      operationId: getAppointmentSlots
+      parameters:
+        - name: entryPath
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/EntryPath"
+        - name: consultationChannel
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ConsultationChannel"
+        - name: locationId
+          in: query
+          required: true
+          schema: { type: string }
+        - name: topicCode
+          in: query
+          required: false
+          schema: { type: string }
+        - name: serviceCode
+          in: query
+          required: false
+          schema: { type: string }
+        - name: selectedDay
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: advisorMode
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/AdvisorMode"
+      responses:
+        "200":
+          description: Days and slots returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentSlotSearchResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentSlotSearchResponse"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentSlotSearchResponse"
+        "404":
+          description: No slots available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentSlotSearchResponse"
+
+  /api/v1/appointments:
+    post:
+      tags: [Advisory Appointment]
+      summary: Create appointment
+      description: >-
+        Creates a mock appointment after CES has read back a summary and the
+        caller has explicitly confirmed the booking.
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointmentRequest"
+      responses:
+        "200":
+          description: Appointment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseCreateAppointmentResponse"
+        "400":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseCreateAppointmentResponse"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseCreateAppointmentResponse"
+        "409":
+          description: Slot not available or summary confirmation missing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseCreateAppointmentResponse"
+
+  /api/v1/appointments/{appointmentId}:
+    get:
+      tags: [Advisory Appointment]
+      summary: Get appointment details
+      operationId: getAppointment
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: appointmentAccessToken
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Appointment returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "403":
+          description: Appointment access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "404":
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+
+  /api/v1/appointments/{appointmentId}/cancel:
+    post:
+      tags: [Advisory Appointment]
+      summary: Cancel appointment
+      operationId: cancelAppointment
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAppointmentRequest"
+      responses:
+        "200":
+          description: Appointment cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "403":
+          description: Access denied or cancellation window closed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "404":
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+
+  /api/v1/appointments/{appointmentId}/reschedule:
+    post:
+      tags: [Advisory Appointment]
+      summary: Reschedule appointment
+      operationId: rescheduleAppointment
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RescheduleAppointmentRequest"
+      responses:
+        "200":
+          description: Appointment rescheduled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "401":
+          description: Transport authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "403":
+          description: Access denied or reschedule window closed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+        "404":
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseAppointmentView"
+
+components:
+  schemas:
+    EntryPath:
+      type: string
+      enum: [SERVICE_REQUEST, PRODUCT_CONSULTATION]
+
+    ConsultationChannel:
+      type: string
+      enum: [BRANCH, PHONE, VIDEO]
+
+    AdvisorMode:
+      type: string
+      enum: [INTERNAL, INDEPENDENT, PRIVATE_BANKING]
+
+    ApiResponseAppointmentTaxonomyResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/AppointmentTaxonomyResponse"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    AppointmentTaxonomyResponse:
+      type: object
+      properties:
+        entryPaths:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntryPathOption"
+        topics:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopicOption"
+        consultationChannels:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsultationChannelOption"
+        advisorModes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdvisorModeOption"
+        validationRules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationRule"
+
+    EntryPathOption:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/EntryPath"
+        label: { type: string }
+        description: { type: string }
+
+    TopicOption:
+      type: object
+      properties:
+        code: { type: string, example: "IN" }
+        label: { type: string, example: "Investments" }
+        entryPath:
+          $ref: "#/components/schemas/EntryPath"
+        requiresComment: { type: boolean }
+
+    ConsultationChannelOption:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/ConsultationChannel"
+        label: { type: string }
+        description: { type: string }
+
+    AdvisorModeOption:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/AdvisorMode"
+        label: { type: string }
+        allowedChannels:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsultationChannel"
+
+    ValidationRule:
+      type: object
+      properties:
+        field: { type: string }
+        required: { type: boolean }
+        message: { type: string }
+        appliesWhen:
+          type: object
+          additionalProperties: { type: string }
+
+    ApiResponseAppointmentServiceSearchResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/AppointmentServiceSearchResponse"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    AppointmentServiceSearchResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceSearchMatch"
+        fallbackGuidance:
+          type: array
+          items: { type: string }
+
+    ServiceSearchMatch:
+      type: object
+      properties:
+        serviceCode: { type: string }
+        label: { type: string }
+        topicCode: { type: string }
+        confidence: { type: number, format: double }
+        requiresComment: { type: boolean }
+
+    ApiResponseAppointmentBranchSearchResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/AppointmentBranchSearchResponse"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    AppointmentBranchSearchResponse:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/AppointmentLocationOption"
+        count: { type: integer, format: int32 }
+        totalMatches: { type: integer, format: int32 }
+        fallbackSuggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/FallbackSuggestion"
+
+    AppointmentLocationOption:
+      type: object
+      properties:
+        locationId: { type: string }
+        locationType:
+          type: string
+          enum: [BRANCH, REMOTE_CENTER]
+        branchId:
+          type: string
+          nullable: true
+        name: { type: string }
+        address: { type: string }
+        city: { type: string }
+        postalCode: { type: string }
+        phone: { type: string }
+        wheelchairAccessible: { type: boolean }
+        distanceKm: { type: number, format: double }
+        supportedChannels:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsultationChannel"
+        supportedAdvisorModes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdvisorMode"
+        nextAvailableDay:
+          type: string
+          format: date
+        eligibilityReason: { type: string }
+
+    ApiResponseAppointmentSlotSearchResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/AppointmentSlotSearchResponse"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    AppointmentSlotSearchResponse:
+      type: object
+      properties:
+        locationId: { type: string }
+        timezone: { type: string, example: "Europe/Berlin" }
+        availableDays:
+          type: array
+          items:
+            $ref: "#/components/schemas/AvailableDay"
+        slots:
+          type: array
+          items:
+            $ref: "#/components/schemas/AppointmentSlotOption"
+        fallbackSuggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/FallbackSuggestion"
+
+    AvailableDay:
+      type: object
+      properties:
+        date: { type: string, format: date }
+        label: { type: string }
+        availableSlotCount: { type: integer, format: int32 }
+        earliestTime: { type: string, example: "09:30" }
+
+    AppointmentSlotOption:
+      type: object
+      properties:
+        slotId: { type: string }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        advisorId: { type: string, nullable: true }
+        advisorName: { type: string, nullable: true }
+        advisorMode:
+          $ref: "#/components/schemas/AdvisorMode"
+
+    FallbackSuggestion:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [TRY_ANOTHER_DAY, TRY_ANOTHER_LOCATION, TRY_ANOTHER_CHANNEL, HANDOFF]
+        label: { type: string }
+
+    CreateAppointmentRequest:
+      type: object
+      required:
+        - entryPath
+        - consultationChannel
+        - locationId
+        - selectedTimeSlotId
+        - customer
+        - summaryConfirmed
+      properties:
+        entryPath:
+          $ref: "#/components/schemas/EntryPath"
+        consultationChannel:
+          $ref: "#/components/schemas/ConsultationChannel"
+        topicCode: { type: string }
+        serviceCode: { type: string }
+        locationId: { type: string }
+        selectedDay: { type: string, format: date }
+        selectedTimeSlotId: { type: string }
+        advisorMode:
+          $ref: "#/components/schemas/AdvisorMode"
+        comment: { type: string }
+        subjectSelections:
+          type: array
+          items: { type: string }
+        subjectInputs:
+          type: object
+          additionalProperties: { type: string }
+        customer:
+          $ref: "#/components/schemas/CustomerContact"
+        existingCustomerContext:
+          $ref: "#/components/schemas/ExistingCustomerContext"
+        summaryConfirmed:
+          type: boolean
+          description: "Must be true before the API will create an appointment"
+
+    CustomerContact:
+      type: object
+      required: [salutation, firstName, lastName, email, phone, isExistingCustomer]
+      properties:
+        salutation:
+          type: string
+          enum: [FRAU, HERR]
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        isExistingCustomer: { type: boolean }
+
+    ExistingCustomerContext:
+      type: object
+      properties:
+        branchNumber: { type: string }
+        accountNumber: { type: string }
+
+    ApiResponseCreateAppointmentResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/CreateAppointmentResponse"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    CreateAppointmentResponse:
+      type: object
+      properties:
+        appointment:
+          $ref: "#/components/schemas/AppointmentView"
+        appointmentAccessToken:
+          type: string
+          description: "Opaque lifecycle token required for retrieve, cancel, and reschedule"
+        delivery:
+          $ref: "#/components/schemas/DeliveryInfo"
+
+    CancelAppointmentRequest:
+      type: object
+      required: [appointmentAccessToken, summaryConfirmed]
+      properties:
+        appointmentAccessToken: { type: string }
+        reason: { type: string }
+        summaryConfirmed: { type: boolean }
+
+    RescheduleAppointmentRequest:
+      type: object
+      required: [appointmentAccessToken, selectedTimeSlotId, summaryConfirmed]
+      properties:
+        appointmentAccessToken: { type: string }
+        selectedDay: { type: string, format: date }
+        selectedTimeSlotId: { type: string }
+        summaryConfirmed: { type: boolean }
+
+    ApiResponseAppointmentView:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: "#/components/schemas/AppointmentView"
+        error:
+          $ref: "#/components/schemas/ErrorInfo"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+
+    AppointmentView:
+      type: object
+      properties:
+        appointmentId: { type: string }
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, CANCELLED, RESCHEDULED]
+        confirmationCode: { type: string }
+        consultationChannel:
+          $ref: "#/components/schemas/ConsultationChannel"
+        topicCode: { type: string }
+        serviceCode: { type: string }
+        locationId: { type: string }
+        locationName: { type: string }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+        advisorName: { type: string, nullable: true }
+        summaryText: { type: string }
+        canCancelUntil: { type: string, format: date-time }
+        canRescheduleUntil: { type: string, format: date-time }
+        timeline:
+          type: array
+          items: { type: string }
+        delivery:
+          $ref: "#/components/schemas/DeliveryInfo"
+
+    DeliveryInfo:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum: [NONE, EMAIL]
+        destinationMasked: { type: string }
+        followUpText: { type: string }
+
+    ErrorInfo:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details:
+          type: object
+          additionalProperties: { type: object }
+
+    ResponseMeta:
+      type: object
+      properties:
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+        apiVersion: { type: string }

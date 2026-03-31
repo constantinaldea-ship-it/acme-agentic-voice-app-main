@@ -1,0 +1,66 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "display_name": "multistep-appointment-booking",
+  "scenarios": [
+    {
+      "name": "appointment_booking_branch_flow_voice",
+      "linked_evaluation": "appointment_booking_branch_flow",
+      "turns": [
+        {
+          "name": "request_branch_booking",
+          "audio_path": "../fixtures/appointment-booking-branch-flow/01-request-branch-booking.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow/01-request-branch-booking.transcript.txt"
+          },
+          "expected_transcript": "I want to book an advisory appointment at a branch in Berlin"
+        },
+        {
+          "name": "choose_topic",
+          "audio_path": "../fixtures/appointment-booking-branch-flow/02-choose-topic.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow/02-choose-topic.transcript.txt"
+          },
+          "expected_transcript": "It's about investment advice"
+        },
+        {
+          "name": "confirm_branch_location",
+          "audio_path": "../fixtures/appointment-booking-branch-flow/02a-confirm-branch-location.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow/02a-confirm-branch-location.transcript.txt"
+          },
+          "expected_transcript": "Yes, that's correct."
+        },
+        {
+          "name": "choose_branch",
+          "audio_path": "../fixtures/appointment-booking-branch-flow/03-choose-branch.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow/03-choose-branch.transcript.txt"
+          },
+          "expected_transcript": "The Alexanderplatz branch would be best"
+        },
+        {
+          "name": "choose_day",
+          "audio_path": "../fixtures/appointment-booking-branch-flow/04-choose-day.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow/04-choose-day.transcript.txt"
+          },
+          "expected_transcript": "Next Tuesday morning works for me"
+        },
+        {
+          "name": "confirm_booking",
+          "audio_path": "../fixtures/appointment-booking-branch-flow/05-confirm-booking.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow/05-confirm-booking.transcript.txt"
+          },
+          "expected_transcript": "Yes, please book that appointment"
+        }
+      ]
+    }
+  ]
+}

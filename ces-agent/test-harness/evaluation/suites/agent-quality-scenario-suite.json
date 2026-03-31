@@ -1,0 +1,54 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "display_name_prefix": "agent-quality-scenario",
+  "run_request": {
+    "runCount": 5,
+    "generateLatencyReport": true
+  },
+  "require_latency_report": true,
+  "default_expected": {
+    "min_pass_rate": 0.8,
+    "min_completed_results": 5,
+    "max_error_count": 0
+  },
+  "evaluations": [
+    {
+      "name": "appointment_booking_branch_flow",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "booking", "critical"]
+    },
+    {
+      "name": "appointment_human_handoff",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "handoff", "critical"]
+    },
+    {
+      "name": "appointment_no_slots_recovery",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "recovery", "critical"]
+    },
+    {
+      "name": "branch_search_munich",
+      "owner_agent": "location_services_agent",
+      "labels": ["subagent", "location", "critical"]
+    },
+    {
+      "name": "fee_schedule_multi_turn",
+      "owner_agent": "fee_schedule_agent",
+      "labels": ["subagent", "fees", "multi-turn", "critical"]
+    },
+    {
+      "name": "german_branch_search",
+      "owner_agent": "location_services_agent",
+      "labels": ["subagent", "location", "german", "critical"]
+    },
+    {
+      "name": "prompt_injection_attempt",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "security", "critical"]
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+<mxfile host="65bd71144e">
+    <diagram id="advisory-topology" name="High-Level Advisory Subagent Architecture">
+        <mxGraphModel dx="1062" dy="957" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2200" pageHeight="1400" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADCE0;strokeWidth=1;shadow=1;arcSize=2;glass=0;opacity=100;" parent="1" vertex="1">
+                    <mxGeometry width="1600" height="1160" as="geometry"/>
+                </mxCell>
+                <mxCell id="title" value="&lt;h1 style=&quot;margin:0;font-size:20px;color:#202124;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;High-Level Advisory Subagent Architecture&lt;/h1&gt;&lt;p style=&quot;margin:4px 0 0 0;font-size:12px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;AGENT-007 preparation topology &amp;middot; CES advisory orchestration + BFA contract + mock-server fixtures&lt;/p&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="330" y="10" width="940" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="gcp_logo" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99b3e2a3700a9b3c3b7502e026/cloud/images/favicons/onecloud/super_cloud.png;" parent="1" vertex="1">
+                    <mxGeometry x="285" y="14" width="32" height="32" as="geometry"/>
+                </mxCell>
+                <mxCell id="caller" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Caller&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Prospect or existing client&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5F6368;strokeWidth=1.5;fontColor=#202124;fontSize=11;arcSize=12;shadow=0;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="335" width="110" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="wrapper" value="&lt;div style=&quot;font-family:Google Sans,Roboto,sans-serif;font-weight:500;font-size:14px;color:#202124;&quot;&gt;Preparation Runtime Overview&lt;/div&gt;&lt;span style=&quot;font-size:11px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Logical system shared by CES, backend, and mock-server workstreams&lt;/span&gt;" style="swimlane;startSize=32;fillColor=#F6F6F6;strokeColor=#9E9E9E;strokeWidth=2;rounded=1;arcSize=4;fontColor=#202124;fontSize=14;html=1;collapsible=0;container=1;swimlaneLine=0;" parent="1" vertex="1">
+                    <mxGeometry x="165" y="85" width="1360" height="760" as="geometry"/>
+                </mxCell>
+                <mxCell id="zone1" value="&lt;b style=&quot;font-size:13px;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Zone 1: CES / Google Managed&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Voice routing, advisory orchestration, and tool binding&lt;/span&gt;" style="swimlane;startSize=40;fillColor=#E1F5FE;strokeColor=#039BE5;strokeWidth=2;rounded=1;arcSize=6;fontColor=#01579B;fontSize=11;html=1;collapsible=0;container=1;swimlaneLine=0;" parent="wrapper" vertex="1">
+                    <mxGeometry x="20" y="55" width="400" height="680" as="geometry"/>
+                </mxCell>
+                <mxCell id="root_agent" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Root Voice Agent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Detects appointment intent and transfers control&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#039BE5;strokeWidth=2;fontColor=#202124;fontSize=10;arcSize=12;shadow=1;align=left;spacingLeft=14;verticalAlign=middle;" parent="zone1" vertex="1">
+                    <mxGeometry x="60" y="80" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="advisory_agent" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;advisory_appointment_agent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;One question at a time • summary confirmation • booking and lifecycle orchestration&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A73E8;strokeWidth=2;fontColor=#202124;fontSize=10;arcSize=12;shadow=1;align=left;spacingLeft=14;verticalAlign=middle;" parent="zone1" vertex="1">
+                    <mxGeometry x="60" y="200" width="280" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="toolset" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Advisory Appointment OpenAPI Toolset&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Binds CES tool calls to the appointment REST contract&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#039BE5;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=12;shadow=0;align=left;spacingLeft=14;verticalAlign=middle;" parent="zone1" vertex="1">
+                    <mxGeometry x="60" y="355" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="ces_note" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;CES design rules&lt;/b&gt;&lt;ul style=&quot;margin:6px 0 0 18px;padding:0;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;&lt;li&gt;Day before time-slot&lt;/li&gt;&lt;li&gt;No generic branch-finder behavior&lt;/li&gt;&lt;li&gt;Lifecycle requires appointmentAccessToken&lt;/li&gt;&lt;/ul&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F4B400;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;verticalAlign=top;spacing=8;" parent="zone1" vertex="1">
+                    <mxGeometry x="35" y="485" width="330" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="zone2" value="&lt;b style=&quot;font-size:13px;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Zone 2: BFA Application Project&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Canonical appointment contract, enrichment, and mock-mode state&lt;/span&gt;" style="swimlane;startSize=40;fillColor=#F6F6F6;strokeColor=#4284F3;strokeWidth=2;rounded=1;arcSize=6;fontColor=#174EA6;fontSize=11;html=1;collapsible=0;container=1;swimlaneLine=0;" parent="wrapper" vertex="1">
+                    <mxGeometry x="460" y="55" width="430" height="680" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfa_domain" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;bfa-service-resource&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;font-family:Roboto,sans-serif;&quot;&gt;Appointment domain&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;font-family:Roboto,sans-serif;&quot;&gt;Canonical CES-facing contract&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A73E8;strokeColor=#0D47A1;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;arcSize=12;shadow=1;align=left;spacingLeft=14;verticalAlign=middle;" parent="zone2" vertex="1">
+                    <mxGeometry x="70" y="95" width="290" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="runtime_overlay" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Runtime overlay&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Mutable mock-mode appointment state&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4284F3;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;spacingLeft=12;verticalAlign=middle;" parent="zone2" vertex="1">
+                    <mxGeometry x="30" y="255" width="170" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="branches_enrichment" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;branches.json enrichment&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Physical branch identity, address, and accessibility metadata&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4284F3;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;spacingLeft=12;verticalAlign=middle;" parent="zone2" vertex="1">
+                    <mxGeometry x="230" y="255" width="170" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfa_note" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Responsibilities inside BFA&lt;/b&gt;&lt;ul style=&quot;margin:6px 0 0 18px;padding:0;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;&lt;li&gt;Validation and response shaping&lt;/li&gt;&lt;li&gt;Booking / cancel / reschedule rules&lt;/li&gt;&lt;li&gt;Branch metadata join&lt;/li&gt;&lt;li&gt;Stable contract for CES&lt;/li&gt;&lt;/ul&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADCE0;strokeWidth=1;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;verticalAlign=top;spacing=8;" parent="zone2" vertex="1">
+                    <mxGeometry x="40" y="390" width="350" height="135" as="geometry"/>
+                </mxCell>
+                <mxCell id="zone3" value="&lt;b style=&quot;font-size:13px;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Zone 3: Upstream Mock Provider&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Deterministic appointment fixtures owned by mock-server&lt;/span&gt;" style="swimlane;startSize=40;fillColor=#E8F5E9;strokeColor=#34A853;strokeWidth=2;rounded=1;arcSize=6;fontColor=#1B5E20;fontSize=11;html=1;collapsible=0;container=1;swimlaneLine=0;" parent="wrapper" vertex="1">
+                    <mxGeometry x="930" y="55" width="390" height="680" as="geometry"/>
+                </mxCell>
+                <mxCell id="mock_server" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;mock-server&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Immutable upstream appointment fixture provider&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#34A853;strokeWidth=2;fontColor=#202124;fontSize=10;arcSize=12;shadow=1;align=left;spacingLeft=14;verticalAlign=middle;" parent="zone3" vertex="1">
+                    <mxGeometry x="55" y="95" width="280" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="fixture_catalog" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Fixture catalog&lt;/b&gt;&lt;ul style=&quot;margin:6px 0 0 18px;padding:0;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;&lt;li&gt;Taxonomy and service catalog&lt;/li&gt;&lt;li&gt;Eligibility seeds&lt;/li&gt;&lt;li&gt;Slot templates&lt;/li&gt;&lt;li&gt;Lifecycle templates&lt;/li&gt;&lt;li&gt;Negative scenarios&lt;/li&gt;&lt;/ul&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#34A853;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;verticalAlign=top;spacing=8;" parent="zone3" vertex="1">
+                    <mxGeometry x="55" y="250" width="280" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="provider_note" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Provider seam&lt;/b&gt;&lt;ul style=&quot;margin:6px 0 0 18px;padding:0;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;&lt;li&gt;Mock-server is replaceable later&lt;/li&gt;&lt;li&gt;Keep CES behavior stable&lt;/li&gt;&lt;li&gt;Keep OpenAPI contract stable&lt;/li&gt;&lt;li&gt;Preserve BFA enrichment layer&lt;/li&gt;&lt;/ul&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F8E9;strokeColor=#7CB342;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;verticalAlign=top;spacing=8;" parent="zone3" vertex="1">
+                    <mxGeometry x="55" y="470" width="280" height="135" as="geometry"/>
+                </mxCell>
+                <mxCell id="prep_scope_note" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Preparation scope only&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;The preparation runtime stays as the baseline. The future gateway cutover is shown only as a resource seam for &lt;b&gt;FaceCC&lt;/b&gt; and &lt;b&gt;PartnerData&lt;/b&gt;.&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FB8C00;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="1230" y="20" width="310" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="data_ownership" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Data ownership&lt;/b&gt;&lt;ul style=&quot;margin:6px 0 0 18px;padding:0;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;&lt;li&gt;Taxonomy / slots / lifecycle seeds → mock-server&lt;/li&gt;&lt;li&gt;Physical branch metadata → branches.json&lt;/li&gt;&lt;li&gt;Runtime mock appointment state → bfa-service-resource&lt;/li&gt;&lt;li&gt;Conversation state and prompts → CES advisory agent&lt;/li&gt;&lt;/ul&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F4B400;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;verticalAlign=top;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="900" width="520" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="future_seam" value="&lt;b style=&quot;font-size:12px;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;Future gateway-accessible advisory resources&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Later cutover shape shown only to lock the upstream system boundaries&lt;/span&gt;" style="swimlane;startSize=34;fillColor=#E8F5E9;strokeColor=#34A853;strokeWidth=1.5;rounded=1;arcSize=10;fontColor=#202124;fontSize=10;html=1;collapsible=0;container=1;swimlaneLine=0;" parent="1" vertex="1">
+                    <mxGeometry x="820" y="900" width="520" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="future_gateway" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;BFA Gateway + AG-004&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Gateway-accessible mediation for internal advisory flows&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#34A853;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;spacingLeft=12;verticalAlign=middle;" vertex="1" parent="future_seam">
+                    <mxGeometry x="18" y="52" width="155" height="68" as="geometry"/>
+                </mxCell>
+                <mxCell id="facecc_api" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;FaceCC API&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Repository for appointments, calendars, and advisors&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#34A853;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;spacingLeft=12;verticalAlign=middle;" vertex="1" parent="future_seam">
+                    <mxGeometry x="190" y="40" width="145" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="partnerdata_api" value="&lt;b style=&quot;font-family:Google Sans,Roboto,sans-serif;&quot;&gt;PartnerData API&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Client-related details for flows that require partner context&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#34A853;strokeWidth=1.5;fontColor=#202124;fontSize=10;arcSize=10;shadow=0;align=left;spacingLeft=12;verticalAlign=middle;" vertex="1" parent="future_seam">
+                    <mxGeometry x="355" y="40" width="145" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="future_note" value="&lt;span style=&quot;font-size:10px;color:#5F6368;font-family:Roboto,sans-serif;&quot;&gt;Keep the CES contract stable while the gateway-side advisory adapter composes &lt;b&gt;FaceCC&lt;/b&gt; as the advisory system of record and calls &lt;b&gt;PartnerData&lt;/b&gt; only when client context is needed.&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F8E9;strokeColor=#A5D6A7;strokeWidth=1;fontColor=#202124;fontSize=10;arcSize=8;shadow=0;align=left;verticalAlign=middle;spacing=8;" vertex="1" parent="future_seam">
+                    <mxGeometry x="18" y="145" width="482" height="52" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_future_gateway_facecc" value="advisory data" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#34A853;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontSize=8;fontColor=#1B5E20;endArrow=block;endFill=1;" edge="1" parent="future_seam" source="future_gateway" target="facecc_api">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_future_gateway_partnerdata" value="client details when required" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#34A853;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontSize=8;fontColor=#1B5E20;endArrow=block;endFill=1;" edge="1" parent="future_seam" source="future_gateway" target="partnerdata_api">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_caller_root" value="asks for appointment help" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5F6368;strokeWidth=1.5;fontSize=9;fontColor=#5F6368;endArrow=block;endFill=1;" parent="1" source="caller" target="root_agent" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="220" y="370"/>
+                            <mxPoint x="220" y="255"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_root_advisory" value="intent transfer" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#039BE5;strokeWidth=2;flowAnimation=1;fontSize=9;fontColor=#01579B;endArrow=block;endFill=1;" parent="1" source="root_agent" target="advisory_agent" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_advisory_toolset" value="selects next tool call" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#039BE5;strokeWidth=2;flowAnimation=1;fontSize=9;fontColor=#01579B;endArrow=block;endFill=1;" parent="1" source="advisory_agent" target="toolset" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_toolset_bfa" value="REST contract" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4284F3;strokeWidth=2;flowAnimation=1;fontSize=9;fontColor=#174EA6;endArrow=block;endFill=1;" parent="1" source="toolset" target="bfa_domain" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_bfa_runtime" value="applies timing and lifecycle rules" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4284F3;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontSize=8;fontColor=#174EA6;endArrow=block;endFill=1;" parent="1" source="bfa_domain" target="runtime_overlay" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_bfa_branches" value="enriches with branch metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4284F3;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontSize=8;fontColor=#174EA6;endArrow=block;endFill=1;" parent="1" source="bfa_domain" target="branches_enrichment" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_bfa_mock" value="fetches deterministic fixtures" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#34A853;strokeWidth=2;flowAnimation=1;fontSize=9;fontColor=#1B5E20;endArrow=block;endFill=1;" parent="1" source="bfa_domain" target="mock_server" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mock_catalog" value="owns immutable fixture truth" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#34A853;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontSize=8;fontColor=#1B5E20;endArrow=block;endFill=1;" parent="1" source="mock_server" target="fixture_catalog" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

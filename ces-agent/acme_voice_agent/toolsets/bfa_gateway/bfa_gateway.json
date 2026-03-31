@@ -1,0 +1,9 @@
+{
+  "displayName": "bfa_gateway",
+  "openApiToolset": {
+    "openApiSchema": "toolsets/bfa_gateway/open_api_toolset/open_api_schema.yaml",
+    "apiAuthentication": {
+      "serviceAgentIdTokenAuthConfig": {}
+    }
+  }
+}

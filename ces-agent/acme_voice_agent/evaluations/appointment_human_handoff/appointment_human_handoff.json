@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_human_handoff",
+  "scenario": {
+    "task": "Test human handoff from the appointment flow. Start with 'I need to book an appointment, but if this gets complicated just connect me to a person'. The agent should route to advisory_appointment_agent, attempt to continue the booking flow normally, respect a direct request for human help at any point, and use the live-agent escalation path rather than fabricating unsupported recovery.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent can stay in the appointment flow until the user explicitly asks for human help."
+      },
+      {
+        "expectedResult": "When the user requests a human, the agent uses the supported escalation path instead of continuing the booking flow."
+      },
+      {
+        "expectedResult": "The agent keeps the response concise and context-aware during the handoff."
+      }
+    ],
+    "maxTurns": 6
+  }
+}

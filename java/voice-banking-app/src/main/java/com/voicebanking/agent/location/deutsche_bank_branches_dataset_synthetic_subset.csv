@@ -1,0 +1,121 @@
+branchId,name,type,address,city,postalCode,latitude,longitude,distanceKm_from_queryPoint,queryLatitude,queryLongitude,openingHours,phone,wheelchairAccessible
+DB-DE-00001,Deutsche Bank Hamburg - Nord,Beratungscenter,Kölner Straße 109,Hamburg,20097,53.522601,9.971203,255.26,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 57 4903402,True
+DB-DE-00002,Deutsche Bank Karlsruhe Center,Filiale,Hauptstraße 195,Karlsruhe,76227,49.013021,8.409825,524.62,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 73 5661907,False
+DB-DE-00003,Deutsche Bank Köln Center,Filiale,Bergstraße 155,Köln,50667,50.920419,6.986649,476.36,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 88 9996414,True
+DB-DE-00004,Deutsche Bank Hamburg Center,Beratungscenter,Kölner Straße 50,Hamburg,22041,53.579487,9.981553,257.34,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 59 5855124,True
+DB-DE-00005,Deutsche Bank München Center,Filiale,Kaiserstraße 95,München,80992,48.156419,11.618648,501.46,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 39 3871230,True
+DB-DE-00006,Deutsche Bank Filiale Freiburg im Breisgau,SelbstbedienungsCenter,Mühlenstraße 197,Freiburg im Breisgau,79106,48.012748,7.80844,639.46,52.52,13.405,Mo-Fr 09:00-17:00,+49 34 6292423,False
+DB-DE-00007,Deutsche Bank Dortmund Ost,Filiale,Gartenstraße 165,Dortmund,44379,51.499664,7.436398,423.83,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 47 5137722,True
+DB-DE-00008,Deutsche Bank Filiale Freiburg im Breisgau,Filiale,Goethestraße 131,Freiburg im Breisgau,79106,48.001339,7.866801,637.93,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 44 3564251,True
+DB-DE-00009,Deutsche Bank Stuttgart Zentrum,Filiale,Münchner Straße 65,Stuttgart,70173,48.793325,9.175116,510.33,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 44 5476583,False
+DB-DE-00010,Deutsche Bank Hannover Center,SelbstbedienungsCenter,Münchner Straße 196,Hannover,30419,52.352593,9.725477,250.1,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 68 9517169,True
+DB-DE-00011,Deutsche Bank Rostock - Altstadt,SelbstbedienungsCenter,Ringstraße 83,Rostock,18057,54.074335,12.086491,193.77,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 76 6159230,True
+DB-DE-00012,Deutsche Bank Leipzig - Mitte,Beratungscenter,Hamburger Straße 197,Leipzig,04103,51.313176,12.410901,150.52,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 51 5446912,True
+DB-DE-00013,Deutsche Bank Filiale Karlsruhe,Beratungscenter,Kirchstraße 103,Karlsruhe,76133,49.029246,8.396014,523.89,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 86 9683481,False
+DB-DE-00014,Deutsche Bank Filiale Mannheim,Filiale,Kölner Straße 57,Mannheim,68165,49.46476,8.43847,485.84,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 59 2130789,True
+DB-DE-00015,Deutsche Bank Filiale Frankfurt am Main,Filiale,Hamburger Straße 34,Frankfurt am Main,60313,50.132478,8.639186,424.28,52.52,13.405,Mo-Fr 08:30-16:30,+49 90 5076817,True
+DB-DE-00016,Deutsche Bank Bonn Zentrum,Filiale,Poststraße 187,Bonn,53111,50.75585,7.067241,479.13,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 37 7754864,True
+DB-DE-00017,Deutsche Bank Filiale Hannover,Filiale,Rathausplatz 47,Hannover,30161,52.393936,9.692927,251.88,52.52,13.405,Mo-Fr 09:00-17:00,+49 39 8434500,True
+DB-DE-00018,Deutsche Bank Filiale Freiburg im Breisgau,SelbstbedienungsCenter,Kaiserstraße 105,Freiburg im Breisgau,79110,47.974875,7.857314,640.72,52.52,13.405,Mo-Fr 09:00-17:00,+49 81 1983738,True
+DB-DE-00019,Deutsche Bank Stuttgart Bahnhof,Filiale,Goethestraße 49,Stuttgart,70178,48.768538,9.231431,510.32,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 99 2022698,True
+DB-DE-00020,Deutsche Bank Hannover - Altstadt,Filiale,Kaiserstraße 18,Hannover,30625,52.34933,9.740418,249.13,52.52,13.405,Mo-Fr 09:00-17:00,+49 81 3011363,True
+DB-DE-00021,Deutsche Bank Kiel Center,Filiale,Lindenstraße 53,Kiel,24118,54.308073,10.132252,294.19,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 60 5456272,True
+DB-DE-00022,Deutsche Bank Dortmund - Ost,Private Banking Center,Hauptstraße 118,Dortmund,44225,51.491453,7.47985,421.25,52.52,13.405,Mo-Fr 08:30-16:30,+49 42 2229110,True
+DB-DE-00023,Deutsche Bank Freiburg im Breisgau Center,Private Banking Center,Kirchstraße 41,Freiburg im Breisgau,79102,47.981789,7.81862,641.79,52.52,13.405,Mo-Fr 08:30-16:30,+49 68 9874152,True
+DB-DE-00024,Deutsche Bank Berlin - Nord,Filiale,Hamburger Straße 40,Berlin,10115,52.530072,13.41046,1.18,52.52,13.405,Mo-Fr 08:30-16:30,+49 56 6752576,True
+DB-DE-00025,Deutsche Bank Düsseldorf - Bahnhof,Filiale,Berliner Straße 163,Düsseldorf,40468,51.23895,6.808791,474.46,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 35 1059486,True
+DB-DE-00026,Deutsche Bank Hannover Nord,Beratungscenter,Hamburger Straße 3,Hannover,30163,52.392167,9.745711,248.33,52.52,13.405,Mo-Fr 09:00-17:00,+49 99 1604451,True
+DB-DE-00027,Deutsche Bank Bremen - City,Filiale,Bergstraße 54,Bremen,28203,53.084251,8.766509,318.01,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 75 7817881,True
+DB-DE-00028,Deutsche Bank Filiale Rostock,SelbstbedienungsCenter,Rathausplatz 7,Rostock,18057,54.107369,12.141676,195.44,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 82 5163555,True
+DB-DE-00029,Deutsche Bank Filiale Dresden,Private Banking Center,Marktstraße 118,Dresden,01159,51.029952,13.757428,167.45,52.52,13.405,Mo-Fr 09:00-17:00,+49 58 1397023,True
+DB-DE-00030,Deutsche Bank Düsseldorf West,Filiale,Hamburger Straße 85,Düsseldorf,40210,51.221608,6.75136,478.88,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 63 3995870,False
+DB-DE-00031,Deutsche Bank Kiel Center,Filiale,Rathausplatz 156,Kiel,24103,54.351052,10.099347,298.95,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 79 4188992,False
+DB-DE-00032,Deutsche Bank Filiale Dresden,Filiale,Bergstraße 111,Dresden,01219,51.023063,13.730906,167.96,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 70 3090865,True
+DB-DE-00033,Deutsche Bank Filiale Nürnberg,Filiale,Marktstraße 108,Nürnberg,90408,49.452527,11.093389,377.47,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 52 6049101,True
+DB-DE-00034,Deutsche Bank Dortmund Center,Filiale,Poststraße 114,Dortmund,44139,51.516476,7.415341,424.65,52.52,13.405,Mo-Fr 09:00-17:00,+49 95 8938746,True
+DB-DE-00035,Deutsche Bank Filiale Stuttgart,Filiale,Kirchstraße 58,Stuttgart,70563,48.785331,9.161279,511.63,52.52,13.405,Mo-Fr 09:00-17:00,+49 33 1775337,False
+DB-DE-00036,Deutsche Bank Filiale Leipzig,Filiale,Gartenstraße 127,Leipzig,04103,51.368736,12.384227,145.88,52.52,13.405,Mo-Fr 09:00-17:00,+49 30 2788238,True
+DB-DE-00037,Deutsche Bank Filiale Essen,Filiale,Schillerstraße 117,Essen,45307,51.43873,7.042011,451.91,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 97 6323376,True
+DB-DE-00038,Deutsche Bank Mannheim Zentrum,Beratungscenter,Kaiserstraße 191,Mannheim,68305,49.494259,8.487927,480.99,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 63 5147994,False
+DB-DE-00039,Deutsche Bank Dresden Center,Filiale,Friedrichstraße 70,Dresden,01069,51.066349,13.73943,163.27,52.52,13.405,Mo-Fr 08:30-16:30,+49 40 3321531,True
+DB-DE-00040,Deutsche Bank Köln Center,Filiale,Hamburger Straße 120,Köln,50668,50.921376,6.979695,476.76,52.52,13.405,Mo-Fr 09:00-17:00,+49 83 7534336,True
+DB-DE-00041,Deutsche Bank Kiel Center,Filiale,Kirchstraße 193,Kiel,24118,54.350064,10.074753,300.07,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 98 4700025,True
+DB-DE-00042,Deutsche Bank Bonn Zentrum,Filiale,Kaiserstraße 120,Bonn,53111,50.720565,7.091784,479.37,52.52,13.405,Mo-Fr 08:30-16:30,+49 98 1452421,False
+DB-DE-00043,Deutsche Bank Dortmund Zentrum,Filiale,Kaiserstraße 13,Dortmund,44135,51.519114,7.4816,420.19,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 57 8628588,True
+DB-DE-00044,Deutsche Bank Hannover - Zentrum,Filiale,Wilhelmstraße 5,Hannover,30163,52.36615,9.769964,246.95,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 74 4761823,True
+DB-DE-00045,Deutsche Bank München - Süd,Filiale,Ringstraße 40,München,80331,48.151974,11.597175,502.32,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 44 4656838,True
+DB-DE-00046,Deutsche Bank Mannheim - Hafen,Filiale,Kaiserstraße 80,Mannheim,68161,49.499468,8.49269,480.34,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 69 7296605,True
+DB-DE-00047,Deutsche Bank Dortmund Center,Filiale,Ringstraße 31,Dortmund,44379,51.540088,7.435133,422.56,52.52,13.405,Mo-Fr 08:30-16:30,+49 35 6825112,False
+DB-DE-00048,Deutsche Bank Freiburg im Breisgau Ost,Filiale,Wilhelmstraße 28,Freiburg im Breisgau,79110,47.994703,7.829157,640.17,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 88 3566765,True
+DB-DE-00049,Deutsche Bank Essen Hafen,Beratungscenter,Poststraße 112,Essen,45130,51.436168,7.013775,453.86,52.52,13.405,Mo-Fr 08:30-16:30,+49 64 6407373,False
+DB-DE-00050,Deutsche Bank Leipzig Süd,Beratungscenter,Mühlenstraße 8,Leipzig,04229,51.359544,12.331766,148.53,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 53 9179730,True
+DB-DE-00051,Deutsche Bank Düsseldorf Center,Beratungscenter,Hamburger Straße 3,Düsseldorf,40212,51.218989,6.749335,479.11,52.52,13.405,Mo-Fr 09:00-17:00,+49 40 5049282,True
+DB-DE-00052,Deutsche Bank Essen - Bahnhof,Filiale,Berliner Straße 76,Essen,45131,51.454915,7.037416,451.66,52.52,13.405,Mo-Fr 09:00-17:00,+49 69 7191135,True
+DB-DE-00053,Deutsche Bank Bonn Ost,Filiale,Lindenstraße 79,Bonn,53227,50.740608,7.082576,478.93,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 54 6294016,True
+DB-DE-00054,Deutsche Bank Hamburg Süd,Filiale,Lindenstraße 186,Hamburg,20097,53.565673,10.038788,253.27,52.52,13.405,Mo-Fr 08:30-16:30,+49 66 2686548,True
+DB-DE-00055,Deutsche Bank Filiale Düsseldorf,Beratungscenter,Lindenstraße 12,Düsseldorf,40212,51.215475,6.759588,478.57,52.52,13.405,Mo-Fr 08:30-16:30,+49 67 3118618,False
+DB-DE-00056,Deutsche Bank Bonn Center,Filiale,Kaiserstraße 14,Bonn,53115,50.713555,7.049427,482.38,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 44 2096280,True
+DB-DE-00057,Deutsche Bank Dortmund Center,Filiale,Berliner Straße 64,Dortmund,44135,51.513105,7.473002,420.96,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 58 9767312,True
+DB-DE-00058,Deutsche Bank Dortmund - Zentrum,Filiale,Ringstraße 190,Dortmund,44379,51.510631,7.459572,421.93,52.52,13.405,Mo-Fr 09:00-17:00,+49 57 5440025,True
+DB-DE-00059,Deutsche Bank München Nord,Filiale,Ringstraße 121,München,80331,48.114523,11.549381,507.23,52.52,13.405,Mo-Fr 09:00-17:00,+49 66 5743227,True
+DB-DE-00060,Deutsche Bank Filiale Mannheim,Filiale,Rathausplatz 30,Mannheim,68165,49.461771,8.439342,486.03,52.52,13.405,Mo-Fr 09:00-17:00,+49 64 3386328,True
+DB-DE-00061,Deutsche Bank München Hafen,Private Banking Center,Schillerstraße 120,München,81241,48.108678,11.611263,506.74,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 64 9396529,True
+DB-DE-00062,Deutsche Bank Freiburg im Breisgau Center,Beratungscenter,Hauptstraße 24,Freiburg im Breisgau,79098,47.998628,7.800144,641.09,52.52,13.405,Mo-Fr 08:30-16:30,+49 32 5521644,True
+DB-DE-00063,Deutsche Bank Kiel Center,Filiale,Kaiserstraße 150,Kiel,24116,54.295714,10.148427,292.49,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 41 8885465,True
+DB-DE-00064,Deutsche Bank Bremen Nord,Filiale,Kirchstraße 170,Bremen,28195,53.073801,8.783806,316.68,52.52,13.405,Mo-Fr 08:30-16:30,+49 34 8630712,False
+DB-DE-00065,Deutsche Bank München - Altstadt,Beratungscenter,Hamburger Straße 119,München,80992,48.123971,11.564327,505.94,52.52,13.405,Mo-Fr 09:00-17:00,+49 96 7069650,True
+DB-DE-00066,Deutsche Bank Filiale Rostock,Filiale,Kirchstraße 113,Rostock,18055,54.107787,12.111641,196.34,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 45 1484348,False
+DB-DE-00067,Deutsche Bank Rostock Altstadt,Filiale,Berliner Straße 58,Rostock,18107,54.110359,12.120078,196.35,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 89 2970754,False
+DB-DE-00068,Deutsche Bank Köln West,Filiale,Wilhelmstraße 63,Köln,50931,50.937403,6.98196,475.88,52.52,13.405,Mo-Fr 09:00-17:00,+49 79 4197911,True
+DB-DE-00069,Deutsche Bank Rostock West,Beratungscenter,Mühlenstraße 130,Rostock,18055,54.092894,12.137033,194.12,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 66 6008935,True
+DB-DE-00070,Deutsche Bank Kiel Center,Filiale,Mühlenstraße 142,Kiel,24105,54.328095,10.138794,295.34,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 88 6398528,False
+DB-DE-00071,Deutsche Bank Düsseldorf Süd,Private Banking Center,Bahnhofstraße 82,Düsseldorf,40213,51.256546,6.747381,477.81,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 79 3551903,True
+DB-DE-00072,Deutsche Bank Bonn Ost,Private Banking Center,Schillerstraße 135,Bonn,53227,50.765289,7.060825,479.07,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 48 7878299,False
+DB-DE-00073,Deutsche Bank Köln Ost,Filiale,Berliner Straße 85,Köln,50670,50.91199,6.988453,476.63,52.52,13.405,Mo-Fr 08:30-16:30,+49 78 6312692,False
+DB-DE-00074,Deutsche Bank Bonn Center,Filiale,Friedrichstraße 192,Bonn,53111,50.759743,7.05179,479.91,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 42 8443690,True
+DB-DE-00075,Deutsche Bank Stuttgart Center,Beratungscenter,Bergstraße 96,Stuttgart,70173,48.78744,9.223242,508.9,52.52,13.405,Mo-Fr 09:00-17:00,+49 97 7913081,True
+DB-DE-00076,Deutsche Bank Kiel Mitte,Filiale,Ringstraße 175,Kiel,24105,54.334208,10.090806,298.12,52.52,13.405,Mo-Fr 08:30-16:30,+49 48 4895475,True
+DB-DE-00077,Deutsche Bank Filiale Mannheim,Private Banking Center,Berliner Straße 114,Mannheim,68159,49.495774,8.461957,482.17,52.52,13.405,Mo-Fr 08:30-16:30,+49 68 8118722,False
+DB-DE-00078,Deutsche Bank Dresden Bahnhof,Filiale,Kölner Straße 92,Dresden,01159,51.04781,13.717512,165.11,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 32 7640518,True
+DB-DE-00079,Deutsche Bank Dresden Center,Beratungscenter,Friedrichstraße 156,Dresden,01067,51.020886,13.773807,168.61,52.52,13.405,Mo-Fr 09:00-17:00,+49 54 5204819,False
+DB-DE-00080,Deutsche Bank Köln - West,Beratungscenter,Kölner Straße 94,Köln,50667,50.945195,7.00064,474.33,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 67 6481437,True
+DB-DE-00081,Deutsche Bank Essen Center,Filiale,Kaiserstraße 66,Essen,45307,51.436138,6.974816,456.43,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 67 6682698,False
+DB-DE-00082,Deutsche Bank Hamburg Center,SelbstbedienungsCenter,Berliner Straße 102,Hamburg,20097,53.5492,9.95123,257.7,52.52,13.405,Mo-Fr 08:30-16:30,+49 45 8630043,True
+DB-DE-00083,Deutsche Bank Bremen Center,Beratungscenter,Schillerstraße 173,Bremen,28759,53.08967,8.818934,314.66,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 71 4713925,True
+DB-DE-00084,Deutsche Bank München - Zentrum,Filiale,Bahnhofstraße 78,München,80796,48.143224,11.578427,503.6,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 42 4939290,False
+DB-DE-00085,Deutsche Bank Filiale Freiburg im Breisgau,Filiale,Rathausplatz 168,Freiburg im Breisgau,79110,47.97714,7.837464,641.39,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 82 5693260,True
+DB-DE-00086,Deutsche Bank Frankfurt am Main - Süd,Private Banking Center,Bergstraße 140,Frankfurt am Main,60316,50.122317,8.653827,424.22,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 37 7679674,False
+DB-DE-00087,Deutsche Bank Dresden - Mitte,Filiale,Bahnhofstraße 86,Dresden,01159,51.031789,13.699516,166.72,52.52,13.405,Mo-Fr 09:00-17:00,+49 56 2151087,True
+DB-DE-00088,Deutsche Bank Freiburg im Breisgau - Ost,Beratungscenter,Lindenstraße 38,Freiburg im Breisgau,79100,47.981429,7.813695,642.04,52.52,13.405,Mo-Fr 08:30-16:30,+49 62 3927575,False
+DB-DE-00089,Deutsche Bank Filiale Hamburg,Beratungscenter,Kölner Straße 83,Hamburg,20095,53.560763,9.946278,258.54,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 36 3126655,True
+DB-DE-00090,Deutsche Bank Essen - Bahnhof,Beratungscenter,Poststraße 129,Essen,45131,51.457165,7.036167,451.67,52.52,13.405,Mo-Fr 08:30-16:30,+49 35 9748499,True
+DB-DE-00091,Deutsche Bank Nürnberg Bahnhof,Beratungscenter,Schillerstraße 126,Nürnberg,90402,49.449583,11.123103,376.89,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 39 2355439,True
+DB-DE-00092,Deutsche Bank Hannover Center,Filiale,Gartenstraße 153,Hannover,30163,52.382398,9.688568,252.29,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 94 8217547,True
+DB-DE-00093,Deutsche Bank Filiale Hamburg,Filiale,Rathausplatz 87,Hamburg,22041,53.568686,9.955141,258.39,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 83 2595275,False
+DB-DE-00094,Deutsche Bank Hannover Nord,Filiale,Berliner Straße 24,Hannover,30163,52.371506,9.748511,248.34,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 85 2620082,False
+DB-DE-00095,Deutsche Bank Bremen - Altstadt,Filiale,Rathausplatz 91,Bremen,28759,53.098006,8.807337,315.58,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 36 5825620,False
+DB-DE-00096,Deutsche Bank Rostock Süd,Filiale,Friedrichstraße 28,Rostock,18119,54.081147,12.05946,195.26,52.52,13.405,Mo-Fr 08:30-16:30,+49 77 2927455,True
+DB-DE-00097,Deutsche Bank Dresden - Hafen,Filiale,Ringstraße 169,Dresden,01219,51.054846,13.768022,164.82,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 33 4026879,False
+DB-DE-00098,Deutsche Bank Filiale Dresden,Filiale,Kölner Straße 169,Dresden,01097,51.062562,13.718198,163.48,52.52,13.405,Mo-Fr 09:00-17:00,+49 33 2539438,True
+DB-DE-00099,Deutsche Bank Karlsruhe Center,Filiale,Kölner Straße 153,Karlsruhe,76135,48.989808,8.395683,527.26,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 49 3640899,True
+DB-DE-00100,Deutsche Bank Rostock Zentrum,Filiale,Rathausplatz 70,Rostock,18109,54.065386,12.057258,193.78,52.52,13.405,Mo-Fr 08:30-16:30,+49 44 6791039,True
+DB-DE-00101,Deutsche Bank Essen Center,Filiale,Bahnhofstraße 57,Essen,45307,51.432253,7.029422,452.96,52.52,13.405,Mo-Fr 08:30-16:30,+49 37 1128967,True
+DB-DE-00102,Deutsche Bank Düsseldorf - West,Filiale,Hauptstraße 128,Düsseldorf,40211,51.215785,6.744623,479.54,52.52,13.405,Mo-Fr 09:00-17:00,+49 46 7378822,True
+DB-DE-00103,Deutsche Bank Freiburg im Breisgau - Mitte,Filiale,Rathausplatz 5,Freiburg im Breisgau,79102,48.01122,7.842126,638.12,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 70 8202195,True
+DB-DE-00104,Deutsche Bank Kiel Center,Filiale,Kaiserstraße 159,Kiel,24106,54.317565,10.136814,294.66,52.52,13.405,"Mo,Mi,Fr 09:00-16:00; Di,Do 09:00-18:00",+49 41 8326807,True
+DB-DE-00105,Deutsche Bank Hamburg Center,Filiale,Mühlenstraße 57,Hamburg,22041,53.535699,10.002587,253.99,52.52,13.405,Mo-Fr 09:00-17:00,+49 39 9564488,True
+DB-DE-00106,Deutsche Bank Filiale Hamburg,Beratungscenter,Friedrichstraße 27,Hamburg,20354,53.552936,9.96309,257.17,52.52,13.405,Mo-Fr 09:00-17:00,+49 52 3564729,True
+DB-DE-00107,Deutsche Bank München Bahnhof,Beratungscenter,Kölner Straße 165,München,80992,48.115729,11.609285,506.01,52.52,13.405,Mo-Fr 08:30-16:30,+49 71 6303930,True
+DB-DE-00108,Deutsche Bank Köln Center,Filiale,Münchner Straße 19,Köln,50670,50.933886,6.957192,477.62,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 34 1954456,True
+DB-DE-00109,Deutsche Bank Bremen Hafen,Filiale,Poststraße 149,Bremen,28195,53.099202,8.759373,318.76,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 87 4158134,True
+DB-DE-00110,Deutsche Bank Hannover Center,Filiale,Berliner Straße 130,Hannover,30159,52.3822,9.732137,249.34,52.52,13.405,Mo-Fr 09:00-18:00; Sa 09:30-13:00,+49 61 8344365,True
+DB-DE-00111,Deutsche Bank Mannheim Ost,Private Banking Center,Rathausplatz 199,Mannheim,68165,49.488944,8.476981,481.97,52.52,13.405,Mo-Fr 08:30-16:30,+49 36 6614484,True
+DB-DE-00112,Deutsche Bank Filiale München,Filiale,Mühlenstraße 21,München,80992,48.124881,11.587796,505.41,52.52,13.405,Mo-Fr 09:00-17:00,+49 74 6204824,True
+DB-DE-00113,Deutsche Bank Dortmund Center,Filiale,Goethestraße 172,Dortmund,44135,51.491337,7.486183,420.84,52.52,13.405,Mo-Fr 08:30-16:30,+49 41 8103580,True
+DB-DE-00114,Deutsche Bank Karlsruhe Süd,Filiale,Marktstraße 58,Karlsruhe,76133,48.99861,8.38996,526.78,52.52,13.405,Mo-Fr 09:00-17:00,+49 39 5962567,False
+DB-DE-00115,Deutsche Bank Filiale Hamburg,Filiale,Ringstraße 97,Hamburg,22041,53.551561,9.997677,255.03,52.52,13.405,Mo-Fr 09:00-17:00,+49 51 8342941,True
+DB-DE-00116,Deutsche Bank Frankfurt am Main Bahnhof,Filiale,Friedrichstraße 137,Frankfurt am Main,60313,50.105552,8.699736,422.97,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 54 7171347,True
+DB-DE-00117,Deutsche Bank Kiel Zentrum,Filiale,Kaiserstraße 52,Kiel,24106,54.352366,10.118968,298.09,52.52,13.405,Mo-Fr 09:00-17:00,+49 62 1875431,False
+DB-DE-00118,Deutsche Bank Bonn Center,Private Banking Center,Berliner Straße 196,Bonn,53111,50.759847,7.103654,476.64,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 95 3472100,True
+DB-DE-00119,Deutsche Bank Essen Ost,Private Banking Center,Bahnhofstraße 102,Essen,45131,51.431103,7.05265,451.47,52.52,13.405,Mo-Fr 09:00-17:00,+49 79 2369112,True
+DB-DE-00120,Deutsche Bank Filiale Bremen,Beratungscenter,Bahnhofstraße 74,Bremen,28195,53.062772,8.783568,316.5,52.52,13.405,Mo-Fr 10:00-18:00; Sa geschlossen,+49 47 8870361,False

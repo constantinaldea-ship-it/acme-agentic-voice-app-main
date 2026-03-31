@@ -1,0 +1,42 @@
+meta {
+  name: Get Personal Data - Missing Authorization
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/customers/1234567890/personal-data
+  body: none
+  auth: none
+}
+
+headers {
+  deuba-client-id: {{clientId}}
+  DB-ID: acme-banking-db-01
+  Accept: application/json
+}
+
+docs {
+  # Get Personal Data - Missing Authorization (Negative Test)
+  
+  Tests that the endpoint returns 401 when the Authorization header is missing.
+  All other required headers are present.
+  
+  ## Expected Response
+  - HTTP 401 (Unauthorized)
+}
+
+assert {
+  res.status: eq 401
+  res.body.error: eq unauthorized
+}
+
+tests {
+  test("should return status 401 when Authorization is missing", function() {
+    expect(res.status).to.equal(401);
+  });
+  
+  test("should return unauthorized error", function() {
+    expect(res.body.error).to.equal("unauthorized");
+  });
+}

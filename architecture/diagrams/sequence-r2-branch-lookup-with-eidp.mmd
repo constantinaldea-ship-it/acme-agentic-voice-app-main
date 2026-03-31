@@ -1,0 +1,38 @@
+%% Revised Sequence: Branch Lookup (non-sensitive) with EIDP for Glue fallback
+%% Created by GitHub Copilot on 2026-03-01 for ADR-0104 Round 2 Review
+%% Shows EIDP token acquisition for Glue-bound calls
+
+sequenceDiagram
+  participant User
+  participant CES as CX Agent Studio
+  participant BFA as BFA Gateway (Cloud Run)
+  participant LOC as Location Adapter (internal)
+  participant LOCRM as Location Read Model<br/>(curated branches.json)
+  participant EIDP as EIDP (Enterprise Identity Provider)
+  participant Glue as Glue (WSO2) / Location API
+
+  User->>CES: "Find the closest branch"
+
+  CES->>BFA: Tool call (Service Directory PNA)<br/>IAM ID token (service identity)<br/>headers: request_id, session_id, agent_id,<br/>tool_id, customer_id_hash, auth_level
+
+  Note over BFA: Validate CES identity<br/>Validate mandatory headers<br/>Classify as NON-SENSITIVE (location = public data)
+
+  BFA->>LOC: Internal route to location domain<br/>propagate: all correlation headers
+
+  alt BFA read model has data (Phase 1 primary path)
+    LOC->>LOCRM: Deterministic lookup by city/postal code
+    LOCRM-->>LOC: Branch list + source version + last_refreshed timestamp
+    Note over LOC: No upstream call needed<br/>No EIDP token needed<br/>Fastest path
+  else Live location call required (Glue fallback)
+    Note over LOC: Glue fallback requires EIDP service token<br/>and verified Interconnect path
+    LOC->>BFA: Request EIDP service token<br/>audience: glue-location-api
+    BFA->>EIDP: Service token request<br/>(OAuth2 client_credentials over mTLS)<br/>audience: glue-location-api<br/>scope: location.branches.read<br/>(via Cloud Interconnect)
+    EIDP-->>BFA: EIDP service token<br/>(short-lived, audience: glue-location-api)
+    BFA-->>LOC: EIDP service token
+    LOC->>Glue: Query branches/ATMs<br/>Authorization: Bearer {eidp_service_token}<br/>(mTLS via Interconnect)<br/>propagate: correlation headers
+    Glue-->>LOC: Branch list
+  end
+
+  LOC-->>BFA: Normalized result set (no PII)
+  BFA-->>CES: Response + correlation IDs
+  CES-->>User: Voice response:<br/>"The nearest branch is at Hauptstraße 12,<br/>open until 6 PM today"

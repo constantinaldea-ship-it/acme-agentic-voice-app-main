@@ -1,0 +1,49 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "display_name_prefix": "langsmith-advisory-booking",
+  "run_request": {
+    "runCount": 1,
+    "generateLatencyReport": true
+  },
+  "require_latency_report": true,
+  "default_expected": {
+    "min_pass_rate": 0.67,
+    "min_completed_results": 1,
+    "max_error_count": 0
+  },
+  "langsmith": {
+    "dataset_name": "ces-advisory-booking-live",
+    "dataset_description": "Externally managed advisory booking experiments sourced from live CES scenario evaluations.",
+    "experiment_description": "Live CES booking-flow experiment for advisory appointment journey quality.",
+    "experiment_metadata": {
+      "agent": "advisory_appointment_agent",
+      "journey_type": "booking",
+      "suite_type": "scenario"
+    }
+  },
+  "evaluations": [
+    {
+      "name": "appointment_booking_branch_flow",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "booking", "branch", "langsmith"]
+    },
+    {
+      "name": "appointment_phone_consultation",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "booking", "phone", "langsmith"]
+    },
+    {
+      "name": "appointment_service_request_booking",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "booking", "service-request", "langsmith"]
+    },
+    {
+      "name": "appointment_video_consultation",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "booking", "video", "langsmith"]
+    }
+  ]
+}

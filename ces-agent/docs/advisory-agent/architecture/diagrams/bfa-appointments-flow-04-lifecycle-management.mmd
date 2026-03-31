@@ -1,0 +1,64 @@
+---
+title: BFA Advisory Appointment Flow 04 - Lifecycle Management
+---
+%%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#4285f4', 'actorTextColor': '#ffffff', 'actorBorder': '#1a56db', 'activationBkg': '#c9daf8', 'activationBorder': '#1a73e8', 'noteBkg': '#fff9c4', 'noteBorderColor': '#f4b400', 'noteTextColor': '#37474f', 'signalColor': '#1a73e8', 'signalTextColor': '#174ea6', 'labelBoxBkgColor': '#e8f0fe', 'labelBoxBorderColor': '#4285f4', 'labelTextColor': '#174ea6', 'loopTextColor': '#174ea6', 'sequenceNumberColor': '#ffffff'}}}%%
+%% Modified by Codex on 2026-03-16.
+%% Scope: Retrieve, reschedule, and cancel flows after appointment creation.
+
+sequenceDiagram
+  autonumber
+
+  participant User as User
+  participant RootAgent as voice_banking_agent
+  participant AppointmentAgent as advisory_appointment_agent
+  participant Controller as AppointmentController
+  participant Service as AppointmentService
+  participant Repository as AppointmentRepository
+  participant SlotService as AppointmentSlotService
+  participant Upstream as AppointmentMockServerClient
+  participant MockServer as mock-server
+
+  User->>RootAgent: "Show, reschedule, or cancel my appointment"
+  RootAgent->>AppointmentAgent: Route lifecycle intent
+  AppointmentAgent-->>User: Ask for appointmentId and appointmentAccessToken if missing
+  User->>AppointmentAgent: Provide lifecycle identifiers
+
+  AppointmentAgent->>Controller: GET /api/v1/appointments/{appointmentId}
+  Controller->>Service: getAppointment(...)
+  Service->>Repository: Load mutable appointment overlay
+  Repository-->>Service: Current appointment or not found
+  Service-->>Controller: AppointmentView
+  Controller-->>AppointmentAgent: ApiResponse with current appointment
+
+  alt reschedule journey
+    AppointmentAgent-->>User: Confirm new-slot search
+    AppointmentAgent->>Controller: GET /api/v1/appointment-slots
+    Controller->>Service: getAvailableSlots(...)
+    Service->>SlotService: Search replacement slots
+    SlotService->>Upstream: Fetch lifecycle slot templates
+    Upstream->>MockServer: GET /advisory-appointments/slots?scenario=reschedule
+    MockServer-->>Upstream: Deterministic reschedule slots or blocked window
+    Upstream-->>SlotService: Typed slot payload
+    SlotService-->>Service: Replacement slot options
+    Service-->>Controller: AppointmentSlotSearchResponse
+    Controller-->>AppointmentAgent: ApiResponse with replacement slots
+    AppointmentAgent-->>User: Present replacement slots
+    User->>AppointmentAgent: Select new slot and confirm
+    AppointmentAgent->>Controller: POST /api/v1/appointments/{appointmentId}/reschedule
+    Controller->>Service: rescheduleAppointment(...)
+    Service->>Repository: Verify access token, state, and slot availability
+    Repository-->>Service: Updated appointment view
+    Service-->>Controller: AppointmentView
+    Controller-->>AppointmentAgent: ApiResponse with rescheduled appointment
+    AppointmentAgent-->>User: Reschedule confirmation or repair prompt
+  else cancel journey
+    AppointmentAgent-->>User: Confirm cancellation intent
+    User->>AppointmentAgent: Cancellation confirmed
+    AppointmentAgent->>Controller: POST /api/v1/appointments/{appointmentId}/cancel
+    Controller->>Service: cancelAppointment(...)
+    Service->>Repository: Verify access token and cancellation rules
+    Repository-->>Service: Cancelled appointment view
+    Service-->>Controller: AppointmentView
+    Controller-->>AppointmentAgent: ApiResponse with cancelled appointment
+    AppointmentAgent-->>User: Cancellation confirmation or repair prompt
+  end

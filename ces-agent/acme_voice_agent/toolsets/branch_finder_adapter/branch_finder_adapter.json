@@ -1,0 +1,9 @@
+{
+  "displayName": "branch_finder_adapter",
+  "openApiToolset": {
+    "openApiSchema": "toolsets/branch_finder_adapter/open_api_toolset/open_api_schema.yaml",
+    "apiAuthentication": {
+      "serviceAgentIdTokenAuthConfig": {}
+    }
+  }
+}

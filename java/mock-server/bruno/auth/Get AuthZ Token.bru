@@ -1,0 +1,73 @@
+meta {
+  name: Get AuthZ Token
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/authz/authorize
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{eidpToken}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "resource": "customers:personal-data",
+    "action": "read"
+  }
+}
+
+docs {
+  # Get AuthZ Token
+  
+  Retrieves an authorization token from the AuthZ service.
+  Requires a valid EIDP Bearer token in the Authorization header.
+  
+  ## Prerequisites
+  - First obtain an EIDP token from `POST /oauth/token`
+  - Set the `eidpToken` environment variable with the access_token value
+  
+  ## Request
+  - POST /authz/authorize
+  - Authorization: Bearer {eidp_token}
+  - Body: { "resource": "customers:personal-data", "action": "read" }
+  
+  ## Expected Response
+  - HTTP 200
+  - Returns authorization_token, authorized flag, permissions, expires_in
+}
+
+assert {
+  res.status: eq 200
+  res.body.authorized: eq true
+  res.body.authorization_token: isString
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return authorized=true", function() {
+    expect(res.body.authorized).to.equal(true);
+  });
+  
+  test("should return an authorization token", function() {
+    expect(res.body.authorization_token).to.be.a("string");
+    expect(res.body.authorization_token.length).to.be.greaterThan(0);
+  });
+  
+  test("should include customer read permissions", function() {
+    expect(res.body.permissions).to.include("read:customers");
+    expect(res.body.permissions).to.include("read:personal-data");
+  });
+}

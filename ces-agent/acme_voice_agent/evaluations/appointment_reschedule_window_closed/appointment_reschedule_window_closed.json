@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_reschedule_window_closed",
+  "scenario": {
+    "task": "Test a blocked reschedule flow. Start with 'I need to move my appointment, but it might be too late'. The agent should route to advisory_appointment_agent, retrieve the existing appointment using the access token, explain the timing rule when rescheduling is no longer allowed, avoid claiming success, and offer an alternative such as booking a new appointment or handing off to a human.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent communicates clearly when the reschedule window is closed."
+      },
+      {
+        "expectedResult": "The agent does not pretend the appointment was changed when the lifecycle action is blocked."
+      },
+      {
+        "expectedResult": "The agent offers an appropriate recovery path after the blocked reschedule attempt."
+      }
+    ],
+    "maxTurns": 8
+  }
+}

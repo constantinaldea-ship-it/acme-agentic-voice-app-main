@@ -1,0 +1,42 @@
+meta {
+  name: Get Appointment Cancelled
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/lifecycle/APT-BRANCH-0001?appointmentAccessToken=aat-branch-0001
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-lifecycle-006
+  Accept: application/json
+}
+
+docs {
+  # Get Appointment — CANCELLED State
+
+  Retrieves appointment details when in CANCELLED state (after Cancel).
+
+  ## Expected Response
+  - HTTP 200
+  - Appointment with status CANCELLED
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should show CANCELLED status", function() {
+    expect(res.body.status).to.equal("CANCELLED");
+  });
+}

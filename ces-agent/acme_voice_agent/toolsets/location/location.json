@@ -1,0 +1,9 @@
+{
+  "displayName": "location",
+  "openApiToolset": {
+    "openApiSchema": "toolsets/location/open_api_toolset/open_api_schema.yaml",
+    "apiAuthentication": {
+      "serviceAgentIdTokenAuthConfig": {}
+    }
+  }
+}

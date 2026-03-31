@@ -1,0 +1,63 @@
+# Cloud Build configuration for Java Voice Banking Assistant
+# Used for GCP-native CI/CD and container builds.
+# Cloud Build provides $PROJECT_ID automatically; local shell scripts use the repository root .env GCP_* variables.
+
+steps:
+  # Step 1: Build and test
+  - name: 'maven:3.9-eclipse-temurin-21'
+    entrypoint: 'mvn'
+    args: ['clean', 'verify', '-f', 'java/pom.xml', '-Pci']
+    id: 'build-and-test'
+
+  # Step 2: Generate coverage report
+  - name: 'maven:3.9-eclipse-temurin-21'
+    entrypoint: 'mvn'
+    args: ['jacoco:report', '-f', 'java/pom.xml']
+    id: 'coverage-report'
+    waitFor: ['build-and-test']
+
+  # Step 3: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voice-banking-java:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voice-banking-java:latest'
+      - '-f'
+      - 'java/Dockerfile'
+      - 'java/'
+    id: 'docker-build'
+    waitFor: ['build-and-test']
+
+  # Step 4: Push to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/voice-banking-java:$SHORT_SHA'
+    id: 'docker-push-sha'
+    waitFor: ['docker-build']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/voice-banking-java:latest'
+    id: 'docker-push-latest'
+    waitFor: ['docker-build']
+
+# Store images in Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/voice-banking-java:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/voice-banking-java:latest'
+
+# Build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+# Timeout (20 minutes)
+timeout: '1200s'
+
+# Substitutions (can be overridden)
+substitutions:
+  _JAVA_VERSION: '21'

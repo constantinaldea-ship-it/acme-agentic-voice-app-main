@@ -1,0 +1,42 @@
+{
+  "app": {
+    "requestContextHeaders": {
+      "agentIdHeader": "X-Agent-Id",
+      "toolIdHeader": "X-Tool-Id",
+      "debugEchoHeader": "X-Debug-Echo-Headers"
+    }
+  },
+  "toolsets": {
+    "location": {
+      "openApiToolset": {
+        "url": "https://bfa-service-resource-6gxbppksrq-uc.a.run.app"
+      }
+    },
+    "advisory_appointment": {
+      "openApiToolset": {
+        "url": "https://bfa-service-resource-6gxbppksrq-uc.a.run.app"
+      }
+    },
+    "customer_details_openapi": {
+      "openApiToolset": {
+        "url": "https://mock-server-6gxbppksrq-uc.a.run.app",
+        "requestContextHeaders": {
+          "agentIdHeader": "X-Agent-Id",
+          "toolIdHeader": "X-Tool-Id",
+          "debugEchoHeader": "X-Debug-Echo-Headers",
+          "defaultAgentId": "customer_details_agent"
+        }
+      }
+    },
+    "bfa_gateway": {
+      "openApiToolset": {
+        "url": "https://bfa-gateway-6gxbppksrq-uc.a.run.app"
+      }
+    },
+    "branch_finder_adapter": {
+      "openApiToolset": {
+        "url": "https://bfa-adapter-branch-finder-6gxbppksrq-uc.a.run.app"
+      }
+    }
+  }
+}

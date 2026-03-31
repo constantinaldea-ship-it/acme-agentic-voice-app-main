@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_video_consultation",
+  "scenario": {
+    "task": "Test a video consultation booking flow. Start with 'I want to book a video appointment about investing'. The agent should route to advisory_appointment_agent, keep the flow in appointment orchestration, search for a suitable topic or taxonomy entry, search eligible VIDEO locations or centers, retrieve video slots, present concise options, ask for explicit confirmation before booking, and explain that any video-link follow-up is mocked in this phase.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent keeps the consultation channel in VIDEO and does not force a branch-only flow."
+      },
+      {
+        "expectedResult": "The agent states clearly that the video follow-up details are mocked rather than live downstream instructions."
+      },
+      {
+        "expectedResult": "The agent asks for explicit confirmation before calling the create appointment action."
+      }
+    ],
+    "maxTurns": 10
+  }
+}

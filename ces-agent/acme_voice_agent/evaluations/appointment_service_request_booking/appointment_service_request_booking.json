@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_service_request_booking",
+  "scenario": {
+    "task": "Test a service-request booking flow from free text. Start with 'I need an appointment because my standing order is wrong'. The agent should route to advisory_appointment_agent, call service search for the free-text issue, select the service-request path instead of a product-consultation topic flow, ask for any required comment if the service match needs it, find an eligible location or remote channel, retrieve slots, summarize the appointment, and ask for confirmation before booking.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent uses the service-search step rather than forcing the user into a product-topic flow."
+      },
+      {
+        "expectedResult": "The agent collects a required short comment when the matched service requires additional context."
+      },
+      {
+        "expectedResult": "The agent confirms the booking summary before calling create appointment."
+      }
+    ],
+    "maxTurns": 10
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "display_name": "simple-voice-routing-openai",
+  "scenarios": [
+    {
+      "name": "appointment_routing_english_voice_openai",
+      "audio_path": "../fixtures/appointment-routing-english/utterance-openai.wav",
+      "transcriber": {
+        "kind": "openai",
+        "model": "gpt-4o-mini-transcribe",
+        "language": "en"
+      },
+      "expected_transcript": "I'd like to book an advisory appointment",
+      "linked_evaluation": "appointment_routing_english"
+    }
+  ]
+}

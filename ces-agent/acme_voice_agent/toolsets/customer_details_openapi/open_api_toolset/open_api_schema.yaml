@@ -1,0 +1,408 @@
+openapi: "3.0.1"
+info:
+  title: Acme Bank Customer Details API
+  description: >-
+    Customer personal data retrieval service for the Voice Banking Assistant.
+    Canonical source: `java/mock-server/openapi-specs/mock-server.json`
+    (customer/authentication subset).
+    Implements a three-step IDP token flow:
+      1. POST /oauth/token → Obtain EIDP access token (client credentials)
+      2. POST /authz/authorize → Exchange for AuthZ authorization token
+      3. GET /customers/{partnerId}/personal-data → Fetch customer details
+    Note: CES cannot chain these operations automatically. The agent must
+    call each operation in sequence and pass tokens between steps.
+  version: "1.1.0"
+servers:
+  - url: "$env_var"
+    description: "Mock Server (environment-injected)"
+
+# NOTE: X-API-Key is modeled as an explicit header parameter because
+# imported CES apps no longer reliably support inline apiKeyConfig values.
+# The wrapper tool passes the mock key directly for this demo environment.
+
+tags:
+  - name: Authentication
+    description: IDP token acquisition and authorization
+  - name: Customer Details
+    description: Customer personal data lookup
+
+paths:
+  /oauth/token:
+    post:
+      tags: [Authentication]
+      summary: Obtain EIDP access token
+      description: >-
+        Step 1 of the IDP token flow. Authenticates using client credentials
+        grant to obtain an EIDP access token. This token is required for
+        the subsequent authorization step.
+      operationId: getEidpToken
+      parameters:
+        - name: X-API-Key
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Mock-server API key for protected deployments.
+        - name: X-Agent-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "customer_details_agent"
+          description: CES subagent identifier for backend attribution.
+        - name: X-Tool-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "getEidpToken"
+          description: CES tool or OpenAPI method identifier for backend attribution.
+        - name: X-Debug-Echo-Headers
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "false"
+          description: >-
+            Optional debug flag. When true, the mock upstream echoes the
+            captured identity headers in the JSON response body for proof.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+                - client_id
+                - client_secret
+              properties:
+                grant_type:
+                  type: string
+                  default: "client_credentials"
+                  description: "OAuth2 grant type (always 'client_credentials')"
+                client_id:
+                  type: string
+                  default: "ces-agent-service"
+                  description: "Service client identifier"
+                client_secret:
+                  type: string
+                  default: "mock-secret"
+                  description: "Service client secret"
+      responses:
+        "200":
+          description: EIDP access token issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EidpTokenResponse"
+        "401":
+          description: Invalid client credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /authz/authorize:
+    post:
+      tags: [Authentication]
+      summary: Exchange EIDP token for AuthZ authorization token
+      description: >-
+        Step 2 of the IDP token flow. Exchanges the EIDP access token for
+        a resource-specific authorization token. The EIDP token must be
+        passed in the Authorization header as a Bearer token.
+      operationId: getAuthzToken
+      parameters:
+        - name: X-API-Key
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Mock-server API key for protected deployments.
+        - name: X-Agent-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "customer_details_agent"
+          description: CES subagent identifier for backend attribution.
+        - name: X-Tool-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "getAuthzToken"
+          description: CES tool or OpenAPI method identifier for backend attribution.
+        - name: X-Debug-Echo-Headers
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "false"
+          description: >-
+            Optional debug flag. When true, the mock upstream echoes the
+            captured identity headers in the JSON response body for proof.
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: >-
+            Bearer token from Step 1 (EIDP access token).
+            Format: 'Bearer {eidp_access_token}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - resource
+                - action
+              properties:
+                resource:
+                  type: string
+                  default: "customers:personal-data"
+                  description: "Resource identifier to authorize access to"
+                action:
+                  type: string
+                  default: "read"
+                  description: "Action to authorize (e.g. 'read', 'write')"
+      responses:
+        "200":
+          description: Authorization token issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthzResponse"
+        "401":
+          description: Missing or invalid EIDP token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Authorization denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /customers/{partnerId}/personal-data:
+    get:
+      tags: [Customer Details]
+      summary: Get customer personal data
+      description: >-
+        Step 3 of the IDP token flow. Retrieve personal details for a
+        customer identified by their partner ID. Requires the AuthZ
+        authorization token from Step 2 in the Authorization header.
+      operationId: getCustomerPersonalData
+      parameters:
+        - name: X-API-Key
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Mock-server API key for protected deployments.
+        - name: X-Agent-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "customer_details_agent"
+          description: CES subagent identifier for backend attribution.
+        - name: X-Tool-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "getCustomerPersonalData"
+          description: CES tool or OpenAPI method identifier for backend attribution.
+        - name: X-Debug-Echo-Headers
+          in: header
+          required: false
+          schema:
+            type: string
+            default: "false"
+          description: >-
+            Optional debug flag. When true, the mock upstream echoes the
+            captured identity headers in the JSON response body for proof.
+        - name: partnerId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "Customer partner ID (e.g. '1234567890')"
+          example: "1234567890"
+        - name: deuba-client-id
+          in: header
+          required: true
+          schema:
+            type: string
+            default: "pb-banking"
+          description: "Client identifier (must contain '-banking')"
+        - name: DB-ID
+          in: header
+          required: true
+          schema:
+            type: string
+            default: "acme-banking-db-01"
+          description: "Database identifier"
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: >-
+            Bearer token from Step 2 (AuthZ authorization token).
+            Format: 'Bearer {authz_authorization_token}'
+      responses:
+        "200":
+          description: Customer personal data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerPersonalData"
+        "401":
+          description: Missing or invalid Authorization header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing DB-ID header or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    EidpTokenResponse:
+      type: object
+      description: "EIDP access token response (Step 1)"
+      properties:
+        access_token:
+          type: string
+          description: "JWT access token to use in Step 2"
+        token_type:
+          type: string
+          description: "Token type (always 'Bearer')"
+        expires_in:
+          type: integer
+          description: "Token lifetime in seconds"
+        scope:
+          type: string
+          description: "Granted scopes (space-separated)"
+
+    AuthzResponse:
+      type: object
+      description: "AuthZ authorization response (Step 2)"
+      properties:
+        authorized:
+          type: boolean
+          description: "Whether the request was authorized"
+        authorization_token:
+          type: string
+          description: "JWT authorization token to use in Step 3"
+        permissions:
+          type: array
+          items:
+            type: string
+          description: "Granted permissions"
+        expires_in:
+          type: integer
+          description: "Token lifetime in seconds"
+
+    CustomerPersonalData:
+      type: object
+      properties:
+        firstname:
+          type: string
+          description: "Customer's first name"
+        lastname:
+          type: string
+          description: "Customer's last name"
+        fullName:
+          type: string
+          description: "Full display name including titles"
+        academicTitle:
+          type: string
+          description: "Academic title (e.g. 'Dr.', 'Prof.')"
+        id:
+          type: integer
+          format: int64
+          description: "Customer partner ID"
+        dateOfBirth:
+          type: string
+          format: date
+          description: "Date of birth (YYYY-MM-DD)"
+        placeOfBirth:
+          type: string
+        nationality:
+          type: string
+          description: "ISO 3166-1 alpha-3 country code"
+        maritalStatus:
+          type: string
+        gender:
+          type: string
+          enum: [MALE, FEMALE, OTHER]
+        registrationAddress:
+          $ref: "#/components/schemas/Address"
+        emailAddress:
+          $ref: "#/components/schemas/EmailAddress"
+        phoneNumbers:
+          $ref: "#/components/schemas/PhoneNumbers"
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        streetNumber:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+
+    EmailAddress:
+      type: object
+      properties:
+        address:
+          type: string
+          format: email
+        type:
+          type: string
+
+    PhoneNumbers:
+      type: object
+      properties:
+        private:
+          $ref: "#/components/schemas/PhoneNumber"
+        work:
+          $ref: "#/components/schemas/PhoneNumber"
+        mobile:
+          $ref: "#/components/schemas/PhoneNumber"
+
+    PhoneNumber:
+      type: object
+      properties:
+        countryCode:
+          type: string
+        number:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string

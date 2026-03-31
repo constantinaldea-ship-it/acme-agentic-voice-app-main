@@ -1,0 +1,38 @@
+meta {
+  name: Get Availability Video Day
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/availability?consultationChannel=VIDEO&locationId=REMOTE-VIDEO-DE&selectedDay=2030-06-18
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-avail-004
+  Accept: application/json
+}
+
+docs {
+  # Get Availability — Video (Specific Day)
+
+  Returns time slots for a video consultation on a specific day.
+
+  ## Expected Response
+  - HTTP 200
+  - Slot list for video appointments on that day
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

@@ -1,0 +1,50 @@
+---
+title: BFA Advisory Appointment Flow 03 - Booking Confirmation
+---
+%%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#4285f4', 'actorTextColor': '#ffffff', 'actorBorder': '#1a56db', 'activationBkg': '#c9daf8', 'activationBorder': '#1a73e8', 'noteBkg': '#fff9c4', 'noteBorderColor': '#f4b400', 'noteTextColor': '#37474f', 'signalColor': '#1a73e8', 'signalTextColor': '#174ea6', 'labelBoxBkgColor': '#e8f0fe', 'labelBoxBorderColor': '#4285f4', 'labelTextColor': '#174ea6', 'loopTextColor': '#174ea6', 'sequenceNumberColor': '#ffffff'}}}%%
+%% Modified by Codex on 2026-03-16.
+%% Scope: Contact capture, spoken confirmation, and appointment creation.
+
+sequenceDiagram
+  autonumber
+
+  participant User as User
+  participant AppointmentAgent as advisory_appointment_agent
+  participant Controller as AppointmentController
+  participant Service as AppointmentService
+  participant Repository as AppointmentRepository
+  participant Upstream as AppointmentMockServerClient
+  participant MockServer as mock-server
+
+  AppointmentAgent-->>User: Collect salutation, first name, last name, email, and phone
+  User->>AppointmentAgent: Provide contact details
+  AppointmentAgent-->>User: Ask whether the caller is an existing customer
+
+  alt existing customer
+    User->>AppointmentAgent: Provide branchNumber and accountNumber
+    AppointmentAgent->>AppointmentAgent: existingCustomerContext captured
+  else prospect or walk-in
+    AppointmentAgent->>AppointmentAgent: Proceed without customer account context
+  end
+
+  AppointmentAgent->>AppointmentAgent: Validate spoken fields and confirm the full appointment summary
+  AppointmentAgent-->>User: Read back channel, location, slot, and masked contact data
+  User->>AppointmentAgent: Confirm booking
+
+  AppointmentAgent->>Controller: POST /api/v1/appointments
+  Controller->>Service: createAppointment(...)
+  Service->>Service: Validate selectedDay, summaryConfirmed, and required customer fields
+  Service->>Repository: Reserve slot and create mutable overlay record
+  Repository->>Upstream: Load deterministic booking context
+  Upstream->>MockServer: GET or POST /advisory-appointments/booking-context
+  MockServer-->>Upstream: Booking metadata, advisor hints, and delivery hints
+  Upstream-->>Repository: Typed booking context
+  Repository-->>Service: Appointment view and appointmentAccessToken
+  Service-->>Controller: CreateAppointmentResponse
+  Controller-->>AppointmentAgent: ApiResponse with booking result
+
+  alt booking succeeds
+    AppointmentAgent-->>User: Confirm appointment ID, time, location, and next-step delivery
+  else slot conflict or invalid contact data
+    AppointmentAgent-->>User: Repair prompt with deterministic retry path
+  end

@@ -1,0 +1,2 @@
+# Optional dependency for direct CES audio runtime checks (--ces-session)
+websockets==16.0

@@ -1,0 +1,33 @@
+{
+  "services": {
+    "mock_server_upstream": {
+      "display_name": "Mock Server Upstream",
+      "base_url_env": "MOCK_SERVER_URL",
+      "required_env": [
+        "CUSTOMER_DETAILS_API_KEY"
+      ],
+      "openapi_spec": "../../../../../java/mock-server/openapi-specs/mock-server.json",
+      "default_headers": {
+        "Authorization": "Bearer mock-appointment-service-token",
+        "X-API-Key": "${CUSTOMER_DETAILS_API_KEY}",
+        "X-BFA-Client": "advisory-appointment-bff",
+        "X-Correlation-ID": "smoke-test"
+      }
+    },
+    "branch_finder_adapter": {
+      "display_name": "Branch Finder Adapter",
+      "base_url_env": "BFA_ADAPTER_BRANCH_FINDER_URL",
+      "openapi_spec": "../../../../../java/bfa-adapter-branch-finder/openapi-specs/branch-finder-adapter.json"
+    },
+    "bfa_gateway": {
+      "display_name": "BFA Gateway",
+      "base_url_env": "BFA_GATEWAY_URL",
+      "openapi_spec": "../../../../../java/bfa-gateway/openapi-specs/bfa-gateway.json"
+    },
+    "advisory_appointment_resource": {
+      "display_name": "Advisory Appointment Resource",
+      "base_url_env": "BFA_SERVICE_RESOURCE_URL",
+      "openapi_spec": "../../../../../java/bfa-service-resource/openapi-specs/bfa-resource-all.json"
+    }
+  }
+}

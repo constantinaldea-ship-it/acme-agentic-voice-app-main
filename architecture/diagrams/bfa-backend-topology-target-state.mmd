@@ -1,0 +1,210 @@
+---
+title: BFA Backend Topology — Logical Architecture View
+---
+%%{init: {'theme': 'base', 'flowchart': {'padding': 20, 'nodeSpacing': 16, 'rankSpacing': 30, 'htmlLabels': true}}}%%
+%% ╔════════════════════════════════════════════════════════════════════════╗
+%% ║  4-COLUMN VERTICAL SWIMLANE LAYOUT                                   ║
+%% ║  ADR-0104 Option C: Single BFA Gateway + Federated Adapters          ║
+%% ║  Col 1 (14%): CX Agent Studio   | Col 2 (50%): BFA Landing Zone     ║
+%% ║  Col 3 (15%): Identity & API LZ | Col 4 (21%): On-Prem DC           ║
+%% ╚════════════════════════════════════════════════════════════════════════╝
+%% Author: GitHub Copilot | Date: 2026-03-01
+
+flowchart LR
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% COLUMN 1 — CX Agent Studio (Google-Managed SaaS) — 14% width
+  %% Full-height swimlane
+  %% ═══════════════════════════════════════════════════════════════════
+  subgraph CES["CX Agent Studio\n(Google-Managed SaaS)"]
+    direction TB
+    VBA["Voice Banking Agent\n(Root Orchestrator)"]
+    HHA["Human Handover Agent"]
+
+    subgraph SUBAGENTS["Domain Sub-Agents"]
+      direction TB
+      SA_LOC["Location Agent (AG-003)"]
+      SA_APPT["Appointments Agent (AG-004)"]
+      SA_FEE["Fees Agent (AG-005)"]
+      SA_KBA["Knowledge Agent (AG-006)"]
+      SA_BANK["Banking Agent (AG-007)"]
+      SA_CARD["Credit Card Agent (AG-008)"]
+      SA_PROD["Products Agent (AG-009)"]
+      SA_MOB["Mobile Assist Agent (AG-010)"]
+      SA_NBS["Non-Banking Agent (AG-011)"]
+      SA_PFI["Personal Finance Agent (AG-012)"]
+    end
+
+    TOOLS["OpenAPI Toolset\n(single BFA endpoint)"]
+    VBA -->|"escalation"| HHA
+    VBA -->|"intent routing"| SUBAGENTS
+    SUBAGENTS -->|"tool execution"| TOOLS
+    %% invisible spacers — equalise height with Column 2
+    CES_S1[" "]:::hidden
+    CES_S2[" "]:::hidden
+    CES_S3[" "]:::hidden
+    CES_S4[" "]:::hidden
+    TOOLS ~~~ CES_S1
+    CES_S1 ~~~ CES_S2
+    CES_S2 ~~~ CES_S3
+    CES_S3 ~~~ CES_S4
+  end
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% COLUMN 2 — BFA Landing Zone (GCP Project) — 50% width
+  %% Primary internal GCP landing zone — full-height swimlane
+  %% ═══════════════════════════════════════════════════════════════════
+  subgraph BFA_LZ["BFA Landing Zone\n(GCP Project)"]
+    direction TB
+    BFA["BFA Gateway\n(Edge PEP + Response PEP)"]
+    PDP["AuthZ PDP"]
+    TKB["Token Broker Service"]
+
+    subgraph ADAPTERS["Domain Adapters"]
+      direction TB
+      LOC["Location (AG-003)"]
+      APPT["Appointments (AG-004)"]
+      FEE["Fees (AG-005)"]
+      KBA["Knowledge (AG-006)"]
+      BANK["Banking (AG-007)"]
+      CARD["Credit Card (AG-008)"]
+      PROD["Products (AG-009)"]
+      MOB["Mobile Assist (AG-010)"]
+      NBS["Non-Banking (AG-011)"]
+      PFI["Personal Finance (AG-012)"]
+    end
+
+    RM[("Curated\nRead Models")]
+
+    BFA --> PDP
+    BFA --> TKB
+    BFA --> ADAPTERS
+    LOC --> RM
+    FEE --> RM
+    KBA --> RM
+    MOB --> RM
+  end
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% COLUMN 3 — Identity & API Landing Zones (GCP) — 15% width
+  %% Full-height swimlane
+  %% ═══════════════════════════════════════════════════════════════════
+  subgraph IDP_COL["Identity & API Services\n(GCP Landing Zones)"]
+    direction TB
+
+    subgraph CIAM_LZ["CIAM Landing Zone"]
+      CIAM["ForgeRock CIAM\nCustomer Identity\n(RFC 8693 Exchange)"]
+    end
+
+    subgraph CIDP_LZ["CIDP Landing Zone"]
+      CIDP["CIDP\nCloud Identity Provider"]
+    end
+
+    subgraph APIGEE_LZ["Apigee Landing Zone"]
+      APIGEE["Apigee Internal\n(Secondary PEP)"]
+    end
+
+    %% invisible spacers — equalise height with Column 2
+    IDP_S1[" "]:::hidden
+    IDP_S2[" "]:::hidden
+    IDP_S3[" "]:::hidden
+    IDP_S4[" "]:::hidden
+    APIGEE ~~~ IDP_S1
+    IDP_S1 ~~~ IDP_S2
+    IDP_S2 ~~~ IDP_S3
+    IDP_S3 ~~~ IDP_S4
+  end
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% COLUMN 4 — On-Premises Data Centre — 21% width (remaining)
+  %% Full-height swimlane
+  %% ═══════════════════════════════════════════════════════════════════
+  subgraph ONPREM["On-Premises Data Centre"]
+    direction TB
+
+    EIDP["EIDP\nEnterprise Identity Provider"]
+    GLUE["Glue (WSO2)\nAPI Manager"]
+    CBS["Core Banking\nSystem of Record"]
+
+    GLUE --> CBS
+
+    %% invisible spacers — equalise height with Column 2
+    ONPREM_S1[" "]:::hidden
+    ONPREM_S2[" "]:::hidden
+    ONPREM_S3[" "]:::hidden
+    ONPREM_S4[" "]:::hidden
+    ONPREM_S5[" "]:::hidden
+    ONPREM_S6[" "]:::hidden
+    CBS ~~~ ONPREM_S1
+    ONPREM_S1 ~~~ ONPREM_S2
+    ONPREM_S2 ~~~ ONPREM_S3
+    ONPREM_S3 ~~~ ONPREM_S4
+    ONPREM_S4 ~~~ ONPREM_S5
+    ONPREM_S5 ~~~ ONPREM_S6
+  end
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% CONNECTIONS — all data flows preserved
+  %% ═══════════════════════════════════════════════════════════════════
+
+  %% CES → BFA (single ingress)
+  TOOLS ==>|"Private Network Access\n(VPC-SC)"| BFA
+
+  %% BFA → Identity & API LZs
+  TKB -->|"RFC 8693\ncustomer token"| CIAM
+  TKB -->|"service token\n(Apigee-bound)"| CIDP
+  BANK -->|"agentic token"| APIGEE
+  CARD -->|"agentic token"| APIGEE
+  PROD -->|"service token"| APIGEE
+  NBS --> APIGEE
+  PFI --> APIGEE
+
+  %% Identity & API → On-Prem
+  TKB -.->|"service token\n(Glue-bound)"| EIDP
+  LOC -.->|"fallback"| GLUE
+  FEE -.->|"fallback"| GLUE
+  APPT -.->|"primary"| GLUE
+  APIGEE -->|"Hybrid Connectivity\n(Interconnect / VPN)"| CBS
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% STYLING — Google Cloud Architecture Palette
+  %% ═══════════════════════════════════════════════════════════════════
+
+  %% Column container styles (swimlane backgrounds)
+  style CES fill:#d2e3fc,stroke:#4285f4,stroke-width:3px,color:#174ea6
+  style BFA_LZ fill:#c9daf8,stroke:#1a73e8,stroke-width:3px,color:#174ea6
+  style IDP_COL fill:#e8f0fe,stroke:#4285f4,stroke-width:3px,color:#1a56db
+  style ONPREM fill:#fce4d6,stroke:#e67c00,stroke-width:3px,color:#7c3f00
+
+  %% Landing Zone sub-styles
+  style CIAM_LZ fill:#ceead6,stroke:#0f9d58,stroke-width:2px,color:#0b6d3e
+  style CIDP_LZ fill:#ceead6,stroke:#0f9d58,stroke-width:2px,color:#0b6d3e
+  style APIGEE_LZ fill:#ceead6,stroke:#0f9d58,stroke-width:2px,color:#0b6d3e
+  style ADAPTERS fill:#e8f0fe,stroke:#4285f4,stroke-width:1px,color:#174ea6
+
+  %% Node classes
+  classDef cesNode fill:#4285f4,color:#fff,stroke:#1a56db,stroke-width:2px
+  classDef bfaNode fill:#1a73e8,color:#fff,stroke:#0d47a1,stroke-width:3px
+  classDef platformNode fill:#4285f4,color:#fff,stroke:#1a56db,stroke-width:2px
+  classDef adapterNode fill:#a4c2f4,color:#0d47a1,stroke:#4285f4,stroke-width:1px
+  classDef readmodel fill:#e8eaed,stroke:#5f6368,stroke-width:2px,color:#3c4043
+  classDef greenNode fill:#0f9d58,color:#fff,stroke:#0b7a42,stroke-width:2px
+  classDef yellowNode fill:#f4b400,color:#000,stroke:#c89200,stroke-width:2px
+  classDef redNode fill:#db4437,color:#fff,stroke:#b02a1f,stroke-width:2px
+  classDef purpleNode fill:#673ab7,color:#fff,stroke:#4a148c,stroke-width:2px
+  classDef hidden opacity:0
+
+  %% Apply classes
+  class VBA,HHA,TOOLS cesNode
+  classDef subagentNode fill:#e3f2fd,color:#0d47a1,stroke:#1565c0,stroke-width:1px
+  class SA_LOC,SA_APPT,SA_FEE,SA_KBA,SA_BANK,SA_CARD,SA_PROD,SA_MOB,SA_NBS,SA_PFI subagentNode
+  style SUBAGENTS fill:#e8f0fe,stroke:#1565c0,stroke-width:1px,color:#0d47a1
+  class BFA bfaNode
+  class PDP,TKB platformNode
+  class LOC,FEE,KBA,MOB,BANK,CARD,PROD,APPT,PFI,NBS adapterNode
+  class RM readmodel
+  class CIAM,CIDP greenNode
+  class APIGEE greenNode
+  class EIDP yellowNode
+  class GLUE redNode
+  class CBS purpleNode

@@ -1,0 +1,42 @@
+meta {
+  name: Get Appointment Rescheduled
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/lifecycle/APT-BRANCH-0001?appointmentAccessToken=aat-branch-0001
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-lifecycle-004
+  Accept: application/json
+}
+
+docs {
+  # Get Appointment — RESCHEDULED State
+
+  Retrieves appointment details when in RESCHEDULED state (after Reschedule).
+
+  ## Expected Response
+  - HTTP 200
+  - Appointment with status RESCHEDULED
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should show RESCHEDULED status", function() {
+    expect(res.body.status).to.equal("RESCHEDULED");
+  });
+}

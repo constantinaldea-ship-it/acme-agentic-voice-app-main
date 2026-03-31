@@ -1,0 +1,36 @@
+{
+  "displayName": "off_topic_redirect",
+  "golden": {
+    "turns": [{
+      "steps": [{
+        "userInput": {
+          "text": "What's the weather like tomorrow?"
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "voice_banking_agent",
+            "chunks": [{
+              "text": "I'm not able to help with weather information, but I'd be happy to assist you with banking services such as finding a branch near you or connecting you with a live agent."
+            }]
+          }
+        }
+      }]
+    }, {
+      "steps": [{
+        "userInput": {
+          "text": "What's my account balance?"
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "voice_banking_agent",
+            "chunks": [{
+              "text": "Account balance inquiries are not yet available through this service. I can help you find a nearby branch or connect you with a live agent who can assist you with your account. What would you prefer?"
+            }]
+          }
+        }
+      }]
+    }]
+  }
+}

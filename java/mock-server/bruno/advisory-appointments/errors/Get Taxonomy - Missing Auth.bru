@@ -1,0 +1,37 @@
+meta {
+  name: Get Taxonomy - Missing Auth
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/taxonomy
+  body: none
+  auth: none
+}
+
+headers {
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-err-001
+  Accept: application/json
+}
+
+docs {
+  # Get Taxonomy — Missing Authorization (401)
+
+  Negative test: sends request WITHOUT Authorization header.
+  WireMock returns 401 Unauthorized.
+
+  ## Expected Response
+  - HTTP 401
+}
+
+assert {
+  res.status: eq 401
+}
+
+tests {
+  test("should return 401 for missing auth", function() {
+    expect(res.status).to.equal(401);
+  });
+}

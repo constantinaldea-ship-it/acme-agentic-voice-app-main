@@ -1,0 +1,117 @@
+%% ADR-0104 Round 2 Review: Option B — Federated Adapters + Token Broker with EIDP/CIDP
+%% Created by GitHub Copilot on 2026-03-01
+
+flowchart LR
+  subgraph CESPlatform["CX Agent Studio (Google-managed)"]
+    CES["CES Agents + Tools"]
+  end
+
+  subgraph VPCSCPerimeter["VPC-SC Perimeter: acme-landingzone"]
+    subgraph NetLayer["Network Layer"]
+      SD["Service Directory PNA"]
+      ILB["Internal HTTP/S LB"]
+    end
+
+    subgraph BFAEdge["BFA Edge (Cloud Run internal)"]
+      BFA["BFA Gateway"]
+      EDGE_PEP["Edge PEP:\n· CES identity validation\n· Correlation header injection\n· PDP authorization call\n· PII response redaction filter"]
+    end
+
+    subgraph SharedServices["Shared Platform Services"]
+      PDP["AuthZ PDP Service"]
+      TOKEN_BROKER["Token Broker Service\n(Cloud Run internal)\n· RFC 8693 CIAM exchange\n· CIDP service token acquisition\n· EIDP service token acquisition\n· Token caching + TTL mgmt"]
+    end
+
+    subgraph DomainA["Team A: Banking Domain"]
+      A1["Banking Adapter\n(AG-007, AG-008)"]
+      A1_CACHE["Session Token Cache"]
+    end
+
+    subgraph DomainB["Team B: Informational Domain"]
+      B1["Location Adapter (AG-003)"]
+      B1_RM["Branch Read Model\n(curated branches.json)"]
+      B2["Fee Adapter (AG-005)"]
+      B2_RM["Fee Read Model\n(curated, versioned)"]
+      B3["KB Adapter (AG-006)"]
+      B3_RM["Knowledge Index\n(managed retrieval)"]
+    end
+
+    subgraph DomainC["Team C: Product & App Domain"]
+      C1["Product Adapter (AG-009)"]
+      C1_CACHE["Product Cache"]
+      C2["Mobile App Adapter (AG-010)"]
+      C2_RM["How-to KB"]
+    end
+
+    subgraph CloudIdentity["Cloud Identity"]
+      CIDP["CIDP\n(Cloud Identity Provider)"]
+    end
+
+    subgraph ApigeeProj["Apigee"]
+      AP["Apigee Internal"]
+    end
+  end
+
+  subgraph CIAMLandingZone["GCP Landing Zone: CIAM"]
+    CIAM["ForgeRock CIAM\n(Customer Identity)"]
+  end
+
+  subgraph OnPrem["On-Prem Data Center"]
+    EIDP["EIDP\n(Enterprise Identity Provider)"]
+    GLUE["Glue (WSO2)"]
+    CORE["Core Banking SoR"]
+  end
+
+  %% CES single ingress
+  CES -->|"IAM ID token"| SD --> ILB --> BFA --> EDGE_PEP
+
+  %% Edge PEP to shared services
+  EDGE_PEP -->|"AuthZ request"| PDP
+  EDGE_PEP -->|"Token request\n(customer context +\nrequired upstreams)"| TOKEN_BROKER
+
+  %% Token Broker to identity providers
+  TOKEN_BROKER -->|"RFC 8693 exchange\n(customer token)\n(cloud-to-cloud)"| CIAM
+  TOKEN_BROKER -->|"Service token\n(Apigee-bound)"| CIDP
+  TOKEN_BROKER -.->|"Service token\n(Glue-bound)\nvia Interconnect"| EIDP
+
+  %% Edge PEP routes to adapters (with token package)
+  EDGE_PEP -->|"+ token package\n+ obligations"| A1
+  EDGE_PEP -->|"+ token package"| B1 & B2 & B3
+  EDGE_PEP -->|"+ token package"| C1 & C2
+
+  %% Adapter internal resources
+  A1 <--> A1_CACHE
+  B1 <--> B1_RM
+  B2 <--> B2_RM
+  B3 <--> B3_RM
+  C1 <--> C1_CACHE
+  C2 <--> C2_RM
+
+  %% Adapter to upstream
+  A1 -->|"Agentic + CIDP token\n(mTLS)"| AP
+  C1 -->|"CIDP token\n(mTLS)"| AP
+  B1 -.->|"Fallback:\nEIDP token\n(mTLS)"| GLUE
+  B2 -.->|"Fallback:\nEIDP token\n(mTLS)"| GLUE
+
+  AP --> CORE
+  GLUE --> CORE
+
+  %% Styling
+  classDef ces fill:#e8daef,stroke:#7d3c98,stroke-width:2px,color:#4a235a;
+  classDef bfa fill:#d4edda,stroke:#1f7a1f,stroke-width:2px,color:#114411;
+  classDef shared fill:#e6f2ff,stroke:#1f4b99,stroke-width:2px,color:#0f2d5c;
+  classDef domain fill:#ebf5fb,stroke:#2e86c1,stroke-width:1.5px,color:#154360;
+  classDef cache fill:#fdf2e9,stroke:#ca6f1e,stroke-width:1px,color:#784212;
+  classDef cloudIdp fill:#d5f5e3,stroke:#1e8449,stroke-width:2px,color:#145a32;
+  classDef onpremIdp fill:#fff3cd,stroke:#b8860b,stroke-width:2px,color:#5f4500;
+  classDef upstream fill:#f8d7da,stroke:#8b2f39,stroke-width:1.5px,color:#5a1c23;
+
+  class CES ces;
+  class BFA,EDGE_PEP,SD,ILB bfa;
+  class PDP,TOKEN_BROKER shared;
+  class A1,B1,B2,B3,C1,C2 domain;
+  class A1_CACHE,B1_RM,B2_RM,B3_RM,C1_CACHE,C2_RM cache;
+  class CIDP cloudIdp;
+  class CIAM cloudIdp;
+  class EIDP onpremIdp;
+  class AP,GLUE,CORE upstream;

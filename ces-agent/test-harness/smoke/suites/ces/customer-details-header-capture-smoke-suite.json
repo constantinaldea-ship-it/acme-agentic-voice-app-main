@@ -1,0 +1,80 @@
+{
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "tests": [
+    {
+      "name": "customer_details_toolset_header_contract",
+      "type": "toolset_schema",
+      "toolset_display_name": "customer_details_openapi",
+      "expect_schema_contains": [
+        "X-Agent-Id",
+        "X-Tool-Id",
+        "X-Debug-Echo-Headers"
+      ]
+    },
+    {
+      "name": "customer_details_wrapper_tool_header_capture",
+      "type": "execute_tool",
+      "tool_display_name": "get_customer_details_wrapper",
+      "args": {
+        "partner_id": "1234567890",
+        "debug_capture": true
+      },
+      "expect": {
+        "equals": {
+          "response.result.success": true,
+          "response.result.debug_capture.headers.x_agent_id": "customer_details_agent",
+          "response.result.debug_capture.headers.x_tool_id": "get_customer_details_wrapper",
+          "response.result.debug_capture.stages.customer_lookup.x_agent_id": "customer_details_agent",
+          "response.result.debug_capture.stages.customer_lookup.x_tool_id": "get_customer_details_wrapper",
+          "response.result.debug_capture.stages.customer_lookup.x_debug_echo_headers": "true"
+        }
+      }
+    },
+    {
+      "name": "customer_details_pure_python_tool_header_capture",
+      "type": "execute_tool",
+      "tool_display_name": "get_customer_details_python",
+      "args": {
+        "partner_id": "1234567890",
+        "debug_capture": true
+      },
+      "expect": {
+        "equals": {
+          "response.result.success": true,
+          "response.result.debug_capture.headers.x_agent_id": "customer_details_agent",
+          "response.result.debug_capture.headers.x_tool_id": "get_customer_details_python",
+          "response.result.debug_capture.stages.customer_lookup.x_agent_id": "customer_details_agent",
+          "response.result.debug_capture.stages.customer_lookup.x_tool_id": "get_customer_details_python",
+          "response.result.debug_capture.stages.customer_lookup.x_debug_echo_headers": "true"
+        }
+      }
+    },
+    {
+      "name": "customer_details_openapi_method_header_capture",
+      "type": "execute_toolset_tool",
+      "toolset_display_name": "customer_details_openapi",
+      "tool_id": "getEidpToken",
+      "args": {
+        "X-API-Key": "${CUSTOMER_DETAILS_API_KEY}",
+        "X-Agent-Id": "customer_details_agent",
+        "X-Tool-Id": "getEidpToken",
+        "X-Debug-Echo-Headers": "true",
+        "grant_type": "client_credentials",
+        "client_id": "ces-agent-service",
+        "client_secret": "mock-secret"
+      },
+      "expect": {
+        "exists": [
+          "response.access_token"
+        ],
+        "equals": {
+          "response._debug.captured_headers.x_agent_id": "customer_details_agent",
+          "response._debug.captured_headers.x_tool_id": "getEidpToken",
+          "response._debug.captured_headers.x_debug_echo_headers": "true"
+        }
+      }
+    }
+  ]
+}

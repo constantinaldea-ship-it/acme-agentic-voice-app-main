@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_cancel_reschedule",
+  "scenario": {
+    "task": "Test the appointment cancel and reschedule flow. Start by saying 'I need to cancel my appointment APT-BRANCH-0001'. The agent should: (1) transfer to advisory_appointment_agent, (2) retrieve the appointment details using the access token, (3) ask for confirmation before cancelling, (4) call the cancel appointment tool. Then ask 'Actually, can I reschedule it instead?' to test the reschedule path. Verify the agent handles lifecycle operations correctly, asks for confirmation on destructive actions, and provides clear status updates.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent routes to advisory_appointment_agent for appointment management."
+      },
+      {
+        "expectedResult": "The agent asks for confirmation before cancelling or rescheduling."
+      },
+      {
+        "expectedResult": "The agent communicates the outcome of the lifecycle action clearly."
+      }
+    ],
+    "maxTurns": 8
+  }
+}

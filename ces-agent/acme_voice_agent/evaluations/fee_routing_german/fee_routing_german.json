@@ -1,0 +1,28 @@
+{
+  "displayName": "fee_routing_german",
+  "golden": {
+    "turns": [{
+      "steps": [{
+        "userInput": {
+          "text": "Was kostet eine Überweisung?"
+        }
+      }, {
+        "expectation": {
+          "agentTransfer": {
+            "targetAgent": "fee_schedule_agent",
+            "displayName": "fee_schedule_agent"
+          }
+        }
+      }, {
+        "expectation": {
+          "agentResponse": {
+            "role": "fee_schedule_agent",
+            "chunks": [{
+              "text": "Laut dem aktuellen Preis- und Leistungsverzeichnis"
+            }]
+          }
+        }
+      }]
+    }]
+  }
+}

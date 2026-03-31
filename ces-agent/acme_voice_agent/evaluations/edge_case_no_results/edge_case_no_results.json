@@ -1,0 +1,21 @@
+{
+  "displayName": "edge_case_no_results",
+  "scenario": {
+    "task": "Test how the agent handles searches that return no results. Ask for branches in a very small German village or a non-existent city. Verify: (1) the agent does not fabricate branch data, (2) the agent clearly states no branches were found, (3) the agent suggests alternatives like searching a nearby larger city or connecting to a live agent.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent clearly states that no branches were found for the requested location."
+      },
+      {
+        "expectedResult": "The agent does NOT claim the city does not exist, is not real, is invalid, or is not a real city. The agent only reports that no branches were found — it does not judge whether the location is genuine."
+      },
+      {
+        "expectedResult": "The agent suggests helpful alternatives such as searching a nearby larger city or connecting with a live agent."
+      },
+      {
+        "expectedResult": "The agent does not fabricate any branch names, addresses, or other data."
+      }
+    ],
+    "maxTurns": 4
+  }
+}

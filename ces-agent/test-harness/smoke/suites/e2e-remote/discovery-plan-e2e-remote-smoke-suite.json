@@ -1,0 +1,69 @@
+{
+  "name": "discovery-plan-e2e-remote-openapi",
+  "services_file": "./discovery-plan-e2e-remote-services.json",
+  "tests": [
+    {
+      "name": "mock_server_upstream.getAppointmentTaxonomyUpstream.advisory_taxonomy_contract",
+      "type": "openapi_operation",
+      "service": "mock_server_upstream",
+      "operation_id": "getAppointmentTaxonomyUpstream",
+      "expected_status": 200
+    },
+    {
+      "name": "branch_finder_adapter.health.cloud_run_health_contract",
+      "type": "openapi_operation",
+      "service": "branch_finder_adapter",
+      "operation_id": "health",
+      "expected_status": 200
+    },
+    {
+      "name": "bfa_gateway.health.single_ingress_health_contract",
+      "type": "openapi_operation",
+      "service": "bfa_gateway",
+      "operation_id": "health",
+      "expected_status": 200
+    },
+    {
+      "name": "bfa_gateway.invoke.branch_finder_search_city_berlin",
+      "type": "openapi_operation",
+      "service": "bfa_gateway",
+      "operation_id": "invoke",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer smoke-user"
+        },
+        "json_body": {
+          "toolName": "branchFinder",
+          "parameters": {
+            "city": "Berlin"
+          }
+        }
+      },
+      "expected_status": 200,
+      "expect": {
+        "equals": {
+          "json.success": true
+        }
+      }
+    },
+    {
+      "name": "advisory_appointment_resource.health.resource_platform_health_contract",
+      "type": "openapi_operation",
+      "service": "advisory_appointment_resource",
+      "operation_id": "health",
+      "expected_status": 200
+    },
+    {
+      "name": "advisory_appointment_resource.getAppointmentTaxonomy.booking_taxonomy_contract",
+      "type": "openapi_operation",
+      "service": "advisory_appointment_resource",
+      "operation_id": "getAppointmentTaxonomy",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer mock-appointment-service-token"
+        }
+      },
+      "expected_status": 200
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+meta {
+  name: Get Maria Musterfrau Personal Data
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/customers/1234567890/personal-data
+  body: none
+  auth: none
+}
+
+headers {
+  deuba-client-id: {{clientId}}
+  DB-ID: acme-banking-db-01
+  Authorization: Bearer {{authzToken}}
+  Accept: application/json
+}
+
+docs {
+  # Get Maria Musterfrau Personal Data
+  
+  Retrieves personal data for the female test client Dr. Maria Musterfrau.
+  
+  ## Partner ID
+  - `1234567890`
+  
+  ## Expected Response
+  - HTTP 200
+  - Gender: FEMALE
+  - Marital Status: single
+  - Academic Title: Dr.
+  - Location: Berlin
+}
+
+assert {
+  res.status: eq 200
+  res.body.firstname: eq Maria
+  res.body.lastname: eq Musterfrau
+  res.body.gender: eq FEMALE
+  res.body.academicTitle: eq Dr.
+  res.body.nationality: eq DEU
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return Maria Musterfrau", function() {
+    expect(res.body.firstname).to.equal("Maria");
+    expect(res.body.lastname).to.equal("Musterfrau");
+  });
+  
+  test("should have correct gender", function() {
+    expect(res.body.gender).to.equal("FEMALE");
+  });
+  
+  test("should have academic title", function() {
+    expect(res.body.academicTitle).to.equal("Dr.");
+  });
+  
+  test("should have German nationality", function() {
+    expect(res.body.nationality).to.equal("DEU");
+  });
+}

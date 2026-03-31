@@ -1,0 +1,47 @@
+meta {
+  name: Check Eligibility Branch Berlin
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/eligibility?consultationChannel=BRANCH&city=berlin
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-elig-001
+  Accept: application/json
+}
+
+docs {
+  # Check Eligibility — Branch in Berlin
+
+  Checks whether the customer is eligible to book a branch
+  appointment in Berlin.
+
+  ## Query Parameters
+  - consultationChannel: BRANCH
+  - city: berlin
+
+  ## Expected Response
+  - HTTP 200
+  - eligible: true, with a list of matching locations
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should be eligible", function() {
+    expect(res.body.eligible).to.equal(true);
+  });
+}

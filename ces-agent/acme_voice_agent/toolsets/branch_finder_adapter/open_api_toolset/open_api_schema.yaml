@@ -1,0 +1,73 @@
+openapi: "3.0.1"
+info:
+  title: Acme Bank Branch Finder Adapter API
+  description: >-
+    Internal adapter contract for AG-003 branch-finder.
+    Canonical source: `java/bfa-adapter-branch-finder/openapi-specs/branch-finder-adapter.json`.
+  version: "1.0.0"
+servers:
+  - url: "$env_var"
+    description: "Branch Finder Adapter (environment-injected)"
+tags:
+  - name: Branch Finder Adapter
+    description: Internal domain adapter contract
+paths:
+  /actions/search:
+    post:
+      tags: [Branch Finder Adapter]
+      summary: Search branches by city
+      operationId: searchBranchesViaAdapter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdapterRequest"
+      responses:
+        "200":
+          description: Search results returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdapterResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdapterResponse"
+  /health:
+    get:
+      tags: [Branch Finder Adapter]
+      summary: Adapter health check
+      operationId: getBranchFinderAdapterHealth
+      responses:
+        "200":
+          description: Health returned
+components:
+  schemas:
+    AdapterRequest:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+    AdapterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          additionalProperties: true
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
+        correlationId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time

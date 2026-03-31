@@ -1,0 +1,244 @@
+{
+  "dataset_name": "advisory-appointment-offline-eval",
+  "description": "LangSmith dataset seed generated from ces-agent advisory appointment scenario evaluations.",
+  "examples": [
+    {
+      "name": "appointment_booking_branch_flow",
+      "inputs": {
+        "task": "Test a full branch appointment booking conversation. Start with 'I want to book an advisory appointment at a branch in Berlin'. The agent should: (1) transfer to advisory_appointment_agent, (2) call the taxonomy or service-search tool to identify consultation topics, (3) call the eligibility tool with consultationChannel=BRANCH and city=berlin, (4) present available branches, (5) call the availability tool for the selected branch, (6) present available time slots, (7) request confirmation before booking, (8) call the create appointment tool. Verify that the agent always asks for confirmation before creating the appointment and responds in English throughout.",
+        "max_turns": 10
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent routes to advisory_appointment_agent when the user requests an appointment.",
+          "The agent calls appropriate appointment tools (eligibility, availability, or lifecycle) during the booking flow.",
+          "The agent asks for explicit confirmation before creating the appointment."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_booking_branch_flow",
+        "journey_type": "booking",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_booking_branch_flow/appointment_booking_branch_flow.json"
+      }
+    },
+    {
+      "name": "appointment_cancel_reschedule",
+      "inputs": {
+        "task": "Test the appointment cancel and reschedule flow. Start by saying 'I need to cancel my appointment APT-BRANCH-0001'. The agent should: (1) transfer to advisory_appointment_agent, (2) retrieve the appointment details using the access token, (3) ask for confirmation before cancelling, (4) call the cancel appointment tool. Then ask 'Actually, can I reschedule it instead?' to test the reschedule path. Verify the agent handles lifecycle operations correctly, asks for confirmation on destructive actions, and provides clear status updates.",
+        "max_turns": 8
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent routes to advisory_appointment_agent for appointment management.",
+          "The agent asks for confirmation before cancelling or rescheduling.",
+          "The agent communicates the outcome of the lifecycle action clearly."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_cancel_reschedule",
+        "journey_type": "lifecycle",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_cancel_reschedule/appointment_cancel_reschedule.json"
+      }
+    },
+    {
+      "name": "appointment_human_handoff",
+      "inputs": {
+        "task": "Test human handoff from the appointment flow. Start with 'I need to book an appointment, but if this gets complicated just connect me to a person'. The agent should route to advisory_appointment_agent, attempt to continue the booking flow normally, respect a direct request for human help at any point, and use the live-agent escalation path rather than fabricating unsupported recovery.",
+        "max_turns": 6
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent can stay in the appointment flow until the user explicitly asks for human help.",
+          "When the user requests a human, the agent uses the supported escalation path instead of continuing the booking flow.",
+          "The agent keeps the response concise and context-aware during the handoff."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_human_handoff",
+        "journey_type": "recovery",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_human_handoff/appointment_human_handoff.json"
+      }
+    },
+    {
+      "name": "appointment_invalid_contact_repair",
+      "inputs": {
+        "task": "Test repair prompts for invalid contact data during booking. Start with 'Book a branch appointment for investing in Berlin next Tuesday'. Progress through the booking flow, then provide an invalid email address and an invalid phone number when the agent asks for contact details. The agent should catch the bad input, ask for repair one field at a time, keep the appointment context intact, and only proceed to the final confirmation once valid contact details are collected.",
+        "max_turns": 12
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent repairs invalid contact data instead of silently accepting it.",
+          "The agent asks for one correction at a time and preserves the rest of the booking context.",
+          "The agent does not attempt to create the appointment until valid contact data and explicit confirmation are present."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_invalid_contact_repair",
+        "journey_type": "recovery",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_invalid_contact_repair/appointment_invalid_contact_repair.json"
+      }
+    },
+    {
+      "name": "appointment_no_slots_recovery",
+      "inputs": {
+        "task": "Test recovery when no appointment slots are available. Start with 'I need an appointment in Berlin on the first available day, but if nothing is free I'd take another branch or a phone consultation'. The agent should route to advisory_appointment_agent, search eligible booking locations, retrieve slots, handle a no-availability response without inventing availability, and offer recovery options such as another day, another eligible location, another channel, or human handoff.",
+        "max_turns": 8
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent does not stop at the first no-slots response and instead offers structured fallback choices.",
+          "The agent never invents time slots or advisor names when availability is empty.",
+          "The agent can move the conversation toward another day, another location, another channel, or handoff."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_no_slots_recovery",
+        "journey_type": "recovery",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_no_slots_recovery/appointment_no_slots_recovery.json"
+      }
+    },
+    {
+      "name": "appointment_phone_consultation",
+      "inputs": {
+        "task": "Test a phone consultation appointment booking. Start with 'I'd like to schedule a phone consultation about a standing order'. The agent should: (1) transfer to advisory_appointment_agent, (2) search services for 'standing order', (3) check eligibility for PHONE channel, (4) get available phone slots, (5) present options and ask for confirmation. Verify the agent correctly handles the PHONE channel without requiring a city, uses the remote phone location ID, and maintains a natural conversational flow.",
+        "max_turns": 8
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent routes to advisory_appointment_agent and uses the PHONE consultation channel.",
+          "The agent searches for services matching 'standing order' and presents results.",
+          "The agent presents available phone slots and asks for time preference."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_phone_consultation",
+        "journey_type": "booking",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_phone_consultation/appointment_phone_consultation.json"
+      }
+    },
+    {
+      "name": "appointment_reschedule_window_closed",
+      "inputs": {
+        "task": "Test a blocked reschedule flow. Start with 'I need to move my appointment, but it might be too late'. The agent should route to advisory_appointment_agent, retrieve the existing appointment using the access token, explain the timing rule when rescheduling is no longer allowed, avoid claiming success, and offer an alternative such as booking a new appointment or handing off to a human.",
+        "max_turns": 8
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent communicates clearly when the reschedule window is closed.",
+          "The agent does not pretend the appointment was changed when the lifecycle action is blocked.",
+          "The agent offers an appropriate recovery path after the blocked reschedule attempt."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_reschedule_window_closed",
+        "journey_type": "lifecycle",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_reschedule_window_closed/appointment_reschedule_window_closed.json"
+      }
+    },
+    {
+      "name": "appointment_routing_english",
+      "inputs": {
+        "task": "I'd like to book an advisory appointment",
+        "max_turns": 1
+      },
+      "outputs": {
+        "reference_expectations": [
+          "Agent transfers to advisory_appointment_agent."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_golden"
+      },
+      "metadata": {
+        "display_name": "appointment_routing_english",
+        "journey_type": "routing",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_routing_english/appointment_routing_english.json"
+      }
+    },
+    {
+      "name": "appointment_routing_german",
+      "inputs": {
+        "task": "Ich möchte einen Beratungstermin vereinbaren",
+        "max_turns": 1
+      },
+      "outputs": {
+        "reference_expectations": [
+          "Agent transfers to advisory_appointment_agent."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_golden"
+      },
+      "metadata": {
+        "display_name": "appointment_routing_german",
+        "journey_type": "routing",
+        "language": "de",
+        "source_path": "acme_voice_agent/evaluations/appointment_routing_german/appointment_routing_german.json"
+      }
+    },
+    {
+      "name": "appointment_service_request_booking",
+      "inputs": {
+        "task": "Test a service-request booking flow from free text. Start with 'I need an appointment because my standing order is wrong'. The agent should route to advisory_appointment_agent, call service search for the free-text issue, select the service-request path instead of a product-consultation topic flow, ask for any required comment if the service match needs it, find an eligible location or remote channel, retrieve slots, summarize the appointment, and ask for confirmation before booking.",
+        "max_turns": 10
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent uses the service-search step rather than forcing the user into a product-topic flow.",
+          "The agent collects a required short comment when the matched service requires additional context.",
+          "The agent confirms the booking summary before calling create appointment."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_service_request_booking",
+        "journey_type": "booking",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_service_request_booking/appointment_service_request_booking.json"
+      }
+    },
+    {
+      "name": "appointment_video_consultation",
+      "inputs": {
+        "task": "Test a video consultation booking flow. Start with 'I want to book a video appointment about investing'. The agent should route to advisory_appointment_agent, keep the flow in appointment orchestration, search for a suitable topic or taxonomy entry, search eligible VIDEO locations or centers, retrieve video slots, present concise options, ask for explicit confirmation before booking, and explain that any video-link follow-up is mocked in this phase.",
+        "max_turns": 10
+      },
+      "outputs": {
+        "reference_expectations": [
+          "The agent keeps the consultation channel in VIDEO and does not force a branch-only flow.",
+          "The agent states clearly that the video follow-up details are mocked rather than live downstream instructions.",
+          "The agent asks for explicit confirmation before calling the create appointment action."
+        ],
+        "target_agent": "advisory_appointment_agent",
+        "source_evaluation_type": "ces_scenario"
+      },
+      "metadata": {
+        "display_name": "appointment_video_consultation",
+        "journey_type": "booking",
+        "language": "en",
+        "source_path": "acme_voice_agent/evaluations/appointment_video_consultation/appointment_video_consultation.json"
+      }
+    }
+  ]
+}

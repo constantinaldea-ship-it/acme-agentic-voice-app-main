@@ -1,0 +1,43 @@
+meta {
+  name: Check Eligibility Phone
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/eligibility?consultationChannel=PHONE
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-elig-002
+  Accept: application/json
+}
+
+docs {
+  # Check Eligibility — Phone
+
+  Checks whether the customer is eligible to book a phone consultation.
+  No city parameter is required for remote channels.
+
+  ## Expected Response
+  - HTTP 200
+  - eligible: true, remote location ID
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should be eligible", function() {
+    expect(res.body.eligible).to.equal(true);
+  });
+}

@@ -1,0 +1,54 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "display_name_prefix": "langsmith-advisory-recovery",
+  "run_request": {
+    "runCount": 3,
+    "generateLatencyReport": true
+  },
+  "require_latency_report": true,
+  "default_expected": {
+    "min_pass_rate": 0.67,
+    "min_completed_results": 3,
+    "max_error_count": 0
+  },
+  "langsmith": {
+    "dataset_name": "ces-advisory-recovery-live",
+    "dataset_description": "Externally managed advisory recovery and lifecycle experiments sourced from live CES scenario evaluations.",
+    "experiment_description": "Live CES recovery and lifecycle experiment for advisory appointment safety and repair behavior.",
+    "experiment_metadata": {
+      "agent": "advisory_appointment_agent",
+      "journey_type": "recovery_lifecycle",
+      "suite_type": "scenario"
+    }
+  },
+  "evaluations": [
+    {
+      "name": "appointment_cancel_reschedule",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "lifecycle", "langsmith"]
+    },
+    {
+      "name": "appointment_human_handoff",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "handoff", "langsmith"]
+    },
+    {
+      "name": "appointment_invalid_contact_repair",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "repair", "langsmith"]
+    },
+    {
+      "name": "appointment_no_slots_recovery",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "no-slots", "langsmith"]
+    },
+    {
+      "name": "appointment_reschedule_window_closed",
+      "owner_agent": "advisory_appointment_agent",
+      "labels": ["subagent", "appointment", "reschedule-window", "langsmith"]
+    }
+  ]
+}

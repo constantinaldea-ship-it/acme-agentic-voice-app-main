@@ -1,0 +1,102 @@
+%% Revised Context Diagram with EIDP/CIDP Identity Providers
+%% Created by GitHub Copilot on 2026-03-01 for ADR-0104 Round 2 Review
+%% Addresses critical EIDP/CIDP omission identified in Round 2
+
+flowchart LR
+  subgraph User["End User"]
+    U(("Voice Caller"))
+  end
+
+  subgraph GoogleManaged["Google-managed: CX Agent Studio"]
+    CES["CX Agent Studio\nRoot + Subagents"]
+  end
+
+  subgraph Perimeter["VPC-SC Service Perimeter: acme-landingzone"]
+    subgraph NetProj["Net Project / Shared VPC"]
+      SD["Service Directory\nPrivate Network Access"]
+      ILB["Internal HTTP(S) LB"]
+      DNS["Cloud DNS\nPrivate Zones"]
+      IC["Cloud Interconnect\n(HA VLAN attachments)"]
+    end
+
+    subgraph AppProj["App Project"]
+      BFA["BFA Gateway\nCloud Run (internal)"]
+      AUTHZ["AuthZ PDP Service\n(Cloud Run or GKE)"]
+      OBS["Logs / Traces / Audit Sinks"]
+      KB["Knowledge Index"]
+      FEES["Fees Read Model"]
+      BRANCHES["Branch Read Model"]
+    end
+
+    subgraph IdentityProj["Identity Services (GCP-hosted)"]
+      CIDP["CIDP\n(Cloud Identity Provider)\nService-to-service tokens\nfor Apigee-bound calls"]
+    end
+
+    subgraph ApigeeProj["Apigee Project"]
+      AP["Apigee Internal\n(GCP-based)"]
+    end
+  end
+
+  subgraph CIAMLandingZone["GCP Landing Zone: CIAM"]
+    CIAM["ForgeRock CIAM\n(Customer Identity)\nRFC 8693 token exchange"]
+  end
+
+  subgraph OnPrem["On-Prem Data Center"]
+    EIDP["EIDP\n(Enterprise Identity Provider)\nService-to-service tokens\nfor Glue-bound calls"]
+    GLUE["Glue (WSO2 API Manager)"]
+    CORE["Core Banking\nSystems of Record"]
+  end
+
+  %% User to CES
+  U --> CES
+
+  %% CES to BFA (single ingress)
+  CES -->|"Tool call via SD PNA\n(IAM service identity)"| SD
+  SD --> ILB --> BFA
+
+  %% BFA to AuthZ
+  BFA -->|"AuthZ decision\n+ obligations"| AUTHZ
+
+  %% BFA to identity providers
+  BFA -->|"RFC 8693 token exchange\n(customer agentic token)\n(cloud-to-cloud)"| CIAM
+  BFA -->|"Service token\n(Apigee-bound APIs)"| CIDP
+  BFA -.->|"Service token\n(Glue-bound APIs)\nvia Interconnect"| EIDP
+
+  %% BFA to upstreams
+  BFA -->|"Regulated/productized APIs\n(agentic + CIDP token, mTLS)"| AP
+  BFA -.->|"Legacy/internal APIs\n(EIDP token, mTLS)\nvia Interconnect"| GLUE
+
+  %% Upstream to core
+  AP --> CORE
+  GLUE --> CORE
+
+  %% Hybrid network (on-prem only — CIAM/CIDP are cloud-hosted)
+  EIDP -.->|"via Interconnect"| IC
+  GLUE -.->|"via Interconnect"| IC
+
+  %% NOTE: CIAM and CIDP are GCP cloud-hosted — no Interconnect dependency
+
+  %% BFA to internal resources
+  BFA --> OBS
+  BFA --> KB
+  BFA --> FEES
+  BFA --> BRANCHES
+  DNS --- SD
+
+  %% Styling
+  classDef user fill:#f5eef8,stroke:#7d3c98,stroke-width:2px,color:#4a235a;
+  classDef ces fill:#e8daef,stroke:#7d3c98,stroke-width:2px,color:#4a235a;
+  classDef bfa fill:#d4edda,stroke:#1f7a1f,stroke-width:2px,color:#114411;
+  classDef readmodel fill:#eaf2f8,stroke:#2e86c1,stroke-width:1px,color:#154360;
+  classDef cloudIdp fill:#d5f5e3,stroke:#1e8449,stroke-width:2.5px,color:#145a32;
+  classDef onpremIdp fill:#fff3cd,stroke:#b8860b,stroke-width:2.5px,color:#5f4500;
+  classDef upstream fill:#f8d7da,stroke:#8b2f39,stroke-width:1.5px,color:#5a1c23;
+
+  class U user;
+  class CES ces;
+  class BFA,AUTHZ,SD,ILB,DNS,IC bfa;
+  class OBS,KB,FEES,BRANCHES readmodel;
+  class CIDP cloudIdp;
+  class CIAM cloudIdp;
+  class EIDP onpremIdp;
+  class AP,GLUE,CORE upstream;

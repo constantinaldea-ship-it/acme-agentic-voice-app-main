@@ -1,0 +1,39 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "display_name_prefix": "langsmith-advisory-routing",
+  "run_request": {
+    "runCount": 1,
+    "generateLatencyReport": true
+  },
+  "require_latency_report": true,
+  "default_expected": {
+    "min_pass_rate": 1.0,
+    "min_completed_results": 1,
+    "max_error_count": 0
+  },
+  "langsmith": {
+    "dataset_name": "ces-advisory-routing-live",
+    "dataset_description": "Externally managed advisory routing experiments sourced from live CES golden evaluations.",
+    "experiment_description": "Live CES routing regression experiment for advisory appointment handoff quality.",
+    "experiment_metadata": {
+      "agent": "advisory_appointment_agent",
+      "journey_type": "routing",
+      "suite_type": "golden"
+    }
+  },
+  "evaluations": [
+    {
+      "name": "appointment_routing_english",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "routing", "appointment", "english", "langsmith"]
+    },
+    {
+      "name": "appointment_routing_german",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "routing", "appointment", "german", "langsmith"]
+    }
+  ]
+}

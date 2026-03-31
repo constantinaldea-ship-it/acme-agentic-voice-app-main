@@ -1,0 +1,43 @@
+meta {
+  name: Get EIDP Token - Missing Grant Type
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/oauth/token
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form-urlencoded {
+  client_id: ces-agent-service
+}
+
+docs {
+  # Get EIDP Token - Missing Grant Type (Negative Test)
+  
+  Tests that the EIDP token endpoint returns 400 when grant_type is missing.
+  
+  ## Expected Response
+  - HTTP 400 (Bad Request)
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq invalid_request
+}
+
+tests {
+  test("should return status 400 when grant_type is missing", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("should return invalid_request error", function() {
+    expect(res.body.error).to.equal("invalid_request");
+  });
+}

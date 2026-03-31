@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_invalid_contact_repair",
+  "scenario": {
+    "task": "Test repair prompts for invalid contact data during booking. Start with 'Book a branch appointment for investing in Berlin next Tuesday'. Progress through the booking flow, then provide an invalid email address and an invalid phone number when the agent asks for contact details. The agent should catch the bad input, ask for repair one field at a time, keep the appointment context intact, and only proceed to the final confirmation once valid contact details are collected.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent repairs invalid contact data instead of silently accepting it."
+      },
+      {
+        "expectedResult": "The agent asks for one correction at a time and preserves the rest of the booking context."
+      },
+      {
+        "expectedResult": "The agent does not attempt to create the appointment until valid contact data and explicit confirmation are present."
+      }
+    ],
+    "maxTurns": 12
+  }
+}

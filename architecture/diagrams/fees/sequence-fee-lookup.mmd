@@ -1,0 +1,23 @@
+%% Modified by Codex on 2026-02-28 for P0 architecture alignment.
+sequenceDiagram
+  participant User
+  participant CES as CX Agent Studio
+  participant BFA as BFA Gateway (Cloud Run)
+  participant FEE as Fees Adapter (internal)
+  participant FEERM as Fees Read Model (BFA internal)
+  participant Glue as Glue (WSO2) / Fee API
+
+  User->>CES: "What is the fee for international transfer?"
+  CES->>BFA: Tool call (Service Directory PNA)\nheaders: request_id, session_id, agent_id, tool_id, customer_id_hash, auth_level, policy_decision_id
+  BFA->>BFA: Validate CES identity\nValidate mandatory headers\nClassify as informational
+  BFA->>FEE: Internal route to fee domain\npropagate mandatory headers
+  alt Curated fee read model is current
+    FEE->>FEERM: Deterministic lookup\napply effective-date rules
+    FEERM-->>FEE: Fee details + conditions + source version
+  else Curated model unavailable or stale
+    FEE->>Glue: Query fee API (mTLS, private)\npropagate mandatory headers
+    Glue-->>FEE: Fee details + conditions
+  end
+  FEE-->>BFA: Normalized fee response
+  BFA-->>CES: Response template + correlation ids
+  CES-->>User: Voice response

@@ -1,0 +1,49 @@
+meta {
+  name: Get Taxonomy
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/taxonomy
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-taxonomy-001
+  Accept: application/json
+}
+
+docs {
+  # Get Advisory Appointment Taxonomy
+
+  Returns the full taxonomy tree of consultation topics and sub-topics.
+
+  ## Required Headers
+  - Authorization: Bearer token
+  - X-BFA-Client: advisory-appointment-bff
+  - X-Correlation-ID: any non-empty value
+
+  ## Expected Response
+  - HTTP 200
+  - JSON array of category objects with subcategories
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should return an array of categories", function() {
+    const body = res.body;
+    expect(body).to.be.an("array");
+    expect(body.length).to.be.greaterThan(0);
+  });
+}

@@ -1,0 +1,101 @@
+%% ADR-0104 Option B: Single Ingress + Federated Internal Domain Adapters
+%% Created by Codex on 2026-02-28 · Improved 2026-03-01
+%%
+%% ONE-LINER: "Expose exactly one CES-facing backend (BFA). Everything
+%%  else is internal. BFA is the policy/audit choke point and routes to
+%%  Apigee / Glue / curated read-models."
+%%
+%% KEY RULES THIS DIAGRAM ENCODES (from ADR-0104):
+%%  GOVERNANCE  — Only one tool surface is registered with CES
+%%  SECURITY    — All identity, authz (PDP), and obligation enforcement
+%%                happens at BFA before any domain adapter is reached
+%%  ROUTING     — BFA selects the target adapter using the Agent Registry
+%%  TESTING     — Routing + contract discipline must be maintained
+%%
+%% EXPLICIT NON-GOALS (what this diagram deliberately does NOT show):
+%%  ✗ CES → adapter direct calls (prohibited)
+%%  ✗ CES → Apigee / Glue direct calls (prohibited by default)
+%%  ✗ Specific internal packaging (adapters may be separate Cloud Run
+%%    services, in-process modules, or microservices — ADR does not mandate)
+%%  ✗ Exception lanes (require separate governance approval per ADR-0104)
+
+flowchart LR
+
+  %% ── External boundary: what CES "sees" ──────────────────────────
+  subgraph EXTERNAL["CES Tool Surface (single registration)"]
+    CES["CES<br/>(CX Agent Studio)"]
+  end
+
+  %% ── Mandatory policy boundary ──────────────────────────────────
+  subgraph BFA_BOUNDARY["BFA Gateway — mandatory policy & audit choke point"]
+    direction TB
+    BFA["BFA Gateway<br/>(Cloud Run, internal ingress)"]
+    POLICY["PEP → PDP<br/>Identity · AuthZ · Obligations"]
+    ROUTE["Agent-Registry<br/>Router"]
+    BFA --> POLICY
+    POLICY -->|"permit + obligations"| ROUTE
+  end
+
+  CES ==>|"① Single ingress<br/>(only allowed path)"| BFA
+
+  %% ── Internal adapters (federated, team-owned) ──────────────────
+  %% NOTE: Internal packaging is NOT mandated by ADR-0104.
+  %% Teams may deploy adapters as separate Cloud Run services,
+  %% in-process modules, or microservices behind the gateway.
+  subgraph INTERNAL["Internal Domain Adapters (not CES-addressable)"]
+    direction TB
+
+    subgraph Domain1["Team A — Banking Domain"]
+      A1["Banking<br/>Adapter"]
+      C1["Domain<br/>Cache"]
+      A1 <-->|"optional hot-path"| C1
+    end
+
+    subgraph Domain2["Team B — Fees Domain"]
+      A2["Fees<br/>Adapter"]
+      C2["Domain<br/>Cache"]
+      A2 <-->|"optional hot-path"| C2
+    end
+
+    subgraph Domain3["Team C — Location Domain"]
+      A3["Location<br/>Adapter"]
+      C3["Domain<br/>Cache"]
+      A3 <-->|"optional hot-path"| C3
+    end
+  end
+
+  ROUTE -->|"② route by<br/>agent registry"| A1
+  ROUTE -->|"② route by<br/>agent registry"| A2
+  ROUTE -->|"② route by<br/>agent registry"| A3
+
+  %% ── Upstream systems ───────────────────────────────────────────
+  subgraph UPSTREAM["Upstream Systems"]
+    AP["Apigee Internal<br/>(regulated APIs · CIDP/EIDP tokens)"]
+    GLUE["Glue · WSO2<br/>(legacy APIs · EIDP tokens · on-prem)"]
+    RM["Curated Read Models<br/>(BFA-hosted · deterministic)"]
+  end
+
+  A1 -->|"③ upstream call"| AP
+  A2 -->|"③ upstream call"| GLUE
+  A3 -->|"③ read"| RM
+
+  %% ── Prohibited paths (shown as invisible to reinforce non-goals) ──
+  CES -.->|"✗ PROHIBITED"| A1
+  CES -.->|"✗ PROHIBITED"| AP
+
+  %% ── Styles ─────────────────────────────────────────────────────
+  classDef external fill:#fff3cd,stroke:#856404,stroke-width:2px,color:#533608;
+  classDef gateway fill:#d4edda,stroke:#1f7a1f,stroke-width:2.5px,color:#114411;
+  classDef policy fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#002752;
+  classDef domain fill:#e6f2ff,stroke:#1f4b99,stroke-width:1.5px,color:#0f2d5c;
+  classDef upstream fill:#f8d7da,stroke:#8b2f39,stroke-width:1.5px,color:#5a1c23;
+  classDef prohibited stroke:#dc3545,stroke-width:1px,stroke-dasharray:5 5;
+
+  class CES external;
+  class BFA gateway;
+  class POLICY,ROUTE policy;
+  class A1,A2,A3,C1,C2,C3 domain;
+  class AP,GLUE,RM upstream;
+
+  linkStyle 8 stroke:#dc3545,stroke-width:1.5px,stroke-dasharray:5 5
+  linkStyle 9 stroke:#dc3545,stroke-width:1.5px,stroke-dasharray:5 5

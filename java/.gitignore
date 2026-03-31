@@ -1,0 +1,53 @@
+# Java build artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+*.launch
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test outputs
+test-output/
+surefire-reports/
+failsafe-reports/
+
+# Coverage
+jacoco.exec
+coverage/
+
+# Spring Boot
+spring-boot-devtools.properties
+
+# Credentials (never commit)
+*.json
+!package.json
+!tsconfig.json
+!**/openapi-specs/*.json
+!bfa-mcp-spike/src/main/resources/data/**
+!bfa-service-resource/src/main/resources/data/**
+credentials/
+secrets/

@@ -1,0 +1,23 @@
+%% Created by Codex on 2026-02-28 for ADR-0104 Option C.
+flowchart LR
+  CES[CES Tools]
+  BFA[BFA Gateway]
+  AP[Apigee Internal]
+  GLUE[Glue]
+  PDP[AuthZ PDP]
+  CIAM[CIAM]
+
+  CES -->|Default path| BFA
+  BFA --> PDP
+  BFA --> CIAM
+  BFA --> AP
+  BFA --> GLUE
+
+  CES -. Exception path (approved non-sensitive reads only) .-> AP
+
+  classDef default fill:#d4edda,stroke:#1f7a1f,stroke-width:2px,color:#114411;
+  classDef exception fill:#fff3cd,stroke:#b8860b,stroke-width:2px,color:#5f4500;
+  classDef backend fill:#e6f2ff,stroke:#1f4b99,stroke-width:1.5px,color:#0f2d5c;
+  class CES,BFA,PDP,CIAM,AP,GLUE backend;
+  class BFA default;
+  class AP exception;

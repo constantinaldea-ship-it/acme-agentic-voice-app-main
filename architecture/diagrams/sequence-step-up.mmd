@@ -1,0 +1,27 @@
+%% Modified by Codex on 2026-02-28 for P0 architecture alignment.
+sequenceDiagram
+  participant User
+  participant CES as CX Agent Studio
+  participant BFA as BFA Gateway
+  participant CIAM as ForgeRock CIAM
+  participant PDP as AuthZ PDP
+  participant AP as Apigee Internal
+  participant Core as Core Banking
+
+  User->>CES: "Show my last 10 card transactions"
+  CES->>BFA: Tool call (Service Directory PNA)\nheaders: request_id, session_id, agent_id, tool_id, customer_id_hash, auth_level, policy_decision_id
+  BFA->>BFA: Validate CES identity\nValidate mandatory headers\nDetect sensitive intent (cards/transactions)
+  BFA->>CIAM: Validate current auth context (token/introspection)\npropagate mandatory headers
+  BFA->>PDP: AuthZ request (includes auth assurance/acr)\npropagate mandatory headers
+  PDP-->>BFA: Permit with obligation: step_up_required(acr=HIGH)\nreturn policy_decision_id
+  BFA-->>CES: Step-up required response\n(challenge method + policy_decision_id)
+  CES-->>User: Trigger step-up (out-of-band)\n"Please confirm in app / OTP"
+  User-->>CIAM: Completes step-up authentication
+  CIAM-->>BFA: Step-up complete / new auth context
+  BFA->>CIAM: Token exchange to mint agentic token with acr=HIGH\npropagate mandatory headers
+  BFA->>AP: Call cards API (mTLS)\nattach agentic token\npropagate mandatory headers + policy_decision_id
+  AP->>Core: Private call to SoR\npropagate mandatory headers + policy_decision_id
+  Core-->>AP: Card transaction payload
+  AP-->>BFA: Normalized response
+  BFA-->>CES: Sanitized response + correlation ids
+  CES-->>User: Voice response

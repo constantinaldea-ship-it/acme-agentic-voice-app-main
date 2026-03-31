@@ -1,0 +1,22 @@
+%% Modified by Codex on 2026-02-28 for P0 architecture alignment.
+sequenceDiagram
+  participant User
+  participant CES as CX Agent Studio
+  participant BFA as BFA Gateway (Cloud Run)
+  participant CIAM as ForgeRock CIAM
+  participant PDP as AuthZ PDP
+  participant AP as Apigee Internal
+  participant Core as Core Banking
+
+  User->>CES: "What's my balance?"
+  CES->>BFA: Tool call (Service Directory PNA)\nheaders: request_id, session_id, agent_id, tool_id, customer_id_hash, auth_level, policy_decision_id
+  BFA->>BFA: Validate CES identity (ID token)\nValidate schema and mandatory headers\nClassify sensitivity
+  BFA->>CIAM: Token exchange (RFC8693 or equivalent)\nMint short-lived agentic token (aud+scopes+acr)\npropagate mandatory headers
+  BFA->>PDP: AuthZ decision request\n(subject/action/resource/context)\npropagate mandatory headers
+  PDP-->>BFA: Permit + obligations (redaction, step-up)\nreturn policy_decision_id
+  BFA->>AP: Call product API (mTLS)\nattach agentic token\npropagate mandatory headers + policy_decision_id
+  AP->>Core: Private call to SoR\npropagate mandatory headers + policy_decision_id
+  Core-->>AP: Balance payload
+  AP-->>BFA: Normalized response + upstream ids
+  BFA-->>CES: Sanitized response + correlation ids
+  CES-->>User: Voice response

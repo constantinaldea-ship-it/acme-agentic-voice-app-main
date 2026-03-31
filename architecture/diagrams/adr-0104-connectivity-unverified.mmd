@@ -1,0 +1,54 @@
+%% Created by Codex on 2026-02-28 for ADR-0104 review support.
+flowchart LR
+  subgraph User[End User]
+    U((Voice Caller))
+  end
+
+  subgraph GoogleManaged[Google-managed]
+    CES[CX Agent Studio]
+  end
+
+  subgraph GCP[GCP Landing Zone]
+    SD[Service Directory PNA]
+    ILB[Internal HTTP(S) Load Balancer]
+    BFA[BFA Gateway]
+    ADP[Domain Adapters]
+    PDP[AuthZ PDP]
+  end
+
+  subgraph CIAMLandingZone[GCP Landing Zone: CIAM]
+    CIAM[ForgeRock CIAM]
+  end
+
+  subgraph OnPrem[On-Premises]
+    GLUE[Glue WSO2 API Manager]
+  end
+
+  subgraph ApigeeProj[Apigee Project]
+    AP[Apigee Internal]
+  end
+
+  subgraph Hybrid[Hybrid Network Controls]
+    IC[Cloud Interconnect]
+    VPN[Cloud VPN Fallback]
+    DNS[Private DNS Split-Horizon]
+    FW[Firewall + Routing Policy]
+    MTLS[mTLS Trust Chain]
+  end
+
+  U --> CES
+  CES --> SD --> ILB --> BFA --> ADP
+  BFA --> PDP
+  ADP --> AP
+  ADP -.->|UNVERIFIED| GLUE
+  BFA -.->|UNVERIFIED| CIAM
+  ADP -.->|depends on| IC
+  ADP -.->|fallback| VPN
+  ADP -.->|depends on| DNS
+  ADP -.->|depends on| FW
+  ADP -.->|depends on| MTLS
+
+  classDef verify fill:#fff3cd,stroke:#b8860b,stroke-width:2px,color:#5f4500;
+  classDef cloudIdp fill:#d5f5e3,stroke:#1e8449,stroke-width:2px,color:#145a32;
+  class GLUE,IC,VPN,DNS,FW,MTLS verify;
+  class CIAM cloudIdp;

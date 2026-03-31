@@ -1,0 +1,6 @@
+{
+  "displayName": "customer_details_openapi",
+  "openApiToolset": {
+    "openApiSchema": "toolsets/customer_details_openapi/open_api_toolset/open_api_schema.yaml"
+  }
+}

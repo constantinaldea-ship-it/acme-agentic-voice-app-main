@@ -1,0 +1,142 @@
+---
+title: BFA Lost Appointment Retrieval / Cancellation Flow — Sequence Diagram
+---
+%%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#4285f4', 'actorTextColor': '#ffffff', 'actorBorder': '#1a56db', 'activationBkg': '#c9daf8', 'activationBorder': '#1a73e8', 'noteBkg': '#fff9c4', 'noteBorderColor': '#f4b400', 'noteTextColor': '#37474f', 'signalColor': '#1a73e8', 'signalTextColor': '#174ea6', 'labelBoxBkgColor': '#e8f0fe', 'labelBoxBorderColor': '#4285f4', 'labelTextColor': '#174ea6', 'loopTextColor': '#174ea6', 'sequenceNumberColor': '#ffffff'}}}%%
+%% ╔════════════════════════════════════════════════════════════════════════╗
+%% ║  LOST APPOINTMENT RETRIEVAL / CANCELLATION — END-TO-END SEQUENCE     ║
+%% ║  ADR-0104 Option C: Single BFA Gateway; all on-prem calls via Glue   ║
+%% ║  Scenario: An identified client has forgotten their appointment.     ║
+%% ║    The helpdesk agent identifies the party via pd-partners, then     ║
+%% ║    retrieves existing appointments. The client can view details      ║
+%% ║    or cancel the appointment.                                        ║
+%% ║  Participants: User | VoiceBankingAgent | BFAGateway (BFA LZ)        ║
+%% ║               AppointmentsAdapter (AG-004, internal Cloud Run)       ║
+%% ║               EIDP | AuthZEndpoint (On-Prem IdP)                     ║
+%% ║               Glue (WSO2) | AdvisorAPI (On-Prem)                     ║
+%% ║  AppointmentsAdapter: BFA-internal domain adapter — protocol         ║
+%% ║    translation, multi-step orchestration, token acquisition via TKB  ║
+%% ║  AdvisorAPI: single on-prem service owning advisor management,       ║
+%% ║              timetable management, partner search, and booking       ║
+%% ╚════════════════════════════════════════════════════════════════════════╝
+%% Author: GitHub Copilot | Date: 2026-03-02
+%% Note: Technical-user / helpdesk-employee flow — BFAGateway calls
+%%       on-premises services using a technical service account acting
+%%       on behalf of the authenticated user; NO direct on-prem calls
+%%       bypassing Glue (WSO2) are permitted under ADR-0104 Option C.
+
+sequenceDiagram
+  %% ═══════════════════════════════════════════════════════════════════
+  %% PARTICIPANTS — ordered left-to-right following call-chain topology
+  %% ═══════════════════════════════════════════════════════════════════
+  participant User as User<br/>(Identified Client)
+  participant VoiceBankingAgent as VoiceBankingAgent<br/>(CX Agent Studio)
+  participant BFAGateway as BFAGateway<br/>(Edge PEP + Response PEP)
+  participant AppointmentsAdapter as AppointmentsAdapter<br/>(AG-004 · BFA Internal Cloud Run)
+  participant EIDP as EIDP<br/>(Enterprise IdP)
+  participant AuthZEndpoint as AuthZEndpoint<br/>(EIDP AuthZ)
+  participant Glue as Glue<br/>(WSO2 API Manager)
+  participant AdvisorAPI as AdvisorAPI<br/>(Advisor Service — On-Prem)<br/>partner search · advisor mgmt · timetable · booking
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% STEP 1 — User Request: "I forgot my appointment"
+  %% ═══════════════════════════════════════════════════════════════════
+  User->>VoiceBankingAgent: "I had an appointment but I forgot<br/>when it was. Can you help me find it?"
+  VoiceBankingAgent->>VoiceBankingAgent: NLU: intent = appointment_retrieval<br/>Extract identifying info (name, DOB, account #)
+  VoiceBankingAgent->>BFAGateway: Tool call: retrieveAppointment<br/>Private Network Access (VPC-SC)<br/>Payload: { clientName, dateOfBirth, accountRef }
+
+  %% ═══════════════════════════════════════════════════════════════════
+  %% STEP 2 — Authentication & Authorization Check
+  %% ═══════════════════════════════════════════════════════════════════
+  BFAGateway->>BFAGateway: Edge PEP: validate identity,<br/>correlation headers, classify sensitivity
+
+  alt NOT authenticated
+    BFAGateway-->>VoiceBankingAgent: 401 Unauthorized
+    VoiceBankingAgent-->>User: "I need to verify your identity first.<br/>Please provide your credentials."
+
+  else authenticated
+    BFAGateway->>AppointmentsAdapter: Route to AG-004 (internal VPC call)
+
+    %% ═══════════════════════════════════════════════════════════════════
+    %% STEP 3 — Token Acquisition (Adapter delegates to Token Broker)
+    %% ═══════════════════════════════════════════════════════════════════
+    Note over AppointmentsAdapter,AuthZEndpoint: Token Acquisition (via Token Broker Service)
+    AppointmentsAdapter->>EIDP: GET /token<br/>(session credentials via TKB)
+    EIDP-->>AppointmentsAdapter: EIDP service token
+    AppointmentsAdapter->>AuthZEndpoint: POST /authz<br/>(EIDP service token)
+    AuthZEndpoint-->>AppointmentsAdapter: AuthZ token
+
+    %% ═══════════════════════════════════════════════════════════════════
+    %% STEP 4 — Party Identification via pd-partners (via Glue)
+    %%          Match the caller to a known partner record
+    %% ═══════════════════════════════════════════════════════════════════
+    Note over AppointmentsAdapter,AdvisorAPI: Party Identification via pd-partners
+    AppointmentsAdapter->>Glue: POST /pd-partners/search<br/>Authorization: AuthZ token + EIDP service token<br/>Body: { name, dateOfBirth, accountRef }
+    Glue->>AdvisorAPI: POST /pd-partners/search
+    AdvisorAPI-->>Glue: List of matching partner records
+    Glue-->>AppointmentsAdapter: List of matching partner records
+
+    alt NO partner found
+      AppointmentsAdapter-->>BFAGateway: 404 — no matching partner
+      BFAGateway-->>VoiceBankingAgent: Response PEP: no match found
+      VoiceBankingAgent-->>User: "I couldn't find your records.<br/>Could you verify your name and date of birth?"
+
+    else partner(s) found
+      AppointmentsAdapter-->>BFAGateway: Matched partner(s)
+      BFAGateway-->>VoiceBankingAgent: Response PEP: redact PII, attach correlation IDs
+      VoiceBankingAgent-->>User: "I found your profile.<br/>Let me confirm: {maskedName}, born {maskedDOB}?"
+      User->>VoiceBankingAgent: "Yes, that's me"
+      VoiceBankingAgent->>BFAGateway: Partner confirmed (partnerId)
+      BFAGateway->>AppointmentsAdapter: Partner confirmed (partnerId)
+
+      %% ═══════════════════════════════════════════════════════════════════
+      %% STEP 5 — Retrieve Existing Appointments for Identified Partner
+      %% ═══════════════════════════════════════════════════════════════════
+      Note over AppointmentsAdapter,AdvisorAPI: Appointment Retrieval by Partner
+      AppointmentsAdapter->>Glue: GET /appointments?partnerId={partnerId}&status=upcoming<br/>Authorization: AuthZ token + EIDP service token
+      Glue->>AdvisorAPI: GET /appointments?partnerId={partnerId}&status=upcoming
+      AdvisorAPI-->>Glue: List of upcoming appointments
+      Glue-->>AppointmentsAdapter: List of upcoming appointments
+
+      alt NO appointments found
+        AppointmentsAdapter-->>BFAGateway: 200 — empty list
+        BFAGateway-->>VoiceBankingAgent: No upcoming appointments
+        VoiceBankingAgent-->>User: "You don't have any upcoming appointments.<br/>Would you like to book a new one?"
+
+      else appointment(s) found
+        AppointmentsAdapter-->>BFAGateway: Appointment list
+        BFAGateway-->>VoiceBankingAgent: Response PEP: redact PII,<br/>format appointment details
+        VoiceBankingAgent-->>User: "I found your appointment:<br/>{dateTime} with {advisorName}<br/>at {location}. Topic: {subject}."
+
+        %% ═══════════════════════════════════════════════════════════════════
+        %% STEP 6 — User Decision: Keep or Cancel
+        %% ═══════════════════════════════════════════════════════════════════
+        Note over User,VoiceBankingAgent: User decides: keep or cancel
+
+        alt User wants to KEEP the appointment
+          User->>VoiceBankingAgent: "Great, thanks! I'll be there."
+          VoiceBankingAgent-->>User: "Perfect. Your appointment is on<br/>{dateTime} at {location}.<br/>Is there anything else I can help with?"
+
+        else User wants to CANCEL the appointment
+          User->>VoiceBankingAgent: "Actually, I'd like to cancel it."
+          VoiceBankingAgent->>VoiceBankingAgent: Confirm cancellation intent
+          VoiceBankingAgent-->>User: "Are you sure you want to cancel<br/>your appointment on {dateTime}<br/>with {advisorName}?"
+          User->>VoiceBankingAgent: "Yes, cancel it"
+          VoiceBankingAgent->>BFAGateway: Tool call: cancelAppointment<br/>{ appointmentId, partnerId }
+          BFAGateway->>AppointmentsAdapter: Cancel appointment request
+
+          %% ═══════════════════════════════════════════════════════════════
+          %% STEP 7 — Appointment Cancellation (via Glue)
+          %% ═══════════════════════════════════════════════════════════════
+          Note over AppointmentsAdapter,AdvisorAPI: Appointment Cancellation
+          AppointmentsAdapter->>Glue: DELETE /appointments/{appointmentId}<br/>Authorization: AuthZ token + EIDP service token<br/>Body: { partnerId, reason: "client_requested" }
+          Glue->>AdvisorAPI: DELETE /appointments/{appointmentId}
+          AdvisorAPI-->>Glue: { status: "cancelled", appointmentId }
+          Glue-->>AppointmentsAdapter: { status: "cancelled", appointmentId }
+          AppointmentsAdapter-->>BFAGateway: Cancellation confirmed
+          BFAGateway-->>VoiceBankingAgent: Response PEP: "Appointment cancelled"
+          VoiceBankingAgent-->>User: "Your appointment on {dateTime}<br/>has been cancelled.<br/>Would you like to reschedule?"
+
+        end
+      end
+    end
+  end

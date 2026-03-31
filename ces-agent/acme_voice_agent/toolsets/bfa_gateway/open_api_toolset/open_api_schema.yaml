@@ -1,0 +1,120 @@
+openapi: "3.0.1"
+info:
+  title: Acme Bank BFA Gateway API
+  description: >-
+    CES-facing single-ingress tool gateway.
+    Canonical source: `java/bfa-gateway/openapi-specs/bfa-gateway.json`.
+  version: "1.0.0"
+servers:
+  - url: "$env_var"
+    description: "BFA Gateway (environment-injected)"
+tags:
+  - name: BFA Gateway
+    description: Tool discovery and invocation
+paths:
+  /api/v1/tools:
+    get:
+      tags: [BFA Gateway]
+      summary: List registered tools
+      operationId: listGatewayTools
+      responses:
+        "200":
+          description: Registered tools returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatewayDiscoveryResponse"
+  /api/v1/tools/invoke:
+    post:
+      tags: [BFA Gateway]
+      summary: Invoke a tool through the gateway
+      operationId: invokeGatewayTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToolInvokeRequest"
+      responses:
+        "200":
+          description: Tool invocation succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInvokeResponse"
+        "400":
+          description: Invalid request or adapter validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInvokeResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInvokeResponse"
+        "403":
+          description: Authorization denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInvokeResponse"
+        "404":
+          description: Unknown tool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInvokeResponse"
+components:
+  schemas:
+    ToolInvokeRequest:
+      type: object
+      required: [toolName, parameters]
+      properties:
+        toolName:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+    ToolInvokeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        toolName:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+        error:
+          $ref: "#/components/schemas/ErrorResponse"
+        correlationId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+    GatewayDiscoveryResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        tools:
+          type: array
+          items:
+            type: string
+        adapters:
+          type: array
+          items:
+            type: string

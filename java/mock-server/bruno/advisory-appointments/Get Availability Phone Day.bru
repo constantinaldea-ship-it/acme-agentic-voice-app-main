@@ -1,0 +1,43 @@
+meta {
+  name: Get Availability Phone Day
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/availability?consultationChannel=PHONE&locationId=REMOTE-PHONE-DE&selectedDay=2030-06-18
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-avail-003
+  Accept: application/json
+}
+
+docs {
+  # Get Availability — Phone (Specific Day)
+
+  Returns time slots for a phone consultation on a specific day.
+
+  ## Query Parameters
+  - consultationChannel: PHONE
+  - locationId: REMOTE-PHONE-DE
+  - selectedDay: 2030-06-18
+
+  ## Expected Response
+  - HTTP 200
+  - Slot list for phone appointments on that day
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

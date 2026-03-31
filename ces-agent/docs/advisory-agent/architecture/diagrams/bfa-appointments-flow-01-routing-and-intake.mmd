@@ -1,0 +1,52 @@
+---
+title: BFA Advisory Appointment Flow 01 - Routing and Intake
+---
+%%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#4285f4', 'actorTextColor': '#ffffff', 'actorBorder': '#1a56db', 'activationBkg': '#c9daf8', 'activationBorder': '#1a73e8', 'noteBkg': '#fff9c4', 'noteBorderColor': '#f4b400', 'noteTextColor': '#37474f', 'signalColor': '#1a73e8', 'signalTextColor': '#174ea6', 'labelBoxBkgColor': '#e8f0fe', 'labelBoxBorderColor': '#4285f4', 'labelTextColor': '#174ea6', 'loopTextColor': '#174ea6', 'sequenceNumberColor': '#ffffff'}}}%%
+%% Modified by Codex on 2026-03-16.
+%% Scope: Root-agent routing plus the intake fields that must exist before slot search starts.
+
+sequenceDiagram
+  autonumber
+
+  participant User as User
+  participant RootAgent as voice_banking_agent
+  participant AppointmentAgent as advisory_appointment_agent
+
+  User->>RootAgent: "I want to book an appointment for mortgage advice"
+  Note over RootAgent: Route to advisory_appointment_agent only when the utterance implies booking,<br/>rescheduling, cancellation, or explicit appointment management.<br/>Generic branch or ATM lookup stays in location_services_agent.
+
+  alt generic location query only
+    RootAgent->>RootAgent: Keep request in location_services_agent
+    RootAgent-->>User: Continue branch or ATM discovery outside the appointment flow
+  else booking or lifecycle semantics detected
+    RootAgent->>AppointmentAgent: Route appointment journey
+
+    alt new appointment
+      AppointmentAgent->>AppointmentAgent: journeyType = CREATE
+
+      alt entryPath missing
+        AppointmentAgent-->>User: Clarify service request vs product consultation
+        User->>AppointmentAgent: "Product consultation"
+      end
+      AppointmentAgent->>AppointmentAgent: Set entryPath
+
+      alt topicCode or serviceCode missing
+        AppointmentAgent-->>User: Ask for the advisory topic or service reason
+        User->>AppointmentAgent: "Mortgage consultation"
+      end
+      AppointmentAgent->>AppointmentAgent: Set topicCode or serviceCode
+
+      alt consultationChannel missing
+        AppointmentAgent-->>User: Ask for branch, video, or phone consultation
+        User->>AppointmentAgent: "Branch"
+      end
+      AppointmentAgent->>AppointmentAgent: Set consultationChannel
+
+    else existing appointment lifecycle
+      AppointmentAgent->>AppointmentAgent: journeyType = GET or RESCHEDULE or CANCEL
+      AppointmentAgent-->>User: Confirm whether the caller wants details, reschedule, or cancellation
+      User->>AppointmentAgent: Lifecycle action
+    end
+  end
+
+  Note over RootAgent,AppointmentAgent: Output to downstream flows:<br/>{ journeyType, entryPath, topicCode or serviceCode, consultationChannel }

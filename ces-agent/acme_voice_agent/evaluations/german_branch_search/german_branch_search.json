@@ -1,0 +1,8 @@
+{
+  "displayName": "german_branch_search",
+  "scenario": {
+    "task": "Test a full German-language branch search conversation with an accessibility follow-up. Start with 'Hallo', then say 'Ich suche eine Filiale in Berlin'. After receiving branch results, ask 'Welche davon ist barrierefrei?' (Which one is wheelchair accessible?). After receiving the accessibility results, say 'Danke, das war alles. Auf Wiedersehen!' to end the conversation. Verify: (1) the voice_banking_agent greets the user in German in a welcoming manner, (2) the agent transfers to the location_services_agent for the branch search, (3) the agent calls the searchBranches tool with city Berlin, (4) the agent responds in German throughout the entire conversation — never switches to English, (5) the agent mentions the total number of branches found in Berlin, (6) the agent lists at least 3 specific branches with their names and addresses — all data must come from the tool response, (7) the agent does not fabricate any branch names, addresses, or phone numbers that were not in the tool response, (8) when asked about wheelchair accessibility the agent calls searchBranches with the accessible parameter set to true or filters the existing results by the wheelchairAccessible field and only presents branches that are wheelchair accessible, (9) the agent asks a helpful follow-up question after presenting results, (10) when the user says goodbye the agent responds with a polite farewell in German.",
+    "scenarioExpectations": [],
+    "maxTurns": 7
+  }
+}

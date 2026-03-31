@@ -1,0 +1,60 @@
+{
+  "displayName": "acme_voice_agent",
+  "rootAgent": "voice_banking_agent",
+  "audioProcessingConfig": {
+    "synthesizeSpeechConfigs": {
+      "de-DE": {
+      },
+      "en-US": {
+      }
+    }
+  },
+  "loggingSettings": {
+    "redactionConfig": {
+    },
+    "audioRecordingConfig": {
+    },
+    "bigqueryExportSettings": {
+      "enabled": true
+    },
+    "cloudLoggingSettings": {
+      "enableCloudLogging": true
+    },
+    "conversationLoggingSettings": {
+    },
+    "metricAnalysisSettings": {
+    }
+  },
+  "guardrails": ["Safety Guardrail 1770494214565", "Prompt Guardrail 1770494214565"],
+  "variableDeclarations": [{
+    "name": "backend",
+    "description": "https://bfa-service-resource-6gxbppksrq-uc.a.run.app",
+    "schema": {
+      "type": "STRING",
+      "default": "https://bfa-service-resource-6gxbppksrq-uc.a.run.app"
+    }
+  }],
+  "globalInstruction": "global_instruction.txt",
+  "languageSettings": {
+    "defaultLanguageCode": "en-US",
+    "supportedLanguageCodes": ["de-DE"]
+  },
+  "defaultChannelProfile": {
+  },
+  "timeZoneSettings": {
+    "timeZone": "Europe/Paris"
+  },
+  "toolExecutionMode": "PARALLEL",
+  "evaluationMetricsThresholds": {
+    "goldenEvaluationMetricsThresholds": {
+      "turnLevelMetricsThresholds": {
+        "semanticSimilaritySuccessThreshold": 3,
+        "overallToolInvocationCorrectnessThreshold": 0.80
+      },
+      "expectationLevelMetricsThresholds": {
+        "toolInvocationParameterCorrectnessThreshold": 0.80
+      }
+    },
+    "hallucinationMetricBehavior": "ENABLED"
+  }
+}

@@ -1,0 +1,9 @@
+- ingressFrom:
+    identities:
+      - serviceAccount:your-client-sa@your-project.iam.gserviceaccount.com
+  ingressTo:
+    resources:
+      - projects/1041912723804
+    operations:
+      - serviceName: ces.googleapis.com
+      - serviceName: contactcenterinsights.googleapis.com

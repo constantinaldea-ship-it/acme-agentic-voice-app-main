@@ -1,0 +1,57 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "display_name": "multistep-appointment-booking-german",
+  "scenarios": [
+    {
+      "name": "appointment_booking_branch_flow_german_voice",
+      "linked_evaluation": "appointment_booking_branch_flow_german",
+      "turns": [
+        {
+          "name": "request_branch_booking",
+          "audio_path": "../fixtures/appointment-booking-branch-flow-german/01-request-branch-booking.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow-german/01-request-branch-booking.transcript.txt"
+          },
+          "expected_transcript": "Ich möchte einen Beratungstermin in einer Filiale in Berlin buchen"
+        },
+        {
+          "name": "choose_topic",
+          "audio_path": "../fixtures/appointment-booking-branch-flow-german/02-choose-topic.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow-german/02-choose-topic.transcript.txt"
+          },
+          "expected_transcript": "Es geht um eine Baufinanzierung"
+        },
+        {
+          "name": "choose_branch",
+          "audio_path": "../fixtures/appointment-booking-branch-flow-german/03-choose-branch.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow-german/03-choose-branch.transcript.txt"
+          },
+          "expected_transcript": "Die Filiale Unter den Linden wäre für mich am besten"
+        },
+        {
+          "name": "choose_day",
+          "audio_path": "../fixtures/appointment-booking-branch-flow-german/04-choose-day.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow-german/04-choose-day.transcript.txt"
+          },
+          "expected_transcript": "Nächsten Dienstag am Vormittag passt es mir"
+        },
+        {
+          "name": "confirm_booking",
+          "audio_path": "../fixtures/appointment-booking-branch-flow-german/05-confirm-booking.wav",
+          "transcriber": {
+            "kind": "sidecar",
+            "transcript_path": "../fixtures/appointment-booking-branch-flow-german/05-confirm-booking.transcript.txt"
+          },
+          "expected_transcript": "Ja, bitte buchen Sie den Termin"
+        }
+      ]
+    }
+  ]
+}

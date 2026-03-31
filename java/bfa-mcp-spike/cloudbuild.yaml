@@ -1,0 +1,84 @@
+# Cloud Build configuration for BFA MCP Spike (ADR-CES-003)
+# Builds, tests, and deploys the standalone MCP location services server.
+#
+# Trigger manually:
+#   gcloud builds submit --config java/bfa-mcp-spike/cloudbuild.yaml .
+#   gcloud builds submit --config java/bfa-mcp-spike/cloudbuild.yaml --substitutions=_GCP_REGION=YOUR_REGION .
+
+steps:
+  # Step 1: Build and test the spike module
+  - name: 'maven:3.9-eclipse-temurin-21'
+    entrypoint: 'mvn'
+    args: ['clean', 'verify', '-f', 'java/pom.xml', '-pl', 'bfa-mcp-spike', '-am']
+    id: 'build-and-test'
+
+  # Step 2: Package JAR (skip tests — already ran above)
+  - name: 'maven:3.9-eclipse-temurin-21'
+    entrypoint: 'mvn'
+    args: ['package', '-f', 'java/pom.xml', '-pl', 'bfa-mcp-spike', '-am', '-DskipTests']
+    id: 'package'
+    waitFor: ['build-and-test']
+
+  # Step 3: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/bfa-mcp-spike:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/bfa-mcp-spike:latest'
+      - 'java/bfa-mcp-spike/'
+    id: 'docker-build'
+    waitFor: ['package']
+
+  # Step 4: Push images
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/bfa-mcp-spike:$SHORT_SHA']
+    id: 'docker-push-sha'
+    waitFor: ['docker-build']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/bfa-mcp-spike:latest']
+    id: 'docker-push-latest'
+    waitFor: ['docker-build']
+
+  # Step 5: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'bfa-mcp-spike'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/bfa-mcp-spike:$SHORT_SHA'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - '$_GCP_REGION'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8081'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--no-cpu-throttling'
+      - '--execution-environment'
+      - 'gen2'
+      - '--set-env-vars'
+      - 'PORT=8081'
+    id: 'deploy'
+    waitFor: ['docker-push-sha']
+
+images:
+  - 'gcr.io/$PROJECT_ID/bfa-mcp-spike:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/bfa-mcp-spike:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+timeout: '900s'
+
+substitutions:
+  _GCP_REGION: 'europe-west1'

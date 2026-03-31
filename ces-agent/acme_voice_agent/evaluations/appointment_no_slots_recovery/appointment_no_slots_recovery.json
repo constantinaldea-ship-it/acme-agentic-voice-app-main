@@ -1,0 +1,18 @@
+{
+  "displayName": "appointment_no_slots_recovery",
+  "scenario": {
+    "task": "Test recovery when no appointment slots are available. Start with 'I need an appointment in Berlin on the first available day, but if nothing is free I'd take another branch or a phone consultation'. The agent should route to advisory_appointment_agent, search eligible booking locations, retrieve slots, handle a no-availability response without inventing availability, and offer recovery options such as another day, another eligible location, another channel, or human handoff.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent does not stop at the first no-slots response and instead offers structured fallback choices."
+      },
+      {
+        "expectedResult": "The agent never invents time slots or advisor names when availability is empty."
+      },
+      {
+        "expectedResult": "The agent can move the conversation toward another day, another location, another channel, or handoff."
+      }
+    ],
+    "maxTurns": 8
+  }
+}

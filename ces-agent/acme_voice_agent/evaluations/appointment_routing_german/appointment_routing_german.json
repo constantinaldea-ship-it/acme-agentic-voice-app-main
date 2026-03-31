@@ -1,0 +1,19 @@
+{
+  "displayName": "appointment_routing_german",
+  "golden": {
+    "turns": [{
+      "steps": [{
+        "userInput": {
+          "text": "Ich möchte einen Beratungstermin vereinbaren"
+        }
+      }, {
+        "expectation": {
+          "agentTransfer": {
+            "targetAgent": "advisory_appointment_agent",
+            "displayName": "advisory_appointment_agent"
+          }
+        }
+      }]
+    }]
+  }
+}

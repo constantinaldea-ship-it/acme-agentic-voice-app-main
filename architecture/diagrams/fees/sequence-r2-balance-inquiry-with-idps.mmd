@@ -1,0 +1,47 @@
+%% Revised Sequence: Balance Inquiry (sensitive) with EIDP/CIDP
+%% Created by GitHub Copilot on 2026-03-01 for ADR-0104 Round 2 Review
+%% Addresses EIDP/CIDP omission — shows full token chain
+
+sequenceDiagram
+  participant User
+  participant CES as CX Agent Studio
+  participant BFA as BFA Gateway (Cloud Run)
+  participant CIDP as CIDP (Cloud Identity Provider)
+  participant CIAM as ForgeRock CIAM (Customer Identity)
+  participant PDP as AuthZ PDP
+  participant AP as Apigee Internal
+  participant Core as Core Banking SoR
+
+  User->>CES: "What's my balance?"
+
+  CES->>BFA: Tool call (Service Directory PNA)<br/>IAM ID token (service identity)<br/>headers: request_id, session_id, agent_id,<br/>tool_id, customer_id_hash, auth_level
+
+  Note over BFA: Validate CES service identity (IAM ID token)<br/>Validate schema + mandatory correlation headers<br/>Classify intent as SENSITIVE (balance = PII data)
+
+  BFA->>CIAM: RFC 8693 Token Exchange<br/>subject_token: customer session context<br/>scope: account:balance:read<br/>audience: acme-banking-agentic<br/>acr: requested assurance level
+
+  CIAM-->>BFA: Agentic customer token<br/>(short-lived, audience-restricted,<br/>includes customer_id_hash + acr)
+
+  BFA->>CIDP: Service token request<br/>(OAuth2 client_credentials over mTLS)<br/>audience: apigee-internal<br/>scope: banking.accounts.balance.read
+
+  CIDP-->>BFA: CIDP service token<br/>(short-lived, audience: apigee-internal)
+
+  BFA->>PDP: AuthZ decision request<br/>subject: customer (from agentic token)<br/>action: account.balance.read<br/>resource: accounts/*<br/>context: agent_id, auth_level/acr<br/>propagate: request_id, session_id, policy_decision_id
+
+  PDP-->>BFA: Permit + obligations<br/>(redaction rules, data minimization)<br/>policy_decision_id: pdp-xxx
+
+  Note over BFA: Route to Banking Adapter (internal)
+
+  BFA->>AP: Call balance API (mTLS)<br/>Authorization: Bearer {agentic_token}<br/>X-Service-Token: {cidp_service_token}<br/>propagate: all correlation headers<br/>+ policy_decision_id
+
+  AP->>Core: Private call to core banking SoR<br/>propagate: correlation headers
+
+  Core-->>AP: Balance payload<br/>(account_id, balance, available_balance,<br/>currency, last_updated)
+
+  AP-->>BFA: Normalized response<br/>+ upstream trace IDs
+
+  Note over BFA: Apply PDP redaction obligations<br/>Mask account_id (show last 4 only)<br/>Strip internal metadata<br/>PII minimization before returning to CES
+
+  BFA-->>CES: Sanitized response<br/>+ correlation IDs<br/>(only: masked_account, balance, currency)
+
+  CES-->>User: Voice response:<br/>"Your checking account ending in 4532<br/>has a balance of €12,345.67"

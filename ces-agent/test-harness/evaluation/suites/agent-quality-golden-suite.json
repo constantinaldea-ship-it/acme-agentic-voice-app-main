@@ -1,0 +1,54 @@
+{
+  "package_root": "../../acme_voice_agent",
+  "project": "${GCP_PROJECT_ID}",
+  "location": "${GCP_LOCATION}",
+  "app_id": "${CES_APP_ID}",
+  "display_name_prefix": "agent-quality-golden",
+  "run_request": {
+    "runCount": 1,
+    "generateLatencyReport": true
+  },
+  "require_latency_report": true,
+  "default_expected": {
+    "min_pass_rate": 1.0,
+    "min_completed_results": 1,
+    "max_error_count": 0
+  },
+  "evaluations": [
+    {
+      "name": "agent_handover_roundtrip",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "routing", "critical"]
+    },
+    {
+      "name": "appointment_routing_english",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "routing", "appointment", "critical"]
+    },
+    {
+      "name": "appointment_routing_german",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "routing", "appointment", "german", "critical"]
+    },
+    {
+      "name": "fee_lookup_basic",
+      "owner_agent": "fee_schedule_agent",
+      "labels": ["subagent", "fees", "critical"]
+    },
+    {
+      "name": "fee_routing_german",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "fees", "german", "critical"]
+    },
+    {
+      "name": "off_topic_redirect",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "policy", "critical"]
+    },
+    {
+      "name": "session_end_live_agent",
+      "owner_agent": "voice_banking_agent",
+      "labels": ["root", "session", "critical"]
+    }
+  ]
+}

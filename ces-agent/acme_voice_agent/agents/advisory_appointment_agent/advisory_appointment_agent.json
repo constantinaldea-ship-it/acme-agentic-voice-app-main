@@ -1,0 +1,19 @@
+{
+  "displayName": "advisory_appointment_agent",
+  "description": "Advisory appointment specialist for booking, cancelling, and rescheduling branch, phone, and video consultations.",
+  "instruction": "agents/advisory_appointment_agent/instruction.txt",
+  "tools": ["end_session"],
+  "toolsets": [{
+    "toolset": "advisory_appointment",
+    "toolIds": [
+      "getAppointmentTaxonomy",
+      "searchAppointmentServices",
+      "searchAppointmentBranches",
+      "getAppointmentSlots",
+      "createAppointment",
+      "getAppointment",
+      "cancelAppointment",
+      "rescheduleAppointment"
+    ]
+  }]
+}

@@ -1,0 +1,56 @@
+refusal:
+  templates:
+    money_movement:
+      id: money-movement-001
+      message: "I am not able to make transfers at this time. To send money, you can use the Deutsche Bank mobile app or log in to online banking."
+      alternatives:
+        - "Use the Deutsche Bank mobile app - tap Transfers on the home screen"
+        - "Log in to online banking at deutsche-bank.de"
+    
+    advisory:
+      id: advisory-001
+      message: "I am not able to give personalized advice, as that requires understanding your personal financial situation. I recommend speaking with one of our advisors."
+      alternatives:
+        - "Speak with a financial advisor"
+        - "Visit a branch for personalized consultation"
+    
+    trading:
+      id: trading-001
+      message: "I am not able to execute trades or access investment portfolios. For trading operations, please use the trading platform."
+      alternatives:
+        - "Use the Deutsche Bank trading platform"
+        - "Contact your investment advisor"
+    
+    account_changes:
+      id: account-changes-001
+      message: "I am not able to make changes to your account settings. You can update your information in the mobile app settings or online banking."
+      alternatives:
+        - "Go to Settings in the mobile app"
+        - "Log in to online banking to update your profile"
+    
+    disputes:
+      id: disputes-001
+      message: "I understand you would like to dispute a transaction. Disputes need to be reviewed by our specialized team."
+      alternatives:
+        - "Connect with a disputes specialist now"
+        - "Submit a dispute through the mobile app"
+      handover_offered: true
+    
+    non_banking:
+      id: non-banking-001
+      message: "I focus on banking-related questions, so I am not able to help with that. But I would be happy to help with your accounts."
+      alternatives:
+        - "Ask about your account balance"
+        - "View recent transactions"
+    
+    harmful:
+      id: harmful-001
+      message: "I am here to help with your banking needs. How can I assist you with your accounts today?"
+      alternatives: []
+    
+    security_violation:
+      id: security-001
+      message: "For your security, I never provide PINs, passwords, or other login credentials."
+      alternatives:
+        - "Learn how to reset your PIN"
+        - "Contact customer service for account security help"

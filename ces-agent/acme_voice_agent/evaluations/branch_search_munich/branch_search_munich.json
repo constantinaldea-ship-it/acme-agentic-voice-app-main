@@ -1,0 +1,12 @@
+{
+  "displayName": "branch_search_munich",
+  "scenario": {
+    "task": "Test a full English-language branch search conversation. Start with 'Hello', then ask 'I need to find a branch in Munich'. After receiving results, say 'Thank you, that's all I needed. Goodbye!' to end the conversation. Verify: (1) the voice_banking_agent greets the user in a welcoming manner, (2) the agent transfers to the location_services_agent for the branch search, (3) the agent calls the searchBranches tool with city Munich, (4) the agent responds in English, (5) the agent mentions the total number of branches found in Munich, (6) the agent lists at least 3 specific branches with their names, addresses, and distances, (7) the agent does not fabricate any branch names or addresses — all data comes from the tool response, (8) the agent asks a follow-up question such as whether the user wants more details or to see more branches, (9) when the user says goodbye the agent responds with a polite farewell.",
+    "scenarioExpectations": [
+      {
+        "expectedResult": "The agent provides a verbal farewell message (e.g., 'Have a great day!', 'Goodbye!') BEFORE or alongside ending the session. The farewell must appear as agent text in the conversation, not just as a tool call."
+      }
+    ],
+    "maxTurns": 5
+  }
+}

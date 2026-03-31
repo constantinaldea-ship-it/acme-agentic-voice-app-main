@@ -1,0 +1,60 @@
+meta {
+  name: Get Hans Mueller Personal Data
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/customers/any-partner-id/personal-data
+  body: none
+  auth: none
+}
+
+headers {
+  deuba-client-id: {{clientId}}
+  DB-ID: acme-banking-db-01
+  Authorization: Bearer {{authzToken}}
+  Accept: application/json
+}
+
+docs {
+  # Get Hans Mueller Personal Data
+
+  Retrieves personal data for the male test client Hans Müller (default response).
+
+  ## Partner ID
+  - Any value (this is the default response)
+
+  ## Expected Response
+  - HTTP 200
+  - Gender: MALE
+  - Marital Status: married
+  - Location: Berlin
+}
+
+assert {
+  res.status: eq 200
+  res.body.firstname: eq Hans
+  res.body.lastname: eq Müller
+  res.body.gender: eq MALE
+  res.body.nationality: eq DEU
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return Hans Müller", function() {
+    expect(res.body.firstname).to.equal("Hans");
+    expect(res.body.lastname).to.equal("Müller");
+  });
+  
+  test("should have correct gender", function() {
+    expect(res.body.gender).to.equal("MALE");
+  });
+  
+  test("should have German nationality", function() {
+    expect(res.body.nationality).to.equal("DEU");
+  });
+}

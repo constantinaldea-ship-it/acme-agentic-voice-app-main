@@ -1,0 +1,106 @@
+%% ADR-0104 Round 2 Review: Option A — Strict Single BFA with EIDP/CIDP
+%% Created by GitHub Copilot on 2026-03-01
+
+flowchart LR
+  subgraph CESPlatform["CX Agent Studio (Google-managed)"]
+    CES["CES Agents + Tools"]
+  end
+
+  subgraph VPCSCPerimeter["VPC-SC Perimeter: acme-landingzone"]
+    subgraph NetLayer["Network Layer"]
+      SD["Service Directory PNA"]
+      ILB["Internal HTTP/S LB"]
+    end
+
+    subgraph BFARuntime["BFA Runtime (Cloud Run internal)"]
+      BFA["BFA Gateway"]
+      PEP["PEP Layer:\nValidation · Correlation\nPII Redaction · Token Orchestration"]
+      PDP["AuthZ PDP Service"]
+    end
+
+    subgraph Adapters["Internal Domain Adapters"]
+      ADP_BANK["Banking Adapter\n(AG-007)"]
+      ADP_FEE["Fee Adapter\n(AG-005)\n+ Curated Read Model"]
+      ADP_LOC["Location Adapter\n(AG-003)\n+ Branch Read Model"]
+      ADP_KB["Knowledge Adapter\n(AG-006)\n+ KB Index"]
+      ADP_PROD["Product Adapter\n(AG-009)"]
+    end
+
+    subgraph CloudIdentity["Cloud Identity Services"]
+      CIDP["CIDP\n(Cloud Identity Provider)\nService-to-service tokens\nfor Apigee-bound calls"]
+    end
+
+    subgraph ApigeeProj["Apigee Project"]
+      AP["Apigee Internal\n(regulated/productized APIs)"]
+    end
+  end
+
+  subgraph CIAMLandingZone["GCP Landing Zone: CIAM"]
+    CIAM["ForgeRock CIAM\n(Customer Identity)\nRFC 8693 token exchange"]
+  end
+
+  subgraph OnPrem["On-Prem Data Center"]
+    EIDP["EIDP\n(Enterprise Identity Provider)\nService-to-service tokens\nfor Glue-bound calls"]
+    GLUE["Glue (WSO2)\nAPI Manager"]
+    CORE["Core Banking\nSystems of Record"]
+  end
+
+  subgraph HybridNet["Hybrid Network"]
+    IC["HA Cloud Interconnect"]
+    VPN["Cloud VPN (fallback)"]
+  end
+
+  %% CES to BFA (single ingress)
+  CES -->|"IAM ID token\n(service identity)"| SD
+  SD --> ILB --> BFA
+  BFA --> PEP
+
+  %% Identity flows
+  PEP -->|"RFC 8693 exchange\n(customer agentic token)\n(cloud-to-cloud)"| CIAM
+  PEP -->|"Service token request\n(cloud-bound APIs)"| CIDP
+  PEP -.->|"Service token request\n(on-prem APIs)\nvia Interconnect"| EIDP
+
+  %% AuthZ
+  PEP -->|"AuthZ decision\n+ obligations"| PDP
+
+  %% PEP to adapters (internal routing)
+  PEP --> ADP_BANK
+  PEP --> ADP_FEE
+  PEP --> ADP_LOC
+  PEP --> ADP_KB
+  PEP --> ADP_PROD
+
+  %% Adapter to upstream
+  ADP_BANK -->|"Agentic token\n+ CIDP service token\n(mTLS)"| AP
+  ADP_PROD -->|"CIDP service token\n(mTLS)"| AP
+  ADP_FEE -.->|"Fallback: EIDP token\n(mTLS via Interconnect)"| GLUE
+  ADP_LOC -.->|"Fallback: EIDP token\n(mTLS via Interconnect)"| GLUE
+
+  %% Upstream to core
+  AP --> CORE
+  GLUE --> CORE
+
+  %% Hybrid network dependencies (on-prem only)
+  EIDP -.->|"depends on"| IC
+  GLUE -.->|"depends on"| IC
+  IC -.->|"fallback"| VPN
+
+  %% NOTE: CIAM and CIDP are cloud-hosted — no Interconnect dependency
+
+  %% Styling
+  classDef ces fill:#e8daef,stroke:#7d3c98,stroke-width:2px,color:#4a235a;
+  classDef bfa fill:#d4edda,stroke:#1f7a1f,stroke-width:2px,color:#114411;
+  classDef adapter fill:#e6f2ff,stroke:#1f4b99,stroke-width:1.5px,color:#0f2d5c;
+  classDef cloudIdp fill:#d5f5e3,stroke:#1e8449,stroke-width:2px,color:#145a32;
+  classDef onpremIdp fill:#fff3cd,stroke:#b8860b,stroke-width:2px,color:#5f4500;
+  classDef upstream fill:#f8d7da,stroke:#8b2f39,stroke-width:1.5px,color:#5a1c23;
+  classDef network fill:#fdebd0,stroke:#b9770e,stroke-width:1px,color:#7e5109;
+
+  class CES ces;
+  class BFA,PEP,PDP,SD,ILB bfa;
+  class ADP_BANK,ADP_FEE,ADP_LOC,ADP_KB,ADP_PROD adapter;
+  class CIDP cloudIdp;
+  class CIAM cloudIdp;
+  class EIDP onpremIdp;
+  class AP,GLUE,CORE upstream;
+  class IC,VPN network;

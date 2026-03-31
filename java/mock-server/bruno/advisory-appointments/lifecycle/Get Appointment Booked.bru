@@ -1,0 +1,45 @@
+meta {
+  name: Get Appointment Booked
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/lifecycle/APT-BRANCH-0001?appointmentAccessToken=aat-branch-0001
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-BFA-Client: {{appointmentClient}}
+  X-Correlation-ID: bruno-lifecycle-002
+  Accept: application/json
+}
+
+docs {
+  # Get Appointment — BOOKED State
+
+  Retrieves appointment details when in BOOKED state (after Create).
+
+  ## Query Parameters
+  - appointmentAccessToken: aat-branch-0001
+
+  ## Expected Response
+  - HTTP 200
+  - Appointment with status BOOKED
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should show BOOKED status", function() {
+    expect(res.body.status).to.equal("BOOKED");
+  });
+}

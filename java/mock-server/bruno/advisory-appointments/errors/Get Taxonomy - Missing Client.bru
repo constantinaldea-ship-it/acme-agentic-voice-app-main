@@ -1,0 +1,37 @@
+meta {
+  name: Get Taxonomy - Missing Client
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/advisory-appointments/taxonomy
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{appointmentAuth}}
+  X-Correlation-ID: bruno-err-002
+  Accept: application/json
+}
+
+docs {
+  # Get Taxonomy — Missing X-BFA-Client (403)
+
+  Negative test: sends request WITHOUT X-BFA-Client header.
+  WireMock returns 403 Forbidden.
+
+  ## Expected Response
+  - HTTP 403
+}
+
+assert {
+  res.status: eq 403
+}
+
+tests {
+  test("should return 403 for missing client header", function() {
+    expect(res.status).to.equal(403);
+  });
+}
