@@ -2,19 +2,19 @@
 
 Canonical deployment tooling for the CES agent package lives in this folder.
 
-These scripts cover three deployment paths:
+These scripts cover the unified CES deployment workflow:
 
-- **Preferred daily path:** plan and apply incremental CES updates for changed toolsets, tools, and agents
-- **Full reset path:** package the full `acme_voice_agent/` app and import it with CES `apps:importApp`
+- **Primary entrypoint:** `ces-deploy-manager.py` for both bootstrap imports and incremental CES updates
+- **Bootstrap helper:** `deploy-agent.sh --import` remains the underlying full-app CES `apps:importApp` implementation reused by the deploy manager when the app is missing
 
 ## Script inventory
 
 | Script | Status | Purpose |
 |---|---|---|
-| `ces-deploy-manager.py` | Preferred | Build a state-aware deployment plan and apply only changed toolsets, tools, and agents |
+| `ces-deploy-manager.py` | Preferred primary entrypoint | Detect missing apps, bootstrap if needed, then plan and apply only changed toolsets, tools, and agents |
 | `ces-undeploy-manager.py` | Preferred cleanup | Delete CES agents, tools, and toolsets idempotently using local manifests plus tracked state |
 | `validate-package.py` | Shared prerequisite | Cross-reference validation for the CES app package before import or incremental deploy |
-| `deploy-agent.sh` | Full-app fallback | Validate, package, and optionally import the full CES app ZIP |
+| `deploy-agent.sh` | Bootstrap helper | Validate, package, and optionally import the full CES app ZIP when invoked directly or by the deploy manager |
 | `manage_datastore.sh` | Supported helper | Provision and sync the fee schedule datastore used by the app package |
 
 ## Internal layout
@@ -47,33 +47,55 @@ python3 ces-deploy-manager.py --status
 python3 ces-deploy-manager.py --status-json
 ```
 
-This is the preferred day-to-day deploy path because it minimizes redundant CES
-API calls, captures a per-run artifact, and keeps the local state aligned with
-the deployed resources. The terminal plan uses color-coded sections for
-`Added`, `Updated`, `Removed`, and `No-op` so review is faster before approval.
+This is now the preferred default deploy path because it handles both bootstrap
+and incremental updates. On every run it prints the resolved CES app target,
+discovered live deployment IDs, and any configured `CES_DEPLOYMENT_ID` match
+status before showing the plan. The terminal plan still uses color-coded
+sections for `Added`, `Updated`, `Removed`, and `No-op` so review is faster
+before approval.
 
 ## Bootstrap vs incremental updates
 
-Use the two deployment paths like this:
+`ces-deploy-manager.py` is now the single recommended entrypoint.
 
-- **Brand-new CES app / no app imported yet** → start with `./deploy-agent.sh --import`
-- **Existing CES app / iterative changes** → use `python3 ces-deploy-manager.py`
-- **Existing CES app / one agent missing** → `ces-deploy-manager.py` can create the
-  missing agent as long as the parent app already exists and any referenced
-  toolsets, tools, and child agents are available in the same run
+It decides the mode automatically:
 
-Why the distinction matters:
+- **Brand-new CES app / no app imported yet** → detects the missing app, explains that bootstrap import is required, asks for confirmation, then invokes the existing `deploy-agent.sh --import` path
+- **Existing CES app / iterative changes** → continues with the normal incremental deployment plan
+- **Existing CES app / one agent missing** → can still create the missing agent as long as the parent app already exists and any referenced toolsets, tools, and child agents are available in the same run
+
+Why the distinction still matters internally:
 
 - `ces-deploy-manager.py` talks to the CES **resource** APIs under an existing
-  `projects/*/locations/*/apps/*` parent
-- `deploy-agent.sh --import` uses `apps:importApp`, which is the repository's
-  authoritative **bootstrap** path for creating or resetting the app package
+  `projects/*/locations/*/apps/*` parent once bootstrap is complete
+- `deploy-agent.sh --import` still uses `apps:importApp`, which remains the repository's authoritative full-app bootstrap implementation reused by the deploy manager
 - built-in CES system tools such as `end_session` are not local tool folders and
   are now preserved as built-ins during incremental agent creation
 
-If incremental deploy fails with HTTP 404 against the app path, the app itself
-is usually missing. In that case, run one full import first and then rerun the
-incremental deploy manager.
+When the app is missing, the deploy manager now catches that condition before it
+tries to create child resources. Instead of surfacing a raw `404 Parent
+resource does not exist`, it prints that the app is missing, shows the resolved
+target, prompts for confirmation, and can run the bootstrap import path for you.
+
+Typical symptom:
+
+```text
+HTTP 404
+Parent resource does not exist.
+```
+
+Recommended default command from `ces-agent/scripts/deploy/`:
+
+```bash
+python3 ces-deploy-manager.py
+```
+
+If the app is missing, that single command will:
+
+1. detect the missing CES app
+2. ask whether it should run the bootstrap import
+3. invoke `deploy-agent.sh --import` on your behalf if you confirm
+4. re-check the target and continue with incremental/state reconciliation when appropriate
 
 ## Incremental deployment workflow
 
@@ -121,8 +143,9 @@ way to inspect the last deployed time, last run id, Git SHA, and remote
 
 Use the ZIP import path when you intentionally want to treat the local package
 as the full source of truth or when you need the repository's authoritative
-full-app import behavior. This is also the correct path for the **first deploy**
-into a brand-new CES app.
+full-app import behavior. `ces-deploy-manager.py` now invokes this path
+automatically for first-time bootstrap, but `deploy-agent.sh` remains available
+for direct/manual full-app imports.
 
 ```bash
 # Validate only

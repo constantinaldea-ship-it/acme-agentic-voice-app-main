@@ -54,6 +54,10 @@ class DeploymentManagerError(RuntimeError):
     """Raised when the deploy manager cannot build a safe plan."""
 
 
+class MissingCesAppError(DeploymentManagerError):
+    """Raised when the configured CES app parent resource does not exist."""
+
+
 @dataclass(frozen=True)
 class LocalComponent:
     """A deployable local CES component."""
@@ -66,6 +70,20 @@ class LocalComponent:
     tracked_files: tuple[Path, ...]
     file_hashes: dict[str, str]
     combined_hash: str
+
+
+@dataclass(frozen=True)
+class ExecutionTargetStatus:
+    """Resolved remote CES target state for deploy execution."""
+
+    project: str
+    location: str
+    app_id: str
+    endpoint: str
+    app_exists: bool
+    deployments: tuple[dict[str, Any], ...]
+    configured_deployment_id: str
+    configured_deployment_matches: bool | None
 
 
 def script_dir() -> Path:
@@ -480,6 +498,106 @@ def app_parent(project: str, location: str, app_id: str) -> str:
     return f"projects/{project}/locations/{location}/apps/{app_id}"
 
 
+def bootstrap_import_hint(project: str, location: str, app_id: str) -> str:
+    return (
+        "Bootstrap it once with ./deploy-agent.sh --import --project "
+        f"{project} --location {location} --app-id {app_id} and then rerun "
+        "ces-deploy-manager.py."
+    )
+
+
+def missing_app_message(project: str, location: str, app_id: str) -> str:
+    return (
+        f"Configured CES app '{app_id}' does not exist under "
+        f"projects/{project}/locations/{location}. {bootstrap_import_hint(project, location, app_id)}"
+    )
+
+
+def get_ces_app(
+    *,
+    project: str,
+    location: str,
+    app_id: str,
+    endpoint: str | None,
+    token: str,
+) -> dict[str, Any] | None:
+    resolved_endpoint = detect_endpoint(location, endpoint)
+    url = f"{resolved_endpoint}/v1/{app_parent(project, location, app_id)}"
+    status, body = http_request("GET", url, token)
+    if status == 404:
+        return None
+    if not 200 <= status < 300:
+        detail = body.strip() or "no response body"
+        raise DeploymentManagerError(
+            f"Unable to inspect CES app '{app_id}' (HTTP {status}): {detail}"
+        )
+    return parse_json_body(body)
+
+
+def inspect_execution_target(
+    *,
+    project: str,
+    location: str,
+    app_id: str,
+    endpoint: str | None,
+    token: str,
+) -> ExecutionTargetStatus:
+    resolved_endpoint = detect_endpoint(location, endpoint)
+    configured_deployment_id = os.environ.get("CES_DEPLOYMENT_ID", "").strip()
+    app_payload = get_ces_app(
+        project=project,
+        location=location,
+        app_id=app_id,
+        endpoint=endpoint,
+        token=token,
+    )
+    if app_payload is None:
+        return ExecutionTargetStatus(
+            project=project,
+            location=location,
+            app_id=app_id,
+            endpoint=resolved_endpoint,
+            app_exists=False,
+            deployments=(),
+            configured_deployment_id=configured_deployment_id,
+            configured_deployment_matches=None,
+        )
+
+    deployments = tuple(
+        list_api_access_deployments(
+            project=project,
+            location=location,
+            app_id=app_id,
+            endpoint=endpoint,
+            token=token,
+        )
+    )
+    normalized_configured_id = resource_id_from_name(configured_deployment_id)
+    configured_match = None
+    if configured_deployment_id:
+        configured_match = False
+        for deployment in deployments:
+            name = deployment.get("name")
+            deployment_id = resource_id_from_name(name) if isinstance(name, str) else ""
+            display_name = deployment.get("displayName")
+            if configured_deployment_id in {name, deployment_id, display_name} or (
+                normalized_configured_id and normalized_configured_id == deployment_id
+            ):
+                configured_match = True
+                break
+
+    return ExecutionTargetStatus(
+        project=project,
+        location=location,
+        app_id=app_id,
+        endpoint=resolved_endpoint,
+        app_exists=True,
+        deployments=deployments,
+        configured_deployment_id=configured_deployment_id,
+        configured_deployment_matches=configured_match,
+    )
+
+
 def resource_id_from_name(resource_name: str) -> str:
     return resource_name.rsplit("/", 1)[-1] if resource_name else ""
 
@@ -515,9 +633,7 @@ def list_api_access_deployments(
     url = f"{resolved_endpoint}/v1beta/{app_parent(project, location, app_id)}/deployments"
     status, body = http_request("GET", url, token)
     if status == 404:
-        raise DeploymentManagerError(
-            f"Configured CES app '{app_id}' was not found while listing API access deployments."
-        )
+        raise MissingCesAppError(missing_app_message(project, location, app_id))
     if not 200 <= status < 300:
         detail = body.strip() or "no response body"
         raise DeploymentManagerError(
@@ -539,10 +655,15 @@ def print_execution_target(
     app_id: str,
     endpoint: str | None,
     token: str,
-) -> None:
-    resolved_endpoint = detect_endpoint(location, endpoint)
+) -> ExecutionTargetStatus:
+    status = inspect_execution_target(
+        project=project,
+        location=location,
+        app_id=app_id,
+        endpoint=endpoint,
+        token=token,
+    )
     console_url = f"https://ces.cloud.google.com/projects/{project}/locations/{location}/apps/{app_id}"
-    configured_deployment_id = os.environ.get("CES_DEPLOYMENT_ID", "").strip()
 
     print("")
     print("CES Execution Target")
@@ -550,35 +671,33 @@ def print_execution_target(
     print(f"Project            : {project}")
     print(f"Location           : {location}")
     print(f"CES_APP_ID         : {app_id}")
-    print(f"CES endpoint       : {resolved_endpoint}")
+    print(f"CES endpoint       : {status.endpoint}")
     print(f"Console URL        : {console_url}")
-    if configured_deployment_id:
-        print(f"Configured CES_DEPLOYMENT_ID: {configured_deployment_id}")
+    print(f"CES app status     : {'exists' if status.app_exists else 'missing'}")
+    if status.configured_deployment_id:
+        print(f"Configured CES_DEPLOYMENT_ID: {status.configured_deployment_id}")
 
-    try:
-        deployments = list_api_access_deployments(
-            project=project,
-            location=location,
-            app_id=app_id,
-            endpoint=endpoint,
-            token=token,
-        )
-    except (DeploymentManagerError, DeployResourceError) as exc:
-        print(f"Discovered deployment IDs: unavailable ({exc})")
+    if not status.app_exists:
+        print("Mode preview       : bootstrap import required")
+        print("Deployment IDs     : unavailable until the CES app exists")
+        if status.configured_deployment_id:
+            print("Configured CES_DEPLOYMENT_ID status: cannot verify because the CES app is missing")
         print("")
-        return
+        return status
 
-    if not deployments:
+    if not status.deployments:
+        print("Mode preview       : incremental deploy")
         print("Discovered deployment IDs: none")
         print("Suggested export    : create an API access deployment in CES and set CES_DEPLOYMENT_ID to that id")
+        if status.configured_deployment_id:
+            print("Configured CES_DEPLOYMENT_ID status: not found in the live app")
         print("")
-        return
+        return status
 
+    print("Mode preview       : incremental deploy")
     print("Discovered deployment IDs:")
     discovered_ids: list[str] = []
-    configured_match = False
-    normalized_configured_id = resource_id_from_name(configured_deployment_id)
-    for deployment in deployments:
+    for deployment in status.deployments:
         name = deployment.get("name")
         if not isinstance(name, str) or not name:
             continue
@@ -589,27 +708,86 @@ def print_execution_target(
         display_name = deployment.get("displayName")
         suffix = f" (displayName={display_name})" if isinstance(display_name, str) and display_name.strip() else ""
         print(f"  - {deployment_id}{suffix}")
-        if configured_deployment_id and (
-            configured_deployment_id == name
-            or configured_deployment_id == deployment_id
-            or normalized_configured_id == deployment_id
-            or configured_deployment_id == display_name
-        ):
-            configured_match = True
 
-    if configured_deployment_id:
-        if configured_match:
+    if status.configured_deployment_id:
+        if status.configured_deployment_matches:
             print("Configured CES_DEPLOYMENT_ID is present in the live app.")
         else:
             print(
                 "Configured CES_DEPLOYMENT_ID was not found in the live app deployments. "
-                f"Available deployments: {format_named_resources(deployments)}"
+                f"Available deployments: {format_named_resources(list(status.deployments))}"
             )
     elif len(discovered_ids) == 1:
         print(f"Suggested export    : CES_DEPLOYMENT_ID={discovered_ids[0]}")
     else:
         print("Suggested export    : set CES_DEPLOYMENT_ID to one of the deployment ids above")
     print("")
+    return status
+
+
+def confirm_bootstrap_import(auto_confirm: bool, *, project: str, location: str, app_id: str) -> bool:
+    if auto_confirm:
+        print("Auto-confirm enabled; proceeding with bootstrap import.")
+        return True
+
+    print("")
+    print("Bootstrap Import Required")
+    print("=========================")
+    print(f"Project            : {project}")
+    print(f"Location           : {location}")
+    print(f"CES_APP_ID         : {app_id}")
+    print("Reason             : the CES app does not exist yet")
+    print("Next step          : run the full bootstrap import via deploy-agent.sh --import")
+    reply = input("Run bootstrap import now? [y/N] ").strip().lower()
+    return reply in {"y", "yes"}
+
+
+def deploy_agent_script() -> Path:
+    return script_dir() / "deploy-agent.sh"
+
+
+def deploy_agent_source_name(app_root: Path) -> str:
+    resolved_app_root = app_root.resolve()
+    if resolved_app_root.parent != ces_agent_dir().resolve():
+        raise DeploymentManagerError(
+            "Bootstrap import currently supports app roots under the ces-agent directory only. "
+            f"Got app root: {resolved_app_root}"
+        )
+    return resolved_app_root.name
+
+
+def run_bootstrap_import(
+    *,
+    app_root: Path,
+    project: str,
+    location: str,
+    app_id: str,
+) -> None:
+    source_name = deploy_agent_source_name(app_root)
+    command = [
+        "bash",
+        str(deploy_agent_script()),
+        "--source",
+        source_name,
+        "--import",
+        "--project",
+        project,
+        "--location",
+        location,
+        "--app-id",
+        app_id,
+    ]
+    print("")
+    print("Bootstrap Import")
+    print("================")
+    print("Mode               : bootstrap import")
+    print(f"Command            : {' '.join(command)}")
+    completed = subprocess.run(command, cwd=script_dir(), check=False)
+    if completed.returncode != 0:
+        raise DeploymentManagerError(
+            f"Bootstrap import failed with exit code {completed.returncode}."
+        )
+    print("Bootstrap import completed successfully.")
 
 
 def confirm_plan(auto_confirm: bool) -> bool:
@@ -617,6 +795,55 @@ def confirm_plan(auto_confirm: bool) -> bool:
         return True
     reply = input("Apply deployment plan? [y/N] ").strip().lower()
     return reply in {"y", "yes"}
+
+
+def reconcile_added_components_with_remote(
+    plan: dict[str, list[LocalComponent]],
+    state_components: dict[str, Any],
+    *,
+    project: str,
+    location: str,
+    app_id: str,
+    endpoint: str | None,
+    token: str,
+) -> tuple[dict[str, list[LocalComponent]], list[LocalComponent]]:
+    refreshed_plan: dict[str, list[LocalComponent]] = {
+        "added": [],
+        "modified": list(plan["modified"]),
+        "noop": list(plan["noop"]),
+    }
+    discovered_existing: list[LocalComponent] = []
+
+    for component in plan["added"]:
+        agent_names, tool_names, toolset_names = resolved_resource_maps(
+            state_components,
+            project=project,
+            location=location,
+            app_id=app_id,
+        )
+        request = build_request(
+            kind=component.kind,
+            source_path=component.source_path,
+            project=project,
+            location=location,
+            app_id=app_id,
+            endpoint=endpoint,
+            agent_names=agent_names,
+            tool_names=tool_names,
+            toolset_names=toolset_names,
+        )
+        existing_resource_name = find_existing_resource_name(request, token)
+        if existing_resource_name:
+            state_components[component.key] = state_entry_for(component, existing_resource_name)
+            refreshed_plan["noop"].append(component)
+            discovered_existing.append(component)
+            continue
+        refreshed_plan["added"].append(component)
+
+    refreshed_plan["noop"] = sorted(
+        refreshed_plan["noop"], key=lambda item: (KIND_ORDER[item.kind], item.resource_id)
+    )
+    return refreshed_plan, discovered_existing
 
 
 def timestamp_now() -> str:
@@ -1215,12 +1442,7 @@ def deployment_error_message(
         f"Deployment failed for {component.key} with HTTP {status}."
     )
     if status == 404:
-        bootstrap_hint = (
-            " If the CES app does not exist yet, bootstrap it once with "
-            "./deploy-agent.sh --import --project "
-            f"{project} --location {location} --app-id {app_id} and then rerun "
-            "ces-deploy-manager.py."
-        )
+        bootstrap_hint = f" {bootstrap_import_hint(project, location, app_id)}"
         base_message += bootstrap_hint
     if detail:
         base_message += f" CES said: {detail}"
@@ -1406,13 +1628,61 @@ def main() -> int:
             location = require_value("location", location)
             app_id = require_value("app-id", app_id)
             token = get_access_token()
-            print_execution_target(
+            target_status = print_execution_target(
                 project=project,
                 location=location,
                 app_id=app_id,
                 endpoint=args.endpoint,
                 token=token,
             )
+            if not target_status.app_exists:
+                print(missing_app_message(project, location, app_id))
+                if not confirm_bootstrap_import(
+                    args.yes,
+                    project=project,
+                    location=location,
+                    app_id=app_id,
+                ):
+                    print("Bootstrap import aborted.")
+                    finalize_artifact(
+                        artifact,
+                        status="cancelled",
+                        message="Bootstrap import aborted by user.",
+                    )
+                    write_run_artifact(artifact_path, artifact)
+                    return 0
+                run_bootstrap_import(
+                    app_root=app_root,
+                    project=project,
+                    location=location,
+                    app_id=app_id,
+                )
+                target_status = print_execution_target(
+                    project=project,
+                    location=location,
+                    app_id=app_id,
+                    endpoint=args.endpoint,
+                    token=token,
+                )
+                if not target_status.app_exists:
+                    raise DeploymentManagerError(
+                        "Bootstrap import reported success but the CES app still could not be found."
+                    )
+                plan, discovered_existing = reconcile_added_components_with_remote(
+                    plan,
+                    state_components,
+                    project=project,
+                    location=location,
+                    app_id=app_id,
+                    endpoint=args.endpoint,
+                    token=token,
+                )
+                if discovered_existing:
+                    write_state(state_file, state)
+                    print(
+                        "Initialized local deployment state from the freshly bootstrapped app for "
+                        f"{len(discovered_existing)} resource(s)."
+                    )
             plan, stale_components = reconcile_noop_components_with_remote(
                 plan,
                 state_components,

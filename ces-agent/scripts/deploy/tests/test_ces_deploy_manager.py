@@ -428,7 +428,18 @@ class CesDeployManagerTests(unittest.TestCase):
         ), mock.patch.object(MODULE, "run_validator"), mock.patch.object(
             MODULE, "get_access_token", return_value="token"
         ), mock.patch.object(
-            MODULE, "print_execution_target"
+            MODULE,
+            "print_execution_target",
+            return_value=MODULE.ExecutionTargetStatus(
+                project="voice-banking-poc",
+                location="us",
+                app_id="acme-voice-us",
+                endpoint="https://ces.us.rep.googleapis.com",
+                app_exists=True,
+                deployments=(),
+                configured_deployment_id="",
+                configured_deployment_matches=None,
+            ),
         ), mock.patch.object(
             MODULE,
             "reconcile_noop_components_with_remote",
@@ -491,6 +502,141 @@ class CesDeployManagerTests(unittest.TestCase):
             artifact["outcome"]["message"],
             "Validation-only mode; no remote changes executed.",
         )
+
+    def test_main_aborts_cleanly_when_bootstrap_import_is_declined(self) -> None:
+        app_root = self.create_app()
+        state_file = app_root / ".ces-deployment-state.json"
+        artifacts_dir = app_root / ".artifacts"
+        args = MODULE.argparse.Namespace(
+            app_root=str(app_root),
+            state_file=str(state_file),
+            artifacts_dir=str(artifacts_dir),
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+            endpoint=None,
+            yes=True,
+            validate_only=False,
+            status=False,
+            status_json=False,
+        )
+
+        missing_status = MODULE.ExecutionTargetStatus(
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+            endpoint="https://ces.eu.rep.googleapis.com",
+            app_exists=False,
+            deployments=(),
+            configured_deployment_id="",
+            configured_deployment_matches=None,
+        )
+        with mock.patch.object(MODULE, "ensure_env_loaded"), mock.patch.object(
+            MODULE, "parse_args", return_value=args
+        ), mock.patch.object(MODULE, "run_validator"), mock.patch.object(
+            MODULE, "get_access_token", return_value="token"
+        ), mock.patch.object(
+            MODULE, "print_execution_target", return_value=missing_status
+        ), mock.patch.object(
+            MODULE, "confirm_bootstrap_import", return_value=False
+        ), mock.patch.object(
+            MODULE, "confirm_plan", side_effect=AssertionError("should not prompt")
+        ), mock.patch.object(
+            MODULE, "run_bootstrap_import", side_effect=AssertionError("should not bootstrap")
+        ), mock.patch.object(
+            MODULE, "execute_plan", side_effect=AssertionError("should not execute")
+        ):
+            result = MODULE.main()
+
+        self.assertEqual(result, 0)
+        artifact_files = sorted(artifacts_dir.glob("*.json"))
+        self.assertEqual(len(artifact_files), 1)
+        artifact = json.loads(artifact_files[0].read_text(encoding="utf-8"))
+        self.assertEqual(artifact["status"], "cancelled")
+        self.assertEqual(artifact["outcome"]["message"], "Bootstrap import aborted by user.")
+
+    def test_main_runs_bootstrap_import_then_initializes_state(self) -> None:
+        app_root = self.create_app()
+        state_file = app_root / ".ces-deployment-state.json"
+        artifacts_dir = app_root / ".artifacts"
+        components = MODULE.discover_components(app_root)
+        args = MODULE.argparse.Namespace(
+            app_root=str(app_root),
+            state_file=str(state_file),
+            artifacts_dir=str(artifacts_dir),
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+            endpoint=None,
+            yes=False,
+            validate_only=False,
+            status=False,
+            status_json=False,
+        )
+        missing_status = MODULE.ExecutionTargetStatus(
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+            endpoint="https://ces.eu.rep.googleapis.com",
+            app_exists=False,
+            deployments=(),
+            configured_deployment_id="",
+            configured_deployment_matches=None,
+        )
+        live_status = MODULE.ExecutionTargetStatus(
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+            endpoint="https://ces.eu.rep.googleapis.com",
+            app_exists=True,
+            deployments=(
+                {
+                    "name": "projects/voice-banking-poc/locations/eu/apps/acme-voice-eu/deployments/api-access-1",
+                    "displayName": "Primary API Access",
+                },
+            ),
+            configured_deployment_id="",
+            configured_deployment_matches=None,
+        )
+        post_bootstrap_plan = {"added": [], "modified": [], "noop": list(components)}
+
+        with mock.patch.object(MODULE, "ensure_env_loaded"), mock.patch.object(
+            MODULE, "parse_args", return_value=args
+        ), mock.patch.object(MODULE, "run_validator"), mock.patch.object(
+            MODULE, "get_access_token", return_value="token"
+        ), mock.patch.object(
+            MODULE, "print_execution_target", side_effect=[missing_status, live_status]
+        ), mock.patch.object(
+            MODULE, "confirm_bootstrap_import", return_value=True
+        ), mock.patch.object(
+            MODULE, "run_bootstrap_import"
+        ) as run_bootstrap_import, mock.patch.object(
+            MODULE,
+            "reconcile_added_components_with_remote",
+            return_value=(post_bootstrap_plan, list(components)),
+        ) as reconcile_added, mock.patch.object(
+            MODULE,
+            "reconcile_noop_components_with_remote",
+            return_value=(post_bootstrap_plan, []),
+        ), mock.patch.object(
+            MODULE, "confirm_plan", side_effect=AssertionError("should not prompt once everything is synced")
+        ), mock.patch.object(
+            MODULE, "execute_plan", side_effect=AssertionError("should not execute once bootstrap import already synced state")
+        ):
+            result = MODULE.main()
+
+        self.assertEqual(result, 0)
+        run_bootstrap_import.assert_called_once_with(
+            app_root=app_root.resolve(),
+            project="voice-banking-poc",
+            location="eu",
+            app_id="acme-voice-eu",
+        )
+        reconcile_added.assert_called_once()
+        artifact_files = sorted(artifacts_dir.glob("*.json"))
+        artifact = json.loads(artifact_files[0].read_text(encoding="utf-8"))
+        self.assertEqual(artifact["status"], "noop")
+        self.assertEqual(artifact["outcome"]["message"], "Everything is up to date.")
 
     def test_write_run_artifact_persists_json(self) -> None:
         target_dir = Path(tempfile.mkdtemp(prefix="ces-deploy-artifact-"))
@@ -587,16 +733,25 @@ class CesDeployManagerTests(unittest.TestCase):
         stdout = io.StringIO()
         with mock.patch.object(
             MODULE,
-            "list_api_access_deployments",
-            return_value=[
-                {
-                    "name": (
-                        "projects/voice-banking-poc/locations/eu/apps/acme-voice-eu/"
-                        "deployments/api-access-1"
-                    ),
-                    "displayName": "Primary API Access",
-                }
-            ],
+            "inspect_execution_target",
+            return_value=MODULE.ExecutionTargetStatus(
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+                endpoint="https://ces.eu.rep.googleapis.com",
+                app_exists=True,
+                deployments=(
+                    {
+                        "name": (
+                            "projects/voice-banking-poc/locations/eu/apps/acme-voice-eu/"
+                            "deployments/api-access-1"
+                        ),
+                        "displayName": "Primary API Access",
+                    },
+                ),
+                configured_deployment_id="",
+                configured_deployment_matches=None,
+            ),
         ), mock.patch.dict("os.environ", {}, clear=True), redirect_stdout(stdout):
             MODULE.print_execution_target(
                 project="voice-banking-poc",
@@ -609,8 +764,120 @@ class CesDeployManagerTests(unittest.TestCase):
         rendered = stdout.getvalue()
         self.assertIn("CES Execution Target", rendered)
         self.assertIn("CES_APP_ID         : acme-voice-eu", rendered)
+        self.assertIn("CES app status     : exists", rendered)
         self.assertIn("api-access-1", rendered)
         self.assertIn("Suggested export    : CES_DEPLOYMENT_ID=api-access-1", rendered)
+
+    def test_print_execution_target_reports_bootstrap_mode_when_app_is_missing(self) -> None:
+        stdout = io.StringIO()
+        with mock.patch.object(
+            MODULE,
+            "inspect_execution_target",
+            return_value=MODULE.ExecutionTargetStatus(
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+                endpoint="https://ces.eu.rep.googleapis.com",
+                app_exists=False,
+                deployments=(),
+                configured_deployment_id="api-access-1",
+                configured_deployment_matches=None,
+            ),
+        ), redirect_stdout(stdout):
+            status = MODULE.print_execution_target(
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+                endpoint=None,
+                token="token",
+            )
+
+        rendered = stdout.getvalue()
+        self.assertFalse(status.app_exists)
+        self.assertIn("CES Execution Target", rendered)
+        self.assertIn("CES app status     : missing", rendered)
+        self.assertIn("Mode preview       : bootstrap import required", rendered)
+        self.assertIn("Deployment IDs     : unavailable until the CES app exists", rendered)
+        self.assertIn("Configured CES_DEPLOYMENT_ID status: cannot verify because the CES app is missing", rendered)
+
+    def test_confirm_bootstrap_import_accepts_yes(self) -> None:
+        with mock.patch("builtins.input", return_value="yes"):
+            approved = MODULE.confirm_bootstrap_import(
+                False,
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+            )
+
+        self.assertTrue(approved)
+
+    def test_run_bootstrap_import_dispatches_deploy_agent_import(self) -> None:
+        app_root = MODULE.ces_agent_dir() / "acme_voice_agent"
+        with mock.patch.object(MODULE.subprocess, "run", return_value=mock.Mock(returncode=0)) as run_subprocess:
+            MODULE.run_bootstrap_import(
+                app_root=app_root,
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+            )
+
+        run_subprocess.assert_called_once()
+        command = run_subprocess.call_args.args[0]
+        self.assertEqual(
+            command,
+            [
+                "bash",
+                str(MODULE.deploy_agent_script()),
+                "--source",
+                "acme_voice_agent",
+                "--import",
+                "--project",
+                "voice-banking-poc",
+                "--location",
+                "eu",
+                "--app-id",
+                "acme-voice-eu",
+            ],
+        )
+
+    def test_reconcile_added_components_with_remote_initializes_state_entries(self) -> None:
+        app_root = self.create_app()
+        components = MODULE.discover_components(app_root)
+        plan = {"added": list(components), "modified": [], "noop": []}
+        state_components: dict[str, dict[str, str]] = {}
+
+        with mock.patch.object(
+            MODULE,
+            "find_existing_resource_name",
+            side_effect=[
+                "projects/.../toolsets/uuid-toolset",
+                "projects/.../tools/uuid-tool",
+                "projects/.../agents/uuid-agent",
+            ],
+        ):
+            refreshed_plan, discovered_existing = MODULE.reconcile_added_components_with_remote(
+                plan,
+                state_components,
+                project="voice-banking-poc",
+                location="eu",
+                app_id="acme-voice-eu",
+                endpoint=None,
+                token="token",
+            )
+
+        self.assertEqual([component.key for component in refreshed_plan["added"]], [])
+        self.assertEqual(
+            [component.key for component in refreshed_plan["noop"]],
+            [component.key for component in components],
+        )
+        self.assertEqual(
+            [component.key for component in discovered_existing],
+            [component.key for component in components],
+        )
+        self.assertEqual(
+            state_components["tool:get_customer_details_python"]["resource_name"],
+            "projects/.../tools/uuid-tool",
+        )
 
 
 if __name__ == "__main__":

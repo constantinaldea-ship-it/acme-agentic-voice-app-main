@@ -182,106 +182,175 @@ usable speech audio.
 
 ## Commands
 
-Run the unit tests for the harness itself:
+All examples below assume you start in the sleeve directory:
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
-/Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/.venv/bin/python -m unittest -b tests/test_voice_eval_runner.py
+cd /path/to/acme-agentic-voice-app-main/ces-agent/voice-testing
 ```
 
-Install the optional direct-session dependency before using `--ces-session`:
+### 1) Harness unit tests
+
+This command runs the local unit tests for `voice-eval-runner.py`.
+
+It is important because it gives the fastest signal that the harness still
+parses suites correctly, resolves fixtures and linked evaluations, writes
+artifacts, and handles remote replay / CES session modes without breaking the
+core workflow.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
-/Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/.venv/bin/python -m pip install -r requirements.txt
+python3 -m unittest -b tests/test_voice_eval_runner.py
 ```
 
-Optionally compile-check the runner before running the tests:
+### 2) Optional compile check
+
+This command asks Python to compile the runner and test module without executing
+the full suite.
+
+It is useful as a very fast syntax check before a larger test run, especially
+after editing CLI logic or string formatting.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
-/Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/.venv/bin/python -m py_compile voice-eval-runner.py tests/test_voice_eval_runner.py
+python3 -m py_compile voice-eval-runner.py tests/test_voice_eval_runner.py
 ```
 
-Validate the suite:
+### 3) Install the optional direct-session dependency
+
+This installs the extra dependency needed only for `--ces-session`
+(`BidiRunSession`) runs.
+
+You do not need this for deterministic sidecar suites, OpenAI transcription, or
+remote replay.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
+python3 -m pip install -r requirements.txt
+```
+
+### 4) Validate a suite definition
+
+This checks the suite JSON, fixture paths, and linked evaluation references
+without running transcription or CES.
+
+It is an important preflight step because it catches broken suite wiring before
+you spend time on live STT or remote CES calls.
+
+```bash
 python3 voice-eval-runner.py validate-suite \
   --suite ./suites/simple-voice-routing-suite.json
 ```
 
-Run the suite:
+### 5) Run the deterministic single-turn suite
+
+This runs the simplest local voice suite using checked-in sidecar transcripts.
+
+Use it first when you want to prove that the fixture, expected transcript, and
+linked CES evaluation text are still aligned.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/simple-voice-routing-suite.json
 ```
 
-Run the live OpenAI-backed suite:
+### 6) Run the live OpenAI-backed single-turn suite
+
+This uses the OpenAI transcription path instead of a sidecar transcript.
+
+It is important when you want to verify that the actual audio file still
+transcribes correctly, not just that the local sidecar text matches the suite.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/simple-voice-routing-openai-suite.json
 ```
 
-Run the deterministic multi-turn branch-booking suite:
+### 7) Run the deterministic multi-turn branch-booking suite
+
+This exercises the multi-turn booking flow locally with checked-in sidecar
+transcripts.
+
+Use it to verify scenario sequencing and transcript expectations before moving
+to live STT or CES integration.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json
 ```
 
-Run the live OpenAI-backed multi-turn branch-booking suite:
+### 8) Run the live OpenAI-backed multi-turn branch-booking suite
+
+This runs the same multi-turn booking flow, but with live OpenAI transcription.
+
+Use it after changing the audio fixtures, wording, or prompts to confirm that
+the audio itself still produces the expected transcripts end to end.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-openai-suite.json
 ```
 
-Run the deterministic German multi-turn branch-booking suite:
+### 9) Run the deterministic German multi-turn suite
+
+This is the local baseline for the German booking flow using sidecar
+transcripts.
+
+It is the safest first check before debugging German audio quality or CES
+runtime behavior.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-german-suite.json
 ```
 
-Run the live OpenAI-backed German multi-turn branch-booking suite:
+### 10) Run the live OpenAI-backed German multi-turn suite
+
+This verifies the German booking fixtures through live OpenAI transcription.
+
+Use it when you need to know whether the recorded German audio is still usable,
+not just whether the suite definition is correct.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-german-openai-suite.json
 ```
 
-Run a suite and replay the linked CES evaluations remotely:
+### 11) Run remote CES replay
+
+This replays the linked CES evaluations remotely after the local transcript
+checks succeed.
+
+Use it when you want to compare the local voice result with the current deployed
+CES behavior and capture the remote evaluation run artifacts beside the local
+voice artifacts.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --remote-replay
 ```
 
-Direct CES runtime check (`BidiRunSession`):
+### 12) Run the direct CES runtime check (`BidiRunSession`)
+
+This streams the prerecorded WAV turns directly into the deployed CES runtime
+instead of replaying a linked text-based evaluation.
+
+It is the most integration-heavy command in this sleeve and is the closest check
+to “can CES consume this audio fixture as audio?”.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --ces-session \
   --deployment-id YOUR_DEPLOYMENT_ID
 ```
 
-Record the prototype direct CES session result without failing the suite:
+### 13) Observe direct CES session output without failing the suite
+
+This records the direct CES session result but does not make the suite fail just
+because CES session mode failed.
+
+Use it while the deployed stack is still unstable and you want artifacts and
+evidence without turning the live CES path into a hard gate.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --ces-session \
@@ -289,21 +358,30 @@ python3 voice-eval-runner.py run-suite \
   --deployment-id YOUR_DEPLOYMENT_ID
 ```
 
-For a quick smoke test of the remote replay path without waiting for a long CES
-operation, shorten the remote timeout:
+### 14) Quick remote replay smoke
+
+This is a fast proof that remote replay starts and records an outcome, without
+waiting for a long CES evaluation operation to finish.
+
+Use it as a lightweight connectivity check before running a longer remote replay
+assertion.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --remote-replay \
   --remote-timeout-seconds 1
 ```
 
-Require the remote CES evaluation to pass as well:
+### 15) Require remote CES replay to pass
+
+This turns remote replay into a gating assertion instead of an observational
+artifact.
+
+It is important when the deployed CES path is expected to be healthy and remote
+success should block merges or handoff.
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --remote-replay \
@@ -430,26 +508,31 @@ surprise:
 ### Suggested command sequence
 
 ```bash
-cd /Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/voice-testing
+cd /path/to/acme-agentic-voice-app-main/ces-agent/voice-testing
 
-# 1) Harness regression tests
-/Users/constantinaldea/IdeaProjects/ai-account-balance/ces-agent/.venv/bin/python -m unittest -b tests/test_voice_eval_runner.py
+# 1) Harness regression tests: fast local check that parsing, artifacts,
+#    and remote-mode control flow still work before any live integration run.
+python3 -m unittest -b tests/test_voice_eval_runner.py
 
-# 2) Deterministic suite
+# 2) Deterministic suite: prove the fixture and expected transcript contract
+#    are still aligned before involving OpenAI or CES.
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json
 
-# 3) Live STT verification
+# 3) Live STT verification: confirm the actual WAV fixtures still transcribe
+#    correctly through the live OpenAI path.
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-openai-suite.json
 
-# 4) Direct CES runtime check (BidiRunSession)
+# 4) Direct CES runtime check: stream the audio into CES itself via
+#    BidiRunSession when you need multimodal runtime evidence.
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --ces-session \
   --deployment-id YOUR_DEPLOYMENT_ID
 
-# 5) Remote CES observation
+# 5) Remote CES observation: record deployed CES evaluation behavior without
+#    making remote success a hard gate yet.
 python3 voice-eval-runner.py run-suite \
   --suite ./suites/multistep-appointment-booking-suite.json \
   --remote-replay

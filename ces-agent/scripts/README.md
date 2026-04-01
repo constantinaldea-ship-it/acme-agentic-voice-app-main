@@ -38,9 +38,10 @@ Reason:
 - environment resolution depends on package-level artifacts such as
   `agents/`, `toolsets/`, and `environment.json`
 
-If you want the preferred day-to-day deploy path, use `ces-deploy-manager.py`.
-If you want the authoritative full-app import path, use `deploy-agent.sh` to
-package the entire app and import the resulting ZIP.
+Use `ces-deploy-manager.py` as the default CES deployment entrypoint.
+It now handles both first-time bootstrap and normal incremental updates.
+Use `deploy-agent.sh` directly only when you explicitly want the underlying
+full-app packaging/import workflow itself.
 
 See also:
 
@@ -51,20 +52,20 @@ See also:
 
 ## Deployment scripts
 
-Start with `deploy/README.md` for the preferred incremental deployment workflow
-and the full-app import fallback.
+Start with `deploy/README.md` for the unified deploy workflow.
 
 ### Recommended entrypoints
 
 ```bash
 cd ces-agent/scripts
 
-# Incremental resource-level deploy planning / apply
+# Default CES deployment entrypoint: bootstrap if needed, otherwise run the
+# normal incremental resource-level plan/apply flow.
 python3 deploy/ces-deploy-manager.py --validate-only
 python3 deploy/ces-deploy-manager.py
 python3 deploy/ces-deploy-manager.py --status
 
-# Supported full-app packaging / import
+# Optional direct full-app packaging / import helper
 ./deploy/deploy-agent.sh --validate
 ./deploy/deploy-agent.sh --import --location us
 
@@ -76,10 +77,13 @@ python3 deploy/ces-deploy-manager.py --status
 
 ### First deploy vs follow-up deploys
 
-- Use `./deploy/deploy-agent.sh --import ...` when the target CES app does not
-  exist yet.
-- Use `python3 deploy/ces-deploy-manager.py ...` after the app already exists
-  and you want resource-level incremental updates.
+- Use `python3 deploy/ces-deploy-manager.py ...` as the default command in both
+  cases.
+- If the target CES app does not exist yet, the deploy manager detects that,
+  prompts for confirmation, and dispatches the existing bootstrap import path
+  for you.
+- If the app already exists, the deploy manager stays on the normal
+  resource-level incremental path.
 - If only a specific agent is missing from an existing app, the incremental
   deploy manager can create it in dependency order. Built-in tools like
   `end_session` do not need a local tool folder.
@@ -306,7 +310,7 @@ gcloud auth application-default login
 
 ## ces-deploy-manager.py
 
-State-aware incremental deploy utility for CES resource APIs.
+State-aware CES deploy utility for bootstrap and incremental CES resource APIs.
 
 This tool is meant to reduce redundant CES API traffic during local iteration.
 It computes a local deployment plan from tracked hashes instead of blindly
@@ -315,6 +319,9 @@ re-importing the whole app every time.
 Current behavior:
 
 - validates the local package first
+- detects whether the target CES app already exists
+- shows the resolved CES app ID plus live/configured deployment IDs before execution
+- prompts to run bootstrap import when the app is missing
 - tracks toolsets, tools, and agents in `.ces-deployment-state.json`
 - hashes manifests plus referenced files such as `instruction.txt`,
   Python code, and OpenAPI schemas
@@ -326,11 +333,11 @@ Current behavior:
 
 Important constraints:
 
-- this uses CES resource APIs, not `apps:importApp`
-- the target app must already exist; bootstrap new apps with `deploy-agent.sh --import`
+- bootstrap still reuses the repository's authoritative `deploy-agent.sh --import`
+  path under the hood
 - removed components are reported but are not deleted remotely
-- this is best for iterative dev/test cycles, while `deploy-agent.sh` remains the
-  supported full-app import path
+- direct `deploy-agent.sh` usage remains available when you explicitly want the
+  standalone full-app import behavior
 
 ### Usage
 
@@ -384,9 +391,9 @@ Each run artifact additionally records:
 
 ### Recommendation
 
-Use `deploy-agent.sh` when you want the authoritative full-app import flow.
-Use `ces-deploy-manager.py` when you want to review and apply only changed
-resource-level updates during development.
+Use `ces-deploy-manager.py` as the default deployment command.
+Use `deploy-agent.sh` directly only when you intentionally want to run the
+standalone full-app packaging/import workflow yourself.
 
 ---
 
