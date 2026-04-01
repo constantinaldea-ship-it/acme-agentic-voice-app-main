@@ -32,6 +32,21 @@ sync_gcp_env_aliases() {
     export GCP_LOCATION="${LOCATION}"
   fi
 
+  # Modified by Augment Agent on 2026-03-31: allow SA_ACCOUNT_LOCATION in .env
+  # to drive the standard GCP credential variables used by repo wrappers.
+  if [[ -n "${SA_ACCOUNT_LOCATION:-}" ]]; then
+    if [[ -z "${GCP_SERVICE_ACCOUNT_KEY:-}" ]]; then
+      export GCP_SERVICE_ACCOUNT_KEY="${SA_ACCOUNT_LOCATION}"
+    fi
+    if [[ -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]]; then
+      export GOOGLE_APPLICATION_CREDENTIALS="${SA_ACCOUNT_LOCATION}"
+    fi
+  elif [[ -n "${GCP_SERVICE_ACCOUNT_KEY:-}" && -z "${SA_ACCOUNT_LOCATION:-}" ]]; then
+    export SA_ACCOUNT_LOCATION="${GCP_SERVICE_ACCOUNT_KEY}"
+  elif [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" && -z "${SA_ACCOUNT_LOCATION:-}" ]]; then
+    export SA_ACCOUNT_LOCATION="${GOOGLE_APPLICATION_CREDENTIALS}"
+  fi
+
   if [[ -n "${GCP_SERVICE_ACCOUNT_KEY:-}" && -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]]; then
     export GOOGLE_APPLICATION_CREDENTIALS="${GCP_SERVICE_ACCOUNT_KEY}"
   elif [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" && -z "${GCP_SERVICE_ACCOUNT_KEY:-}" ]]; then

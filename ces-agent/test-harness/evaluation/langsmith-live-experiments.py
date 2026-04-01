@@ -366,12 +366,27 @@ def normalize_langsmith_api_root(value: str | None) -> str:
     return f"{normalized}/api/v1"
 
 
+def normalize_langsmith_workspace_id(value: str | None) -> str | None:
+    """Return a canonical UUID workspace ID or None when unset/invalid."""
+    raw = (value or "").strip()
+    if not raw:
+        return None
+
+    try:
+        return str(uuid.UUID(raw))
+    except ValueError:
+        print(
+            "WARNING: ignoring LangSmith workspace ID because it is not a valid UUID: "
+            f"{raw}",
+            file=sys.stderr,
+        )
+        return None
+
+
 def resolve_langsmith_auth_config(args: argparse.Namespace) -> LangSmithAuthConfig:
     """Resolve LangSmith auth settings from CLI arguments and environment."""
-    workspace_id = (
-        args.langsmith_workspace_id
-        or os.environ.get("LANGSMITH_WORKSPACE_ID", "").strip()
-        or None
+    workspace_id = normalize_langsmith_workspace_id(
+        args.langsmith_workspace_id or os.environ.get("LANGSMITH_WORKSPACE_ID")
     )
     return LangSmithAuthConfig(
         api_root=normalize_langsmith_api_root(args.langsmith_endpoint),

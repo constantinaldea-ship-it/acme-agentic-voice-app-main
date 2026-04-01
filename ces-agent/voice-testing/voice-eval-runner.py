@@ -304,7 +304,7 @@ def load_env_file(path: Path) -> None:
 
 
 def sync_env_aliases() -> None:
-    """Copy common project/location aliases between shell conventions."""
+    """Copy common project/location and auth aliases between shell conventions."""
     alias_pairs = [
         ("GCP_PROJECT_ID", "PROJECT_ID"),
         ("GCP_LOCATION", "LOCATION"),
@@ -317,6 +317,21 @@ def sync_env_aliases() -> None:
             os.environ[alias] = primary_value
         elif alias_value and not primary_value:
             os.environ[primary] = alias_value
+
+    credential_aliases = (
+        "SA_ACCOUNT_LOCATION",
+        "GCP_SERVICE_ACCOUNT_KEY",
+        "GOOGLE_APPLICATION_CREDENTIALS",
+        "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE",
+    )
+    resolved_credential = next(
+        (os.environ.get(name, "").strip() for name in credential_aliases if os.environ.get(name, "").strip()),
+        "",
+    )
+    if resolved_credential:
+        for name in credential_aliases:
+            if not os.environ.get(name, "").strip():
+                os.environ[name] = resolved_credential
 
 
 def ensure_default_env_loaded() -> None:
@@ -1090,7 +1105,8 @@ def get_access_token() -> str:
             return token
     raise VoiceEvaluationError(
         "Failed to obtain a Google Cloud access token. Run 'gcloud auth login' or "
-        "'gcloud auth application-default login' first."
+        "'gcloud auth application-default login' first, or set SA_ACCOUNT_LOCATION/"
+        "GOOGLE_APPLICATION_CREDENTIALS in the repository .env."
     )
 
 
@@ -2378,17 +2394,18 @@ def run_suite(
                 f"{'; '.join(detail_parts)}"
             )
         else:
+            failure_message = describe_voice_failure(
+                scenario,
+                turn_results,
+                linked_evaluation_matches=linked_evaluation_matches,
+                ces_session_result=ces_session_result,
+                ces_session_enforced=ces_session_enforced,
+                remote_replay_result=remote_replay_result,
+                remote_replay_enforced=remote_replay_enforced,
+            )
             print(
                 f"  {colorize('FAIL', ANSI_RED, bold=True)}  "
-                f"{describe_voice_failure(
-                    scenario,
-                    turn_results,
-                    linked_evaluation_matches=linked_evaluation_matches,
-                    ces_session_result=ces_session_result,
-                    ces_session_enforced=ces_session_enforced,
-                    remote_replay_result=remote_replay_result,
-                    remote_replay_enforced=remote_replay_enforced,
-                )}"
+                f"{failure_message}"
             )
             print(f"  Artifact: {artifact_path}")
 

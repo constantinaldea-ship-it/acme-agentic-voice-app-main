@@ -119,23 +119,39 @@ class LangSmithLiveExperimentTests(unittest.TestCase):
         args = Namespace(langsmith_endpoint=None, langsmith_workspace_id=None)
         with patch.dict(
             os.environ,
-            {"LANGSMITH_API_KEY": "secret", "LANGSMITH_WORKSPACE_ID": "ws_123"},
+            {
+                "LANGSMITH_API_KEY": "secret",
+                "LANGSMITH_WORKSPACE_ID": "12345678-1234-5678-1234-567812345678",
+            },
             clear=True,
         ):
             auth = resolve_langsmith_auth_config(args)
         self.assertEqual(auth.api_root, "https://api.smith.langchain.com/api/v1")
         self.assertEqual(auth.api_key, "secret")
-        self.assertEqual(auth.workspace_id, "ws_123")
+        self.assertEqual(auth.workspace_id, "12345678-1234-5678-1234-567812345678")
+
+    def test_resolve_langsmith_auth_config_ignores_invalid_workspace_id(self) -> None:
+        args = Namespace(langsmith_endpoint=None, langsmith_workspace_id=None)
+        with patch.dict(
+            os.environ,
+            {"LANGSMITH_API_KEY": "secret", "LANGSMITH_WORKSPACE_ID": "ces-bw"},
+            clear=True,
+        ):
+            auth = resolve_langsmith_auth_config(args)
+        self.assertIsNone(auth.workspace_id)
 
     def test_build_langsmith_headers_adds_workspace_header_when_present(self) -> None:
         auth = LangSmithAuthConfig(
             api_root="https://api.smith.langchain.com/api/v1",
             api_key="secret",
-            workspace_id="ws_123",
+            workspace_id="12345678-1234-5678-1234-567812345678",
         )
         self.assertEqual(
             build_langsmith_headers(auth),
-            {"x-api-key": "secret", "x-tenant-id": "ws_123"},
+            {
+                "x-api-key": "secret",
+                "x-tenant-id": "12345678-1234-5678-1234-567812345678",
+            },
         )
         auth_without_workspace = LangSmithAuthConfig(
             api_root="https://api.smith.langchain.com/api/v1",

@@ -139,6 +139,22 @@ class CesEvaluationRunnerUnitTests(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertIn("session_end_live_agent", stdout.getvalue())
 
+    def test_repo_suite_files_resolve_checked_in_package_root(self) -> None:
+        suites_dir = SCRIPT_DIR.parent / "suites"
+        suite_names = (
+            "agent-quality-golden-suite.json",
+            "agent-quality-scenario-suite.json",
+            "langsmith-advisory-routing-suite.json",
+            "langsmith-advisory-booking-suite.json",
+            "langsmith-advisory-recovery-suite.json",
+        )
+
+        for suite_name in suite_names:
+            with self.subTest(suite=suite_name):
+                suite = load_suite(suites_dir / suite_name)
+                self.assertTrue(suite.package_root.is_dir())
+                self.assertTrue((suite.package_root / "app.json").is_file())
+
     def test_bootstrap_runtime_env_loads_state_file_and_defaults(self) -> None:
         base_dir = self.create_temp_dir()
         state_file = self.write_env_file(

@@ -367,6 +367,16 @@ values. The current default shape is:
 - `CES_ENDPOINT=https://ces.us.rep.googleapis.com`
 - `CES_DEPLOYMENT_ID=<deploy-api-access-channel-id>`
 
+For service-account-based local auth, prefer one of:
+
+- `GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/service-account.json`
+- `SA_ACCOUNT_LOCATION=/absolute/path/to/service-account.json`
+
+The runner now normalizes `SA_ACCOUNT_LOCATION` into the standard
+`GOOGLE_APPLICATION_CREDENTIALS` and `CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE`
+variables before invoking `gcloud auth print-access-token`, which matches the
+token-based prototype flow captured in `api-deoloyment.md`.
+
 For the current shared environment validated on `2026-03-29`, the live app id
 was:
 

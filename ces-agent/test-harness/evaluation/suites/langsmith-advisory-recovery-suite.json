@@ -1,5 +1,5 @@
 {
-  "package_root": "../../acme_voice_agent",
+  "package_root": "../../../acme_voice_agent",
   "project": "${GCP_PROJECT_ID}",
   "location": "${GCP_LOCATION}",
   "app_id": "${CES_APP_ID}",

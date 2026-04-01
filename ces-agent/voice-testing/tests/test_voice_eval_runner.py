@@ -6,6 +6,7 @@ import base64
 import importlib.util
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -236,6 +237,30 @@ class VoiceEvalRunnerTests(unittest.TestCase):
         self.assertIn("\033[1m\033[31mFAIL\033[0m", output)
         self.assertIn("Artifact:", output)
         self.assertIn("\033[1m\033[31mSUITE FAILED\033[0m", output)
+
+    def test_sync_env_aliases_promotes_sa_account_location_to_standard_gcp_vars(self) -> None:
+        with mock.patch.dict(
+            "os.environ",
+            {"SA_ACCOUNT_LOCATION": "/tmp/service-account.json"},
+            clear=True,
+        ):
+            voice_eval_runner.sync_env_aliases()
+
+            self.assertEqual(os.environ["GCP_SERVICE_ACCOUNT_KEY"], "/tmp/service-account.json")
+            self.assertEqual(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "/tmp/service-account.json")
+            self.assertEqual(os.environ["CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE"], "/tmp/service-account.json")
+
+    def test_sync_env_aliases_backfills_sa_account_location_from_google_application_credentials(self) -> None:
+        with mock.patch.dict(
+            "os.environ",
+            {"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/adc.json"},
+            clear=True,
+        ):
+            voice_eval_runner.sync_env_aliases()
+
+            self.assertEqual(os.environ["SA_ACCOUNT_LOCATION"], "/tmp/adc.json")
+            self.assertEqual(os.environ["GCP_SERVICE_ACCOUNT_KEY"], "/tmp/adc.json")
+            self.assertEqual(os.environ["CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE"], "/tmp/adc.json")
 
     def test_resolve_remote_replay_config_uses_env_defaults(self) -> None:
         args = Namespace(
