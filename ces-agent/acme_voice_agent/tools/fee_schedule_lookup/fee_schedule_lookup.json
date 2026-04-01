@@ -1,8 +1,0 @@
-{
-  "googleSearchTool": {
-    "name": "fee_schedule_lookup",
-    "description": "Searches the official Deutsche Bank List of Prices and Services (Preis- und Leistungsverzeichnis) for fee amounts, pricing tiers, conditions, waivers, and service charges. Use this tool whenever a customer asks about fees, prices, costs, or charges for any banking service.",
-    "dataStoreId": "projects/voice-banking-poc/locations/global/collections/default_collection/dataStores/fee-schedule-lookup_1771833548805"
-  },
-  "displayName": "fee_schedule_lookup"
-}

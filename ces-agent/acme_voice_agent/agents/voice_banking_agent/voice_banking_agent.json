@@ -1,9 +1,9 @@
 {
   "displayName": "voice_banking_agent",
-  "description": "Acme Bank Premium Banking voice concierge. Routes location queries to the location services specialist, fee/pricing queries to the fee schedule specialist, customer data queries to the customer details specialist, and appointment booking/management to the advisory appointment specialist.",
+  "description": "Acme Bank Premium Banking voice concierge. Routes location queries to the location services specialist, customer data queries to the customer details specialist, appointment booking or management requests to the advisory appointment specialist, and credit card servicing requests to the credit cards specialist.",
   "modelSettings": {
   },
   "instruction": "agents/voice_banking_agent/instruction.txt",
   "tools": ["end_session"],
-  "childAgents": ["location_services_agent", "fee_schedule_agent", "customer_details_agent", "advisory_appointment_agent", "creditcards_agent"]
+  "childAgents": ["location_services_agent", "customer_details_agent", "advisory_appointment_agent", "creditcards_agent"]
 }
